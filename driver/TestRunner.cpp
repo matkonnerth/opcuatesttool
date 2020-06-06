@@ -2,9 +2,24 @@
 #include "Client.h"
 #include "Job.h"
 #include "Task.h"
+#include "pistache/endpoint.h"
+
+using namespace Pistache;
+
+class HelloHandler : public Http::Handler {
+public:
+
+    HTTP_PROTOTYPE(HelloHandler)
+
+    void onRequest(const Http::Request& request, Http::ResponseWriter response) {
+         response.send(Http::Code::Ok, "Hello, World");
+    }
+}; 
 
 int main(int, const char**)
 {
+    
+
     tt::Comm comm;
     auto client = comm.createClient("opc.tcp://192.168.110.10:4840");
     client->connect();
