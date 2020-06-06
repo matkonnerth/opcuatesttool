@@ -1,33 +1,32 @@
-#include "Comm.h"
 #include "Client.h"
+#include "Comm.h"
 #include "Job.h"
 #include "Task.h"
-#include "pistache/endpoint.h"
+#include <iostream>
+#include "JobFactory.h"
 
-using namespace Pistache;
 
-class HelloHandler : public Http::Handler {
-public:
-
-    HTTP_PROTOTYPE(HelloHandler)
-
-    void onRequest(const Http::Request& request, Http::ResponseWriter response) {
-         response.send(Http::Code::Ok, "Hello, World");
-    }
-}; 
-
-int main(int, const char**)
+/*
+    The testrunner instantiates exactly 1 client and executes exactly 1 job with this client.
+    If jobs should run concurrently, multiple testrunner processes have to be instantiated.
+*/
+int main(int argc , const char** argv)
 {
-    
+    for(int i=0; i<argc; i++)
+    {
+        std::cout << argv[i] << "\n";
+    }
+    if(argc!=3)
+    {
+       std::cout << "wrong number of arguments, path to job description needed\n";
+       return 1;
+    }
+
+    tt::JobFactory f;
+    auto job = f.createFromFile(argv[2]);
 
     tt::Comm comm;
-    auto client = comm.createClient("opc.tcp://192.168.110.10:4840");
+    auto client = comm.createClient(job->getServerUri());
     client->connect();
-
-    auto rr = std::make_unique<tt::ReadRequest>("task1", tt::NodeId{"http://opcfoundation.org/UA/", "i=2255"});
-    auto job = std::make_unique<tt::RepetiveJob>("job1", 100000000);
-
-    job->addTask(std::move(rr));
     job->execute(client.get());
-
 }

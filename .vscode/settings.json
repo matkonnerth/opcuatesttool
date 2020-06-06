@@ -42,6 +42,15 @@
         "sstream": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "cstring": "cpp",
+        "ctime": "cpp",
+        "chrono": "cpp",
+        "map": "cpp",
+        "ratio": "cpp",
+        "set": "cpp",
+        "iostream": "cpp",
+        "thread": "cpp",
+        "cfenv": "cpp"
     }
 }

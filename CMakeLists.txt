@@ -1,34 +1,37 @@
 cmake_minimum_required(VERSION 3.0)
 project(opcuaPerfTool)
 
-include(/opt/conan-cmake/conan.cmake)
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+   message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
+   file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/v0.15/conan.cmake"
+                 "${CMAKE_BINARY_DIR}/conan.cmake")
+endif()
 
-conan_cmake_run(
-	CONANFILE conanfile.txt
-	UPDATE
-	BASIC_SETUP
-	BUILD missing
-	ARCH ${CMAKE_SYSTEM_PROCESSOR}
-)
+include(${CMAKE_BINARY_DIR}/conan.cmake)
+conan_cmake_run(CONANFILE conanfile.txt
+                BASIC_SETUP CMAKE_TARGETS
+                BUILD missing)
 
 # Link this 'library' to use the warnings specified in CompilerWarnings.cmake
 add_library(project_warnings INTERFACE)
 include(cmake/CompilerWarnings.cmake)
-#set_project_warnings(project_warnings)
+set_project_warnings(project_warnings)
 
 add_subdirectory(open62541)
 
-add_executable(opcuaPerfTool
+add_executable(testRunner
     driver/TestRunner.cpp
     comm/Comm.cpp
     comm/Client.cpp
 	job/Job.cpp
-	job/Task.cpp)
-target_include_directories(opcuaPerfTool PRIVATE comm)
-target_include_directories(opcuaPerfTool PRIVATE job)
-target_link_libraries(opcuaPerfTool PRIVATE project_warnings)
-target_link_libraries(opcuaPerfTool PRIVATE open62541)
+    job/Task.cpp
+    job/JobFactory.cpp)
+target_include_directories(testRunner PRIVATE comm)
+target_include_directories(testRunner PRIVATE job)
+target_link_libraries(testRunner PRIVATE project_warnings)
+target_link_libraries(testRunner PRIVATE open62541 CONAN_PKG::jsonformoderncpp)
 
-
-add_executable(HttpDriver driver/httpDriver.cpp)
-target_link_libraries(HttpDriver PRIVATE ${CONAN_LIBS})
+add_executable(TestService 
+    TestService/HttpServer.cpp
+    TestService/JobScheduler.cpp)
+target_link_libraries(TestService PRIVATE CONAN_PKG::pistache pthread)

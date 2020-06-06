@@ -1,6 +1,7 @@
 [requires]
 #gtest/1.8.1@engel/stable
 pistache/d5608a1@conan/stable
+jsonformoderncpp/3.7.0
 
 [generators]
 cmake

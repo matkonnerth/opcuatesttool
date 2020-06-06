@@ -1,0 +1,22 @@
+{
+    "name": "job1",
+    "serverUri": "opc.tcp://localhost:4840",
+    "type": "repetiveJob",
+    "iterations": 10000,
+    "tasks": [
+        {
+            "type": "readRequest",
+            "NodeId": {
+                "ns": "http://opcfoundation.org/UA/",
+                "id": "i=2255"
+            }
+        },
+        {
+            "type": "readRequest",
+            "NodeId": {
+                "ns": "http://opcfoundation.org/UA/",
+                "id": "i=2255"
+            }
+        }
+    ]
+}

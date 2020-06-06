@@ -5,10 +5,29 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "perfTool",
+            "name": "testRunner",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/opcuaPerfTool",
+            "program": "${workspaceFolder}/build/bin/testRunner",
+            "args": ["${workspaceFolder}/tests/rest/newJob.json"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "httpDriver",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/bin/HttpDriver",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
