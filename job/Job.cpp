@@ -2,46 +2,58 @@
 #include "Task.h"
 #include <chrono>
 #include <iostream>
+#include <nlohmann/json.hpp>
 
-namespace tt
-{
+
+namespace tt {
 
 void Job::addTask(std::unique_ptr<Task> task)
 {
-    tasks.emplace_back(std::move(task));
+   tasks.emplace_back(std::move(task));
 }
 
 const std::vector<std::unique_ptr<Task>>& Job::getTasks()
 {
-    return tasks;
+   return tasks;
 }
 
 void RepetiveJob::execute(Client* client)
 {
-    for(const auto& t:tasks)
-    {
-        t->prepare(client);
-    }
-    auto start = std::chrono::steady_clock::now();
-    status = JobStatus::RUNNING;
-    for(auto i =0u; i<iterations; i++)
-    {
-        for(const auto& t:tasks)
-        {
-            t->execute(client);
-        }
-    }
-    status = JobStatus::FINISHED;
-    auto end = std::chrono::steady_clock::now();
-    totalRuntime_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
-    runtimePerIteration_ms = totalRuntime_ms/iterations;
-    std::cout << "Job finished" << "\n";
-    std::cout << "Total runtime: " << totalRuntime_ms << "ms\n";
-    std::cout << "runtime per iteration: " << runtimePerIteration_ms << "ms\n";
+   for (const auto& t : tasks)
+   {
+      t->prepare(client);
+   }
+   auto start = std::chrono::steady_clock::now();
+   status = JobStatus::RUNNING;
+   for (auto i = 0u; i < iterations; i++)
+   {
+      for (const auto& t : tasks)
+      {
+         t->execute(client);
+      }
+   }
+   status = JobStatus::FINISHED;
+   auto end = std::chrono::steady_clock::now();
+   totalRuntime_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+   runtimePerIteration_ms = totalRuntime_ms / iterations;
+   std::cout << "Job finished"
+             << "\n";
+   std::cout << "Total runtime: " << totalRuntime_ms << "ms\n";
+   std::cout << "runtime per iteration: " << runtimePerIteration_ms << "ms\n";
 }
 
 const std::string& Job::getServerUri() const
 {
-    return serverUri;
+   return serverUri;
 }
+
+std::ostream& Job::to_json(std::ostream& os)
+{
+   using nlohmann::json;
+   auto j = json{ { "name", name }, { "totalRuntime_ms", totalRuntime_ms }, { "runtimePerIteration_ms", runtimePerIteration_ms } };
+
+   os << j;
+
+   return os;
 }
+} // namespace tt

@@ -27,6 +27,7 @@ public:
    const std::vector<std::unique_ptr<Task>>& getTasks();
    virtual void execute(Client* client) = 0;
    virtual ~Job() = default;
+   std::ostream& to_json(std::ostream& os);
 
 protected:
    JobStatus status{ JobStatus::INIT };
@@ -44,14 +45,10 @@ public:
    : Job{ name, serverUri }
    , iterations{ reps }
    {}
-   size_t getIterations()
-   {
-      return iterations;
-   }
    void execute(Client* client) override;
 
 private:
-   size_t iterations{ 0 };
+   const size_t iterations{ 0 };
 };
 
 } // namespace tt

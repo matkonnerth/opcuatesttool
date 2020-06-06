@@ -51,6 +51,8 @@
         "set": "cpp",
         "iostream": "cpp",
         "thread": "cpp",
-        "cfenv": "cpp"
+        "cfenv": "cpp",
+        "condition_variable": "cpp",
+        "mutex": "cpp"
     }
 }

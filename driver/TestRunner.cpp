@@ -1,9 +1,10 @@
 #include "Client.h"
 #include "Comm.h"
 #include "Job.h"
-#include "Task.h"
-#include <iostream>
 #include "JobFactory.h"
+#include "Task.h"
+#include <fstream>
+#include <iostream>
 
 
 /*
@@ -23,10 +24,17 @@ int main(int argc , const char** argv)
     }
 
     tt::JobFactory f;
-    auto job = f.createFromFile(argv[2]);
+    std::string requestFile = argv[2];
+    auto job = f.createFromFile(requestFile);
 
     tt::Comm comm;
     auto client = comm.createClient(job->getServerUri());
     client->connect();
     job->execute(client.get());
+
+    std::string reportFile = "Finished_" + requestFile;
+
+    std::ofstream out(reportFile);
+    job->to_json(out);
+    out.close();
 }
