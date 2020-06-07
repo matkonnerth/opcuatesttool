@@ -1,9 +1,8 @@
+#include "JobScheduler.h"
 #include <pistache/description.h>
 #include <pistache/endpoint.h>
 #include <pistache/http.h>
 #include <pistache/router.h>
-#include "JobScheduler.h"
-
 
 
 using namespace std;
@@ -29,6 +28,7 @@ public:
    {
       using namespace Rest;
       Routes::Post(router, "/jobs", Routes::bind(&TestService::newJob, this));
+      Routes::Get(router, "/jobs/finished", Routes::bind(&TestService::getFinishedJobs, this));
       auto opts = Http::Endpoint::options().threads(static_cast<int>(thr));
       httpEndpoint->init(opts);
    }
@@ -41,20 +41,23 @@ public:
    }
 
 private:
-  
-
    void newJob(const Rest::Request& request, Http::ResponseWriter response)
    {
-      
-      if(scheduler.create(request.body()))
+      // check for application/json content
+      if (scheduler.create(request.body()))
       {
          response.send(Http::Code::Ok, "Job created");
       }
    }
 
+   void getFinishedJobs(const Rest::Request& request, Http::ResponseWriter response)
+   {
+      response.send(Http::Code::Ok, scheduler.getFinishedJobs());
+   }
+
    std::shared_ptr<Http::Endpoint> httpEndpoint;
    Rest::Router router;
-   JobScheduler scheduler{4};
+   JobScheduler scheduler{ 4 };
 };
 
 int main(int argc, char* argv[])

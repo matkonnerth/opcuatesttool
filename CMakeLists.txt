@@ -17,6 +17,9 @@ add_library(project_warnings INTERFACE)
 include(cmake/CompilerWarnings.cmake)
 set_project_warnings(project_warnings)
 
+add_library(project_options INTERFACE)
+target_compile_features(project_options INTERFACE cxx_std_17)
+
 add_subdirectory(open62541)
 
 add_executable(testRunner
@@ -30,8 +33,11 @@ target_include_directories(testRunner PRIVATE comm)
 target_include_directories(testRunner PRIVATE job)
 target_link_libraries(testRunner PRIVATE project_warnings)
 target_link_libraries(testRunner PRIVATE open62541 CONAN_PKG::jsonformoderncpp)
+target_link_libraries(testRunner PRIVATE project_options)
 
 add_executable(TestService 
     TestService/HttpServer.cpp
     TestService/JobScheduler.cpp)
 target_link_libraries(TestService PRIVATE CONAN_PKG::pistache pthread)
+target_link_libraries(TestService PRIVATE project_options)
+target_link_libraries(TestService PRIVATE stdc++fs)

@@ -10,6 +10,10 @@
 /*
     The testrunner instantiates exactly 1 client and executes exactly 1 job with this client.
     If jobs should run concurrently, multiple testrunner processes have to be instantiated.
+    finishedJobsDir argv[2]
+    requestJobsDir argv[3]
+    filename argv[4]
+    
 */
 int main(int argc , const char** argv)
 {
@@ -17,24 +21,27 @@ int main(int argc , const char** argv)
     {
         std::cout << argv[i] << "\n";
     }
-    if(argc!=3)
+    if(argc!=5)
     {
        std::cout << "wrong number of arguments, path to job description needed\n";
        return 1;
     }
 
+    std::string jobName = argv[4];
+    std::string requestsDir = argv[3];
+    std::string finishedDir = argv[2];
+
     tt::JobFactory f;
-    std::string requestFile = argv[2];
-    auto job = f.createFromFile(requestFile);
+    
+    auto job = f.createFromFile(requestsDir+"/"+jobName);
 
     tt::Comm comm;
     auto client = comm.createClient(job->getServerUri());
     client->connect();
     job->execute(client.get());
 
-    std::string reportFile = "Finished_" + requestFile;
 
-    std::ofstream out(reportFile);
+    std::ofstream out(finishedDir + "/" + jobName);
     job->to_json(out);
     out.close();
 }

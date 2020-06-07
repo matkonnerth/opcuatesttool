@@ -5,6 +5,10 @@
 #include <fstream>
 #include <sys/types.h>
 #include <unistd.h>
+#include <filesystem>
+#include <iostream>
+
+namespace fs = std::filesystem;
 
 JobScheduler::JobScheduler(int maxConcurrentJobs)
 : maxConcurrentJobs{ maxConcurrentJobs }
@@ -17,9 +21,10 @@ bool JobScheduler::create(const std::string& jsonString)
    int ret = 1;
    int status;
 
-   std::string newRequest = "Request_" + std::to_string(jobCount);
+   std::string newRequest = std::to_string(jobCount);
+   std::string newRequestPath = requestedJobsDir + "/" + newRequest;
    jobCount++;
-   std::ofstream out(newRequest);
+   std::ofstream out(newRequestPath);
    out << jsonString;
    out.close();
 
@@ -46,7 +51,10 @@ bool JobScheduler::create(const std::string& jsonString)
       // filename associated with file being executed
       // the array pointer must be terminated by NULL
       // pointer
-      char* argv_list[] = { "./testRunner", "/home/matzy/git/opcuaTestTool/build/bin", const_cast<char*>(newRequest.c_str()), NULL };
+      char* argv_list[] = { "./testRunner", "/home/matzy/git/opcuaTestTool/build/bin", 
+      const_cast<char*>(finishedJobsDir.c_str()), 
+      const_cast<char*>(requestedJobsDir.c_str()),
+      const_cast<char*>(newRequest.c_str()), NULL };
 
       // the execv() only return if error occured.
       // The return value is -1
@@ -58,4 +66,13 @@ bool JobScheduler::create(const std::string& jsonString)
       // parent
    }
    return true;
+}
+
+std::string JobScheduler::getFinishedJobs()
+{
+   for(auto& p:fs::directory_iterator(finishedJobsDir))
+   {
+      std::cout << p << "\n";
+   }
+   return "test";
 }
