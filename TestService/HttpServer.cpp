@@ -67,7 +67,7 @@ private:
    void getFinishedJob(const Rest::Request& request, Http::ResponseWriter response)
    {
       auto jobId = request.param(":jobId").as<int>();
-      response.send(Http::Code::Ok, scheduler.getFinishedJob(jobId));
+      response.send(Http::Code::Ok, scheduler.getFinishedJob(jobId), MIME(Application, Json));
    }
 
    std::shared_ptr<Http::Endpoint> httpEndpoint;
