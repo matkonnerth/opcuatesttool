@@ -27,7 +27,7 @@
             "name": "httpDriver",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/bin/HttpDriver",
+            "program": "${workspaceFolder}/build/bin/TestService",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

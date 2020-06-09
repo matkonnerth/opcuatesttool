@@ -53,6 +53,7 @@
         "thread": "cpp",
         "cfenv": "cpp",
         "condition_variable": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "codecvt": "cpp"
     }
 }

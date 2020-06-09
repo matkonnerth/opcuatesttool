@@ -1,10 +1,14 @@
-# opcuaTestTool
+# WIP: opcuaTestTool
 
-# Useful commands
+## Useful commands
 
-## Triggering a new job
+### Triggering a new job
 curl -H "Content-Type: application/json" --data @../tests/rest/newJob.json http://localhost:9080/jobs
 
-## Get finished jobs (in progress)
+### Get finished jobs (in progress)
 curl http://localhost:9080/jobs/finished
+
+### Get results of job with id 0
+curl http://localhost:9080/jobs/finished/0
+
 
