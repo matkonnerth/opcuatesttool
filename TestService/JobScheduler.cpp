@@ -49,9 +49,6 @@ int JobScheduler::create(const std::string& jsonString)
       {
          close(fd);
       }
-      // pid == 0 means child process created
-      // getpid() returns process id of calling process
-      // Here It will return process id of child process
 
       // the argv list first argument should point to
       // filename associated with file being executed

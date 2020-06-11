@@ -1,7 +1,7 @@
 #include "JobFactory.h"
 #include "Task.h"
 #include <fstream>
-#include <nlohmann/json.hpp>
+
 using json = nlohmann::json;
 
 /*
@@ -22,7 +22,22 @@ using json = nlohmann::json;
 }
 */
 
+
 namespace tt {
+
+std::unique_ptr<Job> createRepetiveJob(const std::string& name, const std::string& serverUri, const nlohmann::json& j)
+{
+   return std::make_unique<RepetiveJob>(name, serverUri, j.at("iterations").get<int>());
+}
+
+std::unique_ptr<Job> createOneCycleJob(const std::string& name, const std::string& serverUri, const nlohmann::json&)
+{
+   return std::make_unique<OneCycleJob>(name, serverUri);
+}
+
+
+const std::unordered_map<std::string, CreateJobFnc> JobFactory::jobs = { { "repetiveJob", createRepetiveJob }, { "oneCycleJob", createOneCycleJob } };
+
 std::unique_ptr<Job> JobFactory::createFromFile(const std::string& path)
 {
    std::ifstream ifs1{ path };
@@ -33,16 +48,7 @@ std::unique_ptr<Job> JobFactory::createFromFile(const std::string& path)
    auto name = j.at("name").get<std::string>();
    auto serverUri = j.at("serverUri").get<std::string>();
 
-   std::unique_ptr<Job> job;
-
-   if (type == "repetiveJob")
-   {
-      job = std::make_unique<RepetiveJob>(name, serverUri, j.at("iterations").get<int>());
-   }
-   if (!job)
-   {
-      return job;
-   }
+   std::unique_ptr<Job> job = jobs.at(type)(name, serverUri, j);
 
    // get the task
    for (auto& el : j["tasks"].items())

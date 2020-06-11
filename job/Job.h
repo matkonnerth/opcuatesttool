@@ -15,12 +15,6 @@ enum class JobStatus
    ABORTED
 };
 
-enum class JobResult
-{
-   ERROR,
-   OK
-};
-
 class Client;
 class Job
 {
@@ -38,7 +32,6 @@ public:
 
 protected:
    JobStatus status{ JobStatus::INIT };
-   JobResult resultCode{ JobResult::ERROR};
    const std::string name;
    std::vector<std::unique_ptr<Task>> tasks{};
    const std::string serverUri{};
@@ -57,6 +50,14 @@ public:
 
 private:
    const size_t iterations{ 0 };
+};
+
+class OneCycleJob : public RepetiveJob
+{
+public:
+   OneCycleJob(const std::string& name, const std::string& serverUri)
+   : RepetiveJob{ name, serverUri, 1 }
+   {};
 };
 
 } // namespace tt
