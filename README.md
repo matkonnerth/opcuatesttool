@@ -1,5 +1,9 @@
 # WIP: opcuaTestTool
 
+## Architecture
+
+![Alt](drawio/architecture.png)
+
 ## Useful commands
 
 ### Triggering a new job
