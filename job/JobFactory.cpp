@@ -1,7 +1,7 @@
 #include "JobFactory.h"
+#include "Task.h"
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include "Task.h"
 using json = nlohmann::json;
 
 /*
@@ -50,8 +50,14 @@ std::unique_ptr<Job> JobFactory::createFromFile(const std::string& path)
       auto type = el.value().at("type").get<std::string>();
       if (type == "readRequest")
       {
-          auto id = NodeId(el.value()["NodeId"]["ns"].get<std::string>(), el.value()["NodeId"]["id"].get<std::string>());
+         auto id = NodeId(el.value()["NodeId"]["ns"].get<std::string>(), el.value()["NodeId"]["id"].get<std::string>());
          auto task = std::make_unique<ReadRequest>("task", id);
+         job->addTask(std::move(task));
+      }
+      else if (type == "wait")
+      {
+         auto delay = el.value()["delay_ms"].get<int>();
+         auto task = std::make_unique<Wait>("task", delay);
          job->addTask(std::move(task));
       }
    }

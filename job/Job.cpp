@@ -29,7 +29,12 @@ void RepetiveJob::execute(Client* client)
    }
    for (const auto& t : tasks)
    {
-      t->prepare(client);
+      if(!t->prepare(client))
+      {
+         status = JobStatus::ABORTED;
+         std::cout << "prepare failed, abort job" << std::endl;
+         return;
+      }
    }
    auto start = std::chrono::steady_clock::now();
    status = JobStatus::RUNNING;
@@ -37,13 +42,20 @@ void RepetiveJob::execute(Client* client)
    {
       for (const auto& t : tasks)
       {
-         t->execute(client);
+         if(!t->execute(client))
+         {
+            status = JobStatus::ABORTED;
+            std::cout << "execute failed, abort job" << std::endl;
+            return;
+         }
       }
    }
    status = JobStatus::FINISHED;
    auto end = std::chrono::steady_clock::now();
-   totalRuntime_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-   runtimePerIteration_ms = totalRuntime_ms / iterations;
+   std::chrono::duration<double, std::milli> duration;
+   duration = end - start;
+   totalRuntime_ms = duration.count();
+   runtimePerIteration_ms = totalRuntime_ms / static_cast<double>(iterations);
 }
 
 const std::string& Job::getServerUri() const
@@ -67,12 +79,13 @@ void Job::addResult(const std::string& inputFile, const std::string& outputFile)
    {
       result["statusCode"] = "Ok";
    }
-   
 
-   j["result"] = result;
+   nlohmann::json output;
+   output["result"] = result;
+   output["request"] = j;
 
    std::ofstream out(outputFile);
-   out << j;
+   out << output;
    out.close();
 }
 } // namespace tt
