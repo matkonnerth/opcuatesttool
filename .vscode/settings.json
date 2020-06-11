@@ -54,6 +54,7 @@
         "cfenv": "cpp",
         "condition_variable": "cpp",
         "mutex": "cpp",
-        "codecvt": "cpp"
+        "codecvt": "cpp",
+        "future": "cpp"
     }
 }

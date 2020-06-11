@@ -1,4 +1,5 @@
 #include "JobScheduler.h"
+#include <future>
 #include <pistache/description.h>
 #include <pistache/endpoint.h>
 #include <pistache/http.h>
@@ -30,8 +31,8 @@ public:
    {
       using namespace Rest;
       Routes::Post(router, "/jobs", Routes::bind(&TestService::newJob, this));
-      Routes::Get(router, "/jobs/finished", Routes::bind(&TestService::getFinishedJobs, this));
-      Routes::Get(router, "/jobs/finished/:jobId", Routes::bind(&TestService::getFinishedJob, this));
+      Routes::Get(router, "/jobs", Routes::bind(&TestService::getJobs, this));
+      Routes::Get(router, "/jobs/:jobId", Routes::bind(&TestService::getFinishedJob, this));
       auto opts = Http::Endpoint::options().threads(static_cast<int>(thr));
       httpEndpoint->init(opts);
    }
@@ -43,25 +44,33 @@ public:
       httpEndpoint->serve();
    }
 
-   static void handleSigChld(int sig)
+   void handleSigChld(int sig)
    {
       pid_t pid = wait(nullptr);
-      p_Scheduler->jobFinished(pid);
+      scheduler.jobFinished(pid);
    }
 
 private:
    void newJob(const Rest::Request& request, Http::ResponseWriter response)
    {
       // check for application/json content
-      if (scheduler.create(request.body()))
-      {
-         response.send(Http::Code::Ok, "Job created");
-      }
+      int id = scheduler.create(request.body());
+      response.send(Http::Code::Ok, "{\"StatusCode\": \"OK\", \"id\": " + std::to_string(id) + "}");
    }
 
-   void getFinishedJobs(const Rest::Request& request, Http::ResponseWriter response)
+   void getJobs(const Rest::Request& request, Http::ResponseWriter response)
    {
-      response.send(Http::Code::Ok, scheduler.getFinishedJobs());
+      auto query = request.query();
+      if (query.has("finished"))
+      {
+         //response.headers().add<Header::ContentType>(MIME(Application, Json));
+         auto stream = response.stream(Http::Code::Ok);
+         scheduler.getFinishedJobs(stream);
+      }
+      else
+      {
+         response.send(Http::Code::Ok, "wrong query");
+      }
    }
 
    void getFinishedJob(const Rest::Request& request, Http::ResponseWriter response)
@@ -73,21 +82,20 @@ private:
    std::shared_ptr<Http::Endpoint> httpEndpoint;
    Rest::Router router;
    JobScheduler scheduler{ 4 };
-   //need this ugly ptr for the signalHandler
-   static JobScheduler* p_Scheduler;
 };
-
-JobScheduler* TestService::p_Scheduler {nullptr};
 
 TestService::TestService(Address addr)
 : httpEndpoint(std::make_shared<Http::Endpoint>(addr))
-{
-   p_Scheduler = &scheduler;
-}
+{}
 
 int main(int argc, char* argv[])
 {
-   signal(SIGCHLD, TestService::handleSigChld);
+   // handle signals in a dedicated thread
+   sigset_t sigset;
+   sigemptyset(&sigset);
+   sigaddset(&sigset, SIGCHLD);
+   pthread_sigmask(SIG_BLOCK, &sigset, nullptr);
+
    Port port(9080);
 
    if (argc >= 2)
@@ -98,7 +106,17 @@ int main(int argc, char* argv[])
    Address addr(Ipv4::any(), port);
    TestService service(addr);
 
-   //epoll fails spontanously when using only 1 thread
+   auto signalHandler = [&service, &sigset]() {
+      while (true)
+      {
+         int signum = 0;
+         // wait until a signal is delivered:
+         sigwait(&sigset, &signum);
+         service.handleSigChld(signum);
+      }
+   };
+
+   auto ft_signal_handler = std::async(std::launch::async, signalHandler);
    service.init(2);
    service.start();
 }

@@ -25,18 +25,20 @@ public:
     ~Client();
     Client(const Client&)=delete;
     Client& operator=(const Client&)=delete;        
-    void connect();
+    bool connect();
     void disconnect();
     void doComm();
     void registerConnectionCallback(ConnectionStateCallback fn);
     void notifyConnectionState(ConnectionState state);
     bool cacheNodeId(const NodeId& id);
     bool read(const NodeId& id);
+    ConnectionState getConnectionState();
 
 private:
     UA_Client* client{nullptr};
     std::string uri{};
     std::vector<ConnectionStateCallback> connectionStateCallbacks{};
+    ConnectionState connState{ConnectionState::DISCONNECTED};
     //static void
     //handler_events(UA_Client *client, UA_UInt32 subId, void *subContext,
     //           UA_UInt32 monId, void *monContext,

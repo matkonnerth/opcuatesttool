@@ -24,7 +24,7 @@ Client::~Client()
     UA_Client_delete(client);
 }
 
-void Client::connect()
+bool Client::connect()
 {
     printf("in Client::connect\n\n");
      UA_StatusCode retval = UA_Client_connect(client, uri.c_str());
@@ -32,7 +32,7 @@ void Client::connect()
         UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
                     "Could not connect client %s with %s", uri.c_str(),
                     UA_StatusCode_name(retval));
-        return;
+        return false;
     }
 
     UA_NodeId namespaceArrayId = UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER_NAMESPACEARRAY);
@@ -44,7 +44,7 @@ void Client::connect()
         UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
                     "could not read namespaceArray with %s",
                     UA_StatusCode_name(retval));
-        return;
+        return false;
     }
     for(auto i=0u; i<var.arrayLength; i++)
     {
@@ -52,7 +52,9 @@ void Client::connect()
         std::string str;
         namespaces.push_back(str.assign(reinterpret_cast<char*>(s.data), s.length));
     }
-    UA_Variant_clear(&var);    
+    UA_Variant_clear(&var);
+    connState = ConnectionState::CONNECTED;
+    return true;
 }
 
 void Client::disconnect()
@@ -133,7 +135,10 @@ bool Client::read(const NodeId& id)
     }
     UA_Variant_clear(&var);
     return true;
-
 }
 
+Client::ConnectionState Client::getConnectionState()
+{
+    return connState;
+}
 }

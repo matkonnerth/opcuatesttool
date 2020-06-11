@@ -3,7 +3,6 @@
 #include "Job.h"
 #include "JobFactory.h"
 #include "Task.h"
-#include <fstream>
 #include <iostream>
 
 
@@ -31,17 +30,12 @@ int main(int argc , const char** argv)
     std::string requestsDir = argv[3];
     std::string finishedDir = argv[2];
 
-    tt::JobFactory f;
-    
+    tt::JobFactory f;    
     auto job = f.createFromFile(requestsDir+"/"+jobName);
 
     tt::Comm comm;
     auto client = comm.createClient(job->getServerUri());
     client->connect();
     job->execute(client.get());
-
-
-    std::ofstream out(finishedDir + "/" + jobName);
-    job->to_json(out);
-    out.close();
+    job->addResult(requestsDir + "/" + jobName, finishedDir + "/" + jobName);
 }

@@ -1,8 +1,10 @@
 #include "Job.h"
 #include "Task.h"
 #include <chrono>
+#include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include "Client.h"
 
 
 namespace tt {
@@ -19,6 +21,12 @@ const std::vector<std::unique_ptr<Task>>& Job::getTasks()
 
 void RepetiveJob::execute(Client* client)
 {
+   if(client->getConnectionState()!=Client::ConnectionState::CONNECTED)
+   {
+      std::cout << "could not connect to server, abort job" << std::endl;
+      status = JobStatus::ABORTED;
+      return;
+   }
    for (const auto& t : tasks)
    {
       t->prepare(client);
@@ -36,10 +44,6 @@ void RepetiveJob::execute(Client* client)
    auto end = std::chrono::steady_clock::now();
    totalRuntime_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
    runtimePerIteration_ms = totalRuntime_ms / iterations;
-   std::cout << "Job finished"
-             << "\n";
-   std::cout << "Total runtime: " << totalRuntime_ms << "ms\n";
-   std::cout << "runtime per iteration: " << runtimePerIteration_ms << "ms\n";
 }
 
 const std::string& Job::getServerUri() const
@@ -47,13 +51,28 @@ const std::string& Job::getServerUri() const
    return serverUri;
 }
 
-std::ostream& Job::to_json(std::ostream& os)
+void Job::addResult(const std::string& inputFile, const std::string& outputFile)
 {
    using nlohmann::json;
-   auto j = json{ { "name", name }, { "totalRuntime_ms", totalRuntime_ms }, { "runtimePerIteration_ms", runtimePerIteration_ms } };
+   std::ifstream ifs1{ inputFile };
 
-   os << j;
+   auto j = json::parse(ifs1);
 
-   return os;
+   auto result = json{ { "totalRuntime_ms", totalRuntime_ms }, { "runtimePerIteration_ms", runtimePerIteration_ms } };
+   if(status!= JobStatus::FINISHED)
+   {
+      result["statusCode"] = "Error";
+   }
+   else
+   {
+      result["statusCode"] = "Ok";
+   }
+   
+
+   j["result"] = result;
+
+   std::ofstream out(outputFile);
+   out << j;
+   out.close();
 }
 } // namespace tt

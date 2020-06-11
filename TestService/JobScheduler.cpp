@@ -14,18 +14,23 @@ JobScheduler::JobScheduler(int maxConcurrentJobs)
 : maxConcurrentJobs{ maxConcurrentJobs }
 {}
 
-bool JobScheduler::create(const std::string& jsonString)
+int JobScheduler::create(const std::string& jsonString)
 {
+   std::string request = jsonString;
    std::lock_guard<std::mutex> guard(_m);
    pid_t pid;
    int ret = 1;
    int status;
 
-   std::string newRequest = std::to_string(jobId);
+   int newJobId = jobId;
+   auto pos = request.find('{');
+   std::string idString = "\"id\": " + std::to_string(newJobId) + ",";
+   request.insert(pos+1, idString);
+   std::string newRequest = std::to_string(newJobId);
    std::string newRequestPath = requestedJobsDir + "/" + newRequest;
 
    std::ofstream out(newRequestPath);
-   out << jsonString;
+   out << request;
    out.close();
 
    pid = fork();
@@ -38,6 +43,12 @@ bool JobScheduler::create(const std::string& jsonString)
    }
    else if (pid == 0)
    {
+      //child process
+      //close file descriptors, let stdin/stdout/stderror open
+      for(int fd=3; fd<256; fd++)
+      {
+         close(fd);
+      }
       // pid == 0 means child process created
       // getpid() returns process id of calling process
       // Here It will return process id of child process
@@ -60,20 +71,35 @@ bool JobScheduler::create(const std::string& jsonString)
       activeJobs[pid] = jobId;
    }
    jobId++;
-   return true;
+   return jobId;
 }
 
-std::string JobScheduler::getFinishedJobs()
+void JobScheduler::getFinishedJobs(Http::ResponseStream & stream)
 {
+   using namespace Pistache;
+   stream << "[\n";
+   size_t cnt = 0;
    for (auto& p : fs::directory_iterator(finishedJobsDir))
    {
-      std::cout << p << "\n";
+      if(cnt>0)
+      {
+         stream << ",\n";
+      }
+      std::ifstream resultFile{ p.path() };
+      std::string line;
+      while (getline(resultFile, line))
+      {
+         stream << line.c_str() << '\n';
+      }
+      cnt++;
    }
-   return "test";
+   stream << "]\n";
+   stream.ends();
 }
 
 void JobScheduler::jobFinished(int id)
 {
+   std::lock_guard<std::mutex> guard(_m);
    auto entry = activeJobs.find(id);
    if (entry != activeJobs.end())
    {

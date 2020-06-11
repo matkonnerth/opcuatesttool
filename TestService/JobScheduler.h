@@ -1,16 +1,18 @@
 #pragma once
 #include <mutex>
+#include <pistache/http.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
+using namespace Pistache;
 
 class JobScheduler
 {
 public:
    explicit JobScheduler(int maxConcurrentJobs = 4);
-   bool create(const std::string& jsonString);
+   int create(const std::string& jsonString);
    void jobFinished(int pid);
-   std::string getFinishedJobs();
+   void getFinishedJobs(Http::ResponseStream& stream);
    std::string getFinishedJob(int jobId);
 
 private:
