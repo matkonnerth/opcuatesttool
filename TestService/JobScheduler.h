@@ -9,7 +9,7 @@ using namespace Pistache;
 class JobScheduler
 {
 public:
-   explicit JobScheduler(int maxConcurrentJobs = 4);
+   JobScheduler(const std::string& workingDir, int maxConcurrentJobs = 4);
    int create(const std::string& jsonString);
    void jobFinished(int pid);
    void getFinishedJobs(Http::ResponseStream& stream);
@@ -19,8 +19,7 @@ private:
    int maxConcurrentJobs{ 4 };
    int jobId{ 0 };
    std::mutex _m;
-   const std::string requestedJobsDir{ "./requests" };
-   const std::string finishedJobsDir{ "./finished" };
+   const std::string workingDir;
    std::unordered_map<int, int> activeJobs{};
    std::vector<int> finishedPids{};
 };

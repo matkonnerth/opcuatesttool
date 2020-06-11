@@ -25,7 +25,7 @@ void handleReady(const Rest::Request&, Http::ResponseWriter response)
 class TestService
 {
 public:
-   TestService(Address addr);
+   TestService(Address addr, const std::string& workingDir);
 
    void init(size_t thr = 1)
    {
@@ -47,14 +47,14 @@ public:
    void handleSigChld(int sig)
    {
       pid_t pid = wait(nullptr);
-      scheduler.jobFinished(pid);
+      scheduler->jobFinished(pid);
    }
 
 private:
    void newJob(const Rest::Request& request, Http::ResponseWriter response)
    {
-      // check for application/json content
-      int id = scheduler.create(request.body());
+      int id = scheduler->create(request.body());
+      response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
       response.send(Http::Code::Ok, "{\"StatusCode\": \"OK\", \"id\": " + std::to_string(id) + "}");
    }
 
@@ -63,29 +63,29 @@ private:
       auto query = request.query();
       if (query.has("finished"))
       {
-         //response.headers().add<Header::ContentType>(MIME(Application, Json));
+         response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
          auto stream = response.stream(Http::Code::Ok);
-         scheduler.getFinishedJobs(stream);
+         scheduler->getFinishedJobs(stream);
       }
       else
       {
-         response.send(Http::Code::Ok, "wrong query");
+         response.send(Http::Code::Bad_Request, "wrong query");
       }
    }
 
    void getFinishedJob(const Rest::Request& request, Http::ResponseWriter response)
    {
       auto jobId = request.param(":jobId").as<int>();
-      response.send(Http::Code::Ok, scheduler.getFinishedJob(jobId), MIME(Application, Json));
+      response.send(Http::Code::Ok, scheduler->getFinishedJob(jobId), MIME(Application, Json));
    }
 
    std::shared_ptr<Http::Endpoint> httpEndpoint;
    Rest::Router router;
-   JobScheduler scheduler{ 4 };
+   std::unique_ptr<JobScheduler> scheduler{ nullptr };
 };
 
-TestService::TestService(Address addr)
-: httpEndpoint(std::make_shared<Http::Endpoint>(addr))
+TestService::TestService(Address addr, const std::string& workingDir)
+: httpEndpoint(std::make_shared<Http::Endpoint>(addr)), scheduler{std::make_unique<JobScheduler>(workingDir)}
 {}
 
 int main(int argc, char* argv[])
@@ -103,8 +103,12 @@ int main(int argc, char* argv[])
       port = static_cast<uint16_t>(std::stol(argv[1]));
    }
 
+   std::string binaryPath = argv[0];
+   auto pos = binaryPath.find_last_of('/');
+   binaryPath.erase(pos);
+
    Address addr(Ipv4::any(), port);
-   TestService service(addr);
+   TestService service(addr, binaryPath);
 
    auto signalHandler = [&service, &sigset]() {
       while (true)

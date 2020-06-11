@@ -1,8 +1,8 @@
 {
-    "name": "job1",
-    "serverUri": "opc.tcp://localhost:4840",
-    "type": "repetiveJob",
-    "iterations": 10000,
+    "name": "singleRead",
+    "serverUri": "opc.tcp://debian:4840",
+    "type": "oneCycleJob",
+    "iterations": 100,
     "tasks": [
         {
             "type": "readRequest",
@@ -12,11 +12,8 @@
             }
         },
         {
-            "type": "readRequest",
-            "NodeId": {
-                "ns": "http://opcfoundation.org/UA/",
-                "id": "i=2255"
-            }
+            "type": "wait",
+            "delay_ms": 200
         }
     ]
 }
