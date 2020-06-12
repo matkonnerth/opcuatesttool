@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/bin/testRunner",
-            "args": ["${workspaceFolder}/build", "${workspaceFolder}/build", "${workspaceFolder}/tests/rest/", "genericServiceRequest.json"],
+            "args": ["${workspaceFolder}/build", "${workspaceFolder}/build", "${workspaceFolder}/tests/rest/", "genericCall.json"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

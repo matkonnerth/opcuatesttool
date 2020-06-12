@@ -172,16 +172,35 @@ bool TestClient::invokeGenericService(const std::string& jsonRequest)
    buf.length = jsonRequest.length();
 
    UA_StatusCode retval = UA_decodeJson(&buf, &out, &UA_TYPES[UA_TYPES_EXTENSIONOBJECT]);
-   if(retval!=UA_STATUSCODE_GOOD)
+   if (retval != UA_STATUSCODE_GOOD)
    {
       return false;
    }
 
-   UA_ReadResponse resp = UA_Client_Service_read(client, *static_cast<UA_ReadRequest*>(out.content.decoded.data));
-   if(resp.results->status != UA_STATUSCODE_GOOD)
+
+   if (out.content.decoded.type == &UA_TYPES[UA_TYPES_READREQUEST])
    {
+      UA_ReadResponse resp = UA_Client_Service_read(client, *static_cast<UA_ReadRequest*>(out.content.decoded.data));
+      if (resp.results->status != UA_STATUSCODE_GOOD)
+      {
+         return false;
+      }
+   }
+   else if (out.content.decoded.type == &UA_TYPES[UA_TYPES_CALLREQUEST])
+   {
+      UA_CallResponse resp = UA_Client_Service_call(client, *static_cast<UA_CallRequest*>(out.content.decoded.data));
+      if (resp.results->statusCode != UA_STATUSCODE_GOOD)
+      {
+         return false;
+      }
+   }
+   else
+   {
+      printf("unknown service call\n");
       return false;
    }
+
+
    return true;
 }
 
