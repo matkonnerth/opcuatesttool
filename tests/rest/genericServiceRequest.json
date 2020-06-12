@@ -1,0 +1,35 @@
+{
+    "name": "singleRead",
+    "serverUri": "opc.tcp://debian:4840",
+    "type": "repetiveJob",
+    "iterations": 1000,
+    "tasks": [
+        {
+            "type": "generic",
+            "serviceRequest": {
+                "TypeId": {
+                    "Id": 629
+                },
+                "Body": {
+                    "RequestHeader": {
+                        "Timestamp": "2020-06-12T16:40:43.339Z",
+                        "RequestHandle": 1,
+                        "TimeoutHint": 30000,
+                        "ReturnDiagnostics": 2,
+                        "AuthenticationToken": null
+                    },
+                    "MaxAge": 0,
+                    "TimestampsToReturn": 0,
+                    "NodesToRead": [
+                        {
+                            "NodeId": {
+                                "Id": 2255
+                            },
+                            "AttributeId": 13
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

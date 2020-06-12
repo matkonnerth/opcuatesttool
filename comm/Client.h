@@ -48,6 +48,7 @@ public:
    : Client(endpointUri){};
    bool read(const NodeId& id);
    bool browse(const NodeId& id);
+   bool invokeGenericService(const std::string& jsonRequest);
 };
 
 } // namespace tt

@@ -25,6 +25,16 @@ bool BrowseRequest::execute(TestClient* client)
    return client->browse(id);
 }
 
+bool GenericRequest::prepare(TestClient* client)
+{
+   return true;
+}
+
+bool GenericRequest::execute(TestClient* client)
+{
+   return client->invokeGenericService(jsonRequest);
+}
+
 bool Wait::prepare(TestClient*)
 {
    return true;

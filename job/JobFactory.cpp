@@ -56,10 +56,17 @@ std::unique_ptr<Task> createWaitTask(const std::string& name, const nlohmann::js
    return std::make_unique<Wait>(name, delay);
 }
 
+std::unique_ptr<Task> createGenericTask(const std::string& name, const nlohmann::json& j)
+{
+   auto request = j["serviceRequest"];
+   return std::make_unique<GenericRequest>(name, request.dump());
+}
+
 const std::unordered_map<std::string, CreateTaskFnc> JobFactory::tasks = {
    { "readRequest", createReadRequestTask },
    { "browseRequest", createBrowseRequestTask },
-   { "wait", createWaitTask}
+   { "wait", createWaitTask},
+   { "generic", createGenericTask}
 };
 
 std::unique_ptr<Job> JobFactory::createFromFile(const std::string& path)

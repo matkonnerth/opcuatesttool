@@ -53,4 +53,18 @@ public:
 private:
    int delay {0};
 };
+
+class GenericRequest : public Task
+{
+public:
+   GenericRequest(const std::string& name, const std::string& jsonRequest)
+   : Task{ name }
+   , jsonRequest{ jsonRequest }
+   {}
+   bool prepare(TestClient* client) override;
+   bool execute(TestClient* client) override;
+
+private:
+   const std::string jsonRequest;
+};
 }

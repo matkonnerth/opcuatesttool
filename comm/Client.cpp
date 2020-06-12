@@ -161,5 +161,29 @@ bool TestClient::browse(const NodeId& id)
    UA_BrowseRequest_clear(&bReq);
    UA_BrowseResponse_clear(&bResp);
    return status;
+} // namespace tt
+
+bool TestClient::invokeGenericService(const std::string& jsonRequest)
+{
+   UA_ExtensionObject out;
+   UA_ExtensionObject_init(&out);
+   UA_ByteString buf;
+   buf.data = reinterpret_cast<UA_Byte*>(const_cast<char*>(jsonRequest.c_str()));
+   buf.length = jsonRequest.length();
+
+   UA_StatusCode retval = UA_decodeJson(&buf, &out, &UA_TYPES[UA_TYPES_EXTENSIONOBJECT]);
+   if(retval!=UA_STATUSCODE_GOOD)
+   {
+      return false;
+   }
+
+   UA_ReadResponse resp = UA_Client_Service_read(client, *static_cast<UA_ReadRequest*>(out.content.decoded.data));
+   if(resp.results->status != UA_STATUSCODE_GOOD)
+   {
+      return false;
+   }
+   return true;
 }
+
+
 } // namespace tt

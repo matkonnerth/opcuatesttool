@@ -16,6 +16,7 @@ A task is a single command, e.g. a read request or a wait. Types of tasks:
 * readRequest: reads the value attribute of a node
 * browseRequest: browses a node
 * wait: pauses the job execution for N milliseconds
+* generic: describe the service request in json encoding, as described in the opc ua specification specs https://prototyping.opcfoundation.org/Home/Read/
 
 ## Useful commands
 
