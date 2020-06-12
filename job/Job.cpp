@@ -19,7 +19,7 @@ const std::vector<std::unique_ptr<Task>>& Job::getTasks()
    return tasks;
 }
 
-void RepetiveJob::execute(Client* client)
+void RepetiveJob::execute(TestClient* client)
 {
    if(client->getConnectionState()!=Client::ConnectionState::CONNECTED)
    {

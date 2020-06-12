@@ -1,0 +1,15 @@
+{
+    "name": "browseRequests",
+    "serverUri": "opc.tcp://debian:4840",
+    "type": "oneCycleJob",
+    "iterations": 100,
+    "tasks": [
+        {
+            "type": "browseRequest",
+            "NodeId": {
+                "ns": "http://opcfoundation.org/UA/",
+                "id": "i=85"
+            }
+        }
+    ]
+}

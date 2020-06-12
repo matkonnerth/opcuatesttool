@@ -12,7 +12,6 @@
     finishedJobsDir argv[2]
     requestJobsDir argv[3]
     filename argv[4]
-    
 */
 int main(int argc , const char** argv)
 {
@@ -34,7 +33,7 @@ int main(int argc , const char** argv)
     auto job = f.createFromFile(requestsDir+"/"+jobName);
 
     tt::Comm comm;
-    auto client = comm.createClient(job->getServerUri());
+    auto client = comm.createTestClient(job->getServerUri());
     client->connect();
     job->execute(client.get());
     job->addResult(requestsDir + "/" + jobName, finishedDir + "/" + jobName);

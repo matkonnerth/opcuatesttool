@@ -5,22 +5,32 @@
 
 namespace tt {
 
-bool ReadRequest::prepare(Client* client)
+bool ReadRequest::prepare(TestClient* client)
 {
    return client->cacheNodeId(id);
 }
 
-bool ReadRequest::execute(Client* client)
+bool ReadRequest::execute(TestClient* client)
 {
    return client->read(id);
 }
 
-bool Wait::prepare(Client*)
+bool BrowseRequest::prepare(TestClient* client)
+{
+   return client->cacheNodeId(id);
+}
+
+bool BrowseRequest::execute(TestClient* client)
+{
+   return client->browse(id);
+}
+
+bool Wait::prepare(TestClient*)
 {
    return true;
 }
 
-bool Wait::execute(Client*)
+bool Wait::execute(TestClient*)
 {
    std::this_thread::sleep_for(std::chrono::milliseconds(delay));
    return true;

@@ -55,6 +55,9 @@
         "condition_variable": "cpp",
         "mutex": "cpp",
         "codecvt": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "bitset": "cpp",
+        "forward_list": "cpp",
+        "valarray": "cpp"
     }
 }

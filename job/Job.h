@@ -15,7 +15,7 @@ enum class JobStatus
    ABORTED
 };
 
-class Client;
+class TestClient;
 class Job
 {
 public:
@@ -26,7 +26,7 @@ public:
    const std::string& getServerUri() const;
    void addTask(std::unique_ptr<Task> task);
    const std::vector<std::unique_ptr<Task>>& getTasks();
-   virtual void execute(Client* client) = 0;
+   virtual void execute(TestClient* client) = 0;
    virtual ~Job() = default;
    void addResult(const std::string& inputFile, const std::string& outputFile);
 
@@ -46,7 +46,7 @@ public:
    : Job{ name, serverUri }
    , iterations{ reps }
    {}
-   void execute(Client* client) override;
+   void execute(TestClient* client) override;
 
 private:
    const size_t iterations{ 0 };
