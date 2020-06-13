@@ -44,11 +44,14 @@ protected:
 class TestClient : public Client
 {
 public:
+   using ServiceRequestFnc = bool (*)(UA_Client*, const UA_ExtensionObject& obj);
    TestClient(const std::string& endpointUri)
    : Client(endpointUri){};
    bool read(const NodeId& id);
    bool browse(const NodeId& id);
    bool invokeGenericService(const std::string& jsonRequest);
+private:
+   static const std::unordered_map<int, ServiceRequestFnc> requests;
 };
 
 } // namespace tt

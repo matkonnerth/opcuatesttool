@@ -163,6 +163,48 @@ bool TestClient::browse(const NodeId& id)
    return status;
 } // namespace tt
 
+static bool readRequest(UA_Client* client, const UA_ExtensionObject& serviceObj)
+{
+   UA_ReadResponse resp = UA_Client_Service_read(client, *static_cast<UA_ReadRequest*>(serviceObj.content.decoded.data));
+   if (resp.results->status != UA_STATUSCODE_GOOD)
+   {
+      return false;
+   }
+   return true;
+}
+
+static bool callRequest(UA_Client* client, const UA_ExtensionObject& serviceObj)
+{
+   UA_CallResponse resp = UA_Client_Service_call(client, *static_cast<UA_CallRequest*>(serviceObj.content.decoded.data));
+   if (resp.results->statusCode != UA_STATUSCODE_GOOD)
+   {
+      return false;
+   }
+   return true;
+}
+
+static bool writeRequest(UA_Client* client, const UA_ExtensionObject& serviceObj)
+{
+   UA_WriteResponse resp = UA_Client_Service_write(client, *static_cast<UA_WriteRequest*>(serviceObj.content.decoded.data));
+   if (resp.results != UA_STATUSCODE_GOOD)
+   {
+      return false;
+   }
+   return true;
+}
+
+static bool browseRequest(UA_Client* client, const UA_ExtensionObject& serviceObj)
+{
+   UA_BrowseResponse resp = UA_Client_Service_browse(client, *static_cast<UA_BrowseRequest*>(serviceObj.content.decoded.data));
+   if (resp.results != UA_STATUSCODE_GOOD)
+   {
+      return false;
+   }
+   return true;
+}
+
+const std::unordered_map<int, TestClient::ServiceRequestFnc> TestClient::requests = { { UA_TYPES_BROWSEREQUEST, browseRequest }, { UA_TYPES_WRITEREQUEST, writeRequest }, { UA_TYPES_READREQUEST, readRequest }, { UA_TYPES_CALLREQUEST, callRequest } };
+
 bool TestClient::invokeGenericService(const std::string& jsonRequest)
 {
    UA_ExtensionObject out;
@@ -177,31 +219,7 @@ bool TestClient::invokeGenericService(const std::string& jsonRequest)
       return false;
    }
 
-
-   if (out.content.decoded.type == &UA_TYPES[UA_TYPES_READREQUEST])
-   {
-      UA_ReadResponse resp = UA_Client_Service_read(client, *static_cast<UA_ReadRequest*>(out.content.decoded.data));
-      if (resp.results->status != UA_STATUSCODE_GOOD)
-      {
-         return false;
-      }
-   }
-   else if (out.content.decoded.type == &UA_TYPES[UA_TYPES_CALLREQUEST])
-   {
-      UA_CallResponse resp = UA_Client_Service_call(client, *static_cast<UA_CallRequest*>(out.content.decoded.data));
-      if (resp.results->statusCode != UA_STATUSCODE_GOOD)
-      {
-         return false;
-      }
-   }
-   else
-   {
-      printf("unknown service call\n");
-      return false;
-   }
-
-
-   return true;
+   return requests.at(out.content.decoded.type->typeIndex)(client, out);
 }
 
 
