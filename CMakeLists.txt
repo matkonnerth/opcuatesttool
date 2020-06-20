@@ -20,7 +20,7 @@ set_project_warnings(project_warnings)
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_17)
 
-add_subdirectory(open62541)
+add_subdirectory(open)
 
 add_executable(testRunner
     driver/TestRunner.cpp
