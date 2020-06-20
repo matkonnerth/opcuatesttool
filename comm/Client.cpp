@@ -218,7 +218,6 @@ bool TestClient::invokeGenericService(const std::string& jsonRequest)
    {
       return false;
    }
-
    return requests.at(out.content.decoded.type->typeIndex)(client, out);
 }
 
