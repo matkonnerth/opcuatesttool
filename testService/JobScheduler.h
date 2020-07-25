@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "DataBase.h"
 using namespace Pistache;
 
 class JobScheduler
@@ -16,10 +17,10 @@ public:
    std::string getFinishedJob(int jobId);
 
 private:
-   int maxConcurrentJobs{ 4 };
-   int jobId{ 0 };
+   int maxConcurrentJobs{ 4 };   
    std::mutex _m;
    const std::string workingDir;
    std::unordered_map<int, int> activeJobs{};
    std::vector<int> finishedPids{};
+   std::unique_ptr<DataBase> db {nullptr};
 };

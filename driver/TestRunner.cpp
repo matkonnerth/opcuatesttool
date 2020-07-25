@@ -12,7 +12,7 @@ using json = nlohmann::json;
     If jobs should run concurrently, multiple testrunner processes have to be instantiated.
     finishedJobsDir argv[2]
     requestJobsDir argv[3]
-    filename argv[4]
+    requestFilename argv[4]
 */
 int main(int argc , const char** argv)
 {
@@ -26,9 +26,9 @@ int main(int argc , const char** argv)
        return 1;
     }
 
-    std::string jobName = argv[4];
-    std::string requestsDir = argv[3];
     std::string finishedDir = argv[2];
+    std::string requestsDir = argv[3];
+    std::string jobName = argv[4];    
 
     tt::JobFactory f;    
     auto job = f.createFromFile(requestsDir+"/"+jobName);

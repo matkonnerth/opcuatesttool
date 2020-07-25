@@ -11,27 +11,19 @@
 namespace fs = std::filesystem;
 
 JobScheduler::JobScheduler(const std::string& workingDir, int maxConcurrentJobs)
-: workingDir{workingDir}, maxConcurrentJobs{ maxConcurrentJobs }
+: workingDir{ workingDir }
+, maxConcurrentJobs{ maxConcurrentJobs }
+, db{ std::make_unique<DataBase>(workingDir) }
 {}
 
 int JobScheduler::create(const std::string& jsonString)
 {
-   std::string request = jsonString;
    std::lock_guard<std::mutex> guard(_m);
    pid_t pid;
    int ret = 1;
    int status;
 
-   int newJobId = jobId;
-   auto pos = request.find('{');
-   std::string idString = "\"id\": " + std::to_string(newJobId) + ",";
-   request.insert(pos+1, idString);
-   std::string newRequest = std::to_string(newJobId);
-   std::string newRequestPath = workingDir + "/requests/" + newRequest;
-
-   std::ofstream out(newRequestPath);
-   out << request;
-   out.close();
+   int newJobId = db->newJob(jsonString);
 
    pid = fork();
 
@@ -43,9 +35,9 @@ int JobScheduler::create(const std::string& jsonString)
    }
    else if (pid == 0)
    {
-      //child process
-      //close file descriptors, let stdin/stdout/stderror open
-      for(int fd=3; fd<256; fd++)
+      // child process
+      // close file descriptors, let stdin/stdout/stderror open
+      for (int fd = 3; fd < 256; fd++)
       {
          close(fd);
       }
@@ -54,9 +46,7 @@ int JobScheduler::create(const std::string& jsonString)
       // filename associated with file being executed
       // the array pointer must be terminated by NULL
       // pointer
-      std::string finishedJobsDir = workingDir + "/finished";
-      std::string requestedJobsDir = workingDir + "/requests";
-      char* argv_list[] = { "./testRunner", const_cast<char*>(workingDir.c_str()), const_cast<char*>(finishedJobsDir.c_str()), const_cast<char*>(requestedJobsDir.c_str()), const_cast<char*>(newRequest.c_str()), NULL };
+      char* argv_list[] = { "./testRunner", const_cast<char*>(workingDir.c_str()), const_cast<char*>(db->getJobs_finished_dir().c_str()), const_cast<char*>(db->getJobs_requests_dir().c_str()), const_cast<char*>(db->getRequestFilePath(newJobId).c_str()), NULL };
 
       // the execv() only return if error occured.
       // The return value is -1
@@ -68,20 +58,19 @@ int JobScheduler::create(const std::string& jsonString)
    {
       // parent
       printf("testrunner forked, pid = %u\n", pid);
-      activeJobs[pid] = jobId;
+      activeJobs[pid] = newJobId;
    }
-   jobId++;
-   return jobId;
+   return newJobId;
 }
 
-void JobScheduler::getFinishedJobs(Http::ResponseStream & stream)
+void JobScheduler::getFinishedJobs(Http::ResponseStream& stream)
 {
    using namespace Pistache;
    stream << "[\n";
    size_t cnt = 0;
-   for (auto& p : fs::directory_iterator(workingDir + "/finished"))
+   for (auto& p : fs::directory_iterator(db->getJobs_finished_dir()))
    {
-      if(cnt>0)
+      if (cnt > 0)
       {
          stream << ",\n";
       }
@@ -113,7 +102,7 @@ void JobScheduler::jobFinished(int id)
 
 std::string JobScheduler::getFinishedJob(int jobId)
 {
-   std::ifstream job(workingDir+ "/finished/" + std::to_string(jobId));
+   std::ifstream job(db->getFinishedFilePath(jobId));
    if (job.fail())
    {
       return "job not found";
