@@ -36,7 +36,7 @@ target_link_libraries(testRunner PRIVATE open62541 CONAN_PKG::jsonformoderncpp)
 target_link_libraries(testRunner PRIVATE project_options)
 
 add_executable(testService 
-    testService/HttpServer.cpp
+    testService/TestService.cpp
     testService/JobScheduler.cpp
     testService/DataBase.cpp)
 target_link_libraries(testService PRIVATE CONAN_PKG::pistache pthread)

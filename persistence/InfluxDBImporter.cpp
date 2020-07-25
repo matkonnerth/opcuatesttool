@@ -6,6 +6,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <stdio.h>
+#include <thread>
 
 using json = nlohmann::json;
 
@@ -118,33 +119,51 @@ int main(void)
    curl_easy_setopt(curl, CURLOPT_URL, "localhost:9080/jobs?finished=true");
 
    /* Perform the request, res will get the return code */
-   res = curl_fetch_url(curl, "localhost:9080/jobs?finished=true", &curlFinishedJobs);
-   /* Check for errors */
-   if (res != CURLE_OK)
+   while(true)
    {
-      fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-      curl_easy_cleanup(curl);
-      return 1;
+      res = curl_fetch_url(curl, "localhost:9080/jobs?finished=true", &curlFinishedJobs);
+      /* Check for errors */
+      if (res != CURLE_OK)
+      {
+         fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+         //check for memleaks?
+      }
+      else
+      {
+         std::cout << "import in influx start\n";
+         auto j = json::parse(curlFinishedJobs.payload);
+
+         //todo: check if its necessary to insert
+         auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=mydb");
+
+         for (auto& job : j.items())
+         {
+            int id = job.value().at("request").at("id").get<int>();
+            std::string name = job.value().at("request").at("name").get<std::string>();
+            double totalRuntime_ms = job.value().at("result").at("totalRuntime_ms").get<double>();
+            int64_t ts_start = job.value().at("result").at("ts_start").get<int64_t>();
+            int64_t ts_stop = job.value().at("result").at("ts_stop").get<int64_t>();
+
+            
+            try
+            {
+               // we insert a start and a stop event
+               influxdb->write(influxdb::Point{ "mydb" }.addField("totalRuntime_ms", totalRuntime_ms).addTag("id", std::to_string(id)).setTimestamp(std::chrono::time_point<std::chrono::system_clock>(std::chrono::nanoseconds(ts_stop))));
+               influxdb->write(influxdb::Point{ "mydb" }.addField("totalRuntime_ms", totalRuntime_ms).addTag("id", std::to_string(id)).setTimestamp(std::chrono::time_point<std::chrono::system_clock>(std::chrono::nanoseconds(ts_start))));
+            }
+            catch(const std::exception& e)
+            {
+               std::cerr << e.what() << '\n';
+               break;
+            }
+            
+            
+            // influxdb->write(influxdb::Point{ "mydb" }.addField("cnt", 1).addTag("counter", "cnt"));
+         }
+      }
+      using namespace std::chrono_literals;
+      std::this_thread::sleep_for(5s);
    }
-
-   auto j = json::parse(curlFinishedJobs.payload);
-
-   auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=mydb");
-
-   for (auto& job : j.items())
-   {
-      int id = job.value().at("request").at("id").get<int>();
-      std::string name = job.value().at("request").at("name").get<std::string>();
-      double totalRuntime_ms = job.value().at("result").at("totalRuntime_ms").get<double>();
-      int64_t ts_start = job.value().at("result").at("ts_start").get<int64_t>();
-      int64_t ts_stop = job.value().at("result").at("ts_stop").get<int64_t>();
-
-      // we insert a start and a stop event
-      influxdb->write(influxdb::Point{ "mydb" }.addField("totalRuntime_ms", totalRuntime_ms).addTag("id", std::to_string(id)).setTimestamp(std::chrono::time_point<std::chrono::system_clock>(std::chrono::nanoseconds(ts_stop))));
-      // influxdb->write(influxdb::Point{ "mydb" }.addField("cnt", 1).addTag("counter", "cnt"));
-   }
-
-
    curl_easy_cleanup(curl);
    curl_global_cleanup();
    return 0;

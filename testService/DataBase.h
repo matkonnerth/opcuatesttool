@@ -27,6 +27,16 @@ public:
            fs::create_directories(jobs_requests_dir);
            fs::create_directories(jobs_finished_dir);
        }
+       else
+       {
+           //get the jobId
+           int lastId=0;
+           while(fs::exists(jobs_requests_dir+"/"+std::to_string(lastId)))
+           {
+               lastId++;
+           }
+           jobId=lastId;
+       }
    }
 
    int newJob(const std::string& requestJson);

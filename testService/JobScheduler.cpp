@@ -16,16 +16,19 @@ JobScheduler::JobScheduler(const std::string& workingDir, int maxConcurrentJobs)
 , db{ std::make_unique<DataBase>(workingDir) }
 {}
 
-int JobScheduler::create(const std::string& jsonString)
+void JobScheduler::schedule()
 {
-   std::lock_guard<std::mutex> guard(_m);
-   pid_t pid;
-   int ret = 1;
-   int status;
-
-   int newJobId = db->newJob(jsonString);
-
-   pid = fork();
+   if(waitQueue.empty())
+   {
+      return;
+   }
+   if(activeJobs.size()>=maxConcurrentJobs)
+   {
+      return;
+   }
+   int jobId = waitQueue.front();
+   waitQueue.pop();
+   int pid = fork();
 
    if (pid == -1)
    {
@@ -46,7 +49,12 @@ int JobScheduler::create(const std::string& jsonString)
       // filename associated with file being executed
       // the array pointer must be terminated by NULL
       // pointer
-      char* argv_list[] = { "./testRunner", const_cast<char*>(workingDir.c_str()), const_cast<char*>(db->getJobs_finished_dir().c_str()), const_cast<char*>(db->getJobs_requests_dir().c_str()), const_cast<char*>(db->getRequestFilePath(newJobId).c_str()), NULL };
+      char* argv_list[] = { "./testRunner",
+                            const_cast<char*>(workingDir.c_str()),
+                            const_cast<char*>(db->getJobs_finished_dir().c_str()),
+                            const_cast<char*>(db->getJobs_requests_dir().c_str()),
+                            const_cast<char*>(std::to_string(jobId).c_str()),
+                            NULL };
 
       // the execv() only return if error occured.
       // The return value is -1
@@ -58,9 +66,33 @@ int JobScheduler::create(const std::string& jsonString)
    {
       // parent
       printf("testrunner forked, pid = %u\n", pid);
-      activeJobs[pid] = newJobId;
+      activeJobs[pid] = jobId;
    }
+}
+
+int JobScheduler::create(const std::string& jsonString)
+{
+   std::lock_guard<std::mutex> guard(_m);
+   int newJobId = db->newJob(jsonString);
+   waitQueue.push(newJobId);
+   schedule();
    return newJobId;
+}
+
+void JobScheduler::jobFinished(int id)
+{
+   std::lock_guard<std::mutex> guard(_m);
+   auto entry = activeJobs.find(id);
+   if (entry != activeJobs.end())
+   {
+      std::cout << "job (pid: " << id << ", jobId: " << entry->second << ") finished\n";
+      activeJobs.erase(entry);
+   }
+   else
+   {
+      std::cout << "received signal with pid " << id << " but no job active with this id?!\n";
+   }
+   schedule();
 }
 
 void JobScheduler::getFinishedJobs(Http::ResponseStream& stream)
@@ -84,20 +116,6 @@ void JobScheduler::getFinishedJobs(Http::ResponseStream& stream)
    }
    stream << "]\n";
    stream.ends();
-}
-
-void JobScheduler::jobFinished(int id)
-{
-   std::lock_guard<std::mutex> guard(_m);
-   auto entry = activeJobs.find(id);
-   if (entry != activeJobs.end())
-   {
-      std::cout << "job (pid: " << id << ", jobId: " << entry->second << ") finished\n";
-   }
-   else
-   {
-      std::cout << "received signal with pid " << id << " but no job active with this id?!\n";
-   }
 }
 
 std::string JobScheduler::getFinishedJob(int jobId)
