@@ -41,3 +41,7 @@ add_executable(TestService
 target_link_libraries(TestService PRIVATE CONAN_PKG::pistache pthread)
 target_link_libraries(TestService PRIVATE project_options)
 target_link_libraries(TestService PRIVATE stdc++fs)
+
+add_executable(testInfluxDb testInflux.cpp)
+target_link_libraries(testInfluxDb PRIVATE CONAN_PKG::InfluxDB)
+target_link_libraries(testInfluxDb PRIVATE project_options)

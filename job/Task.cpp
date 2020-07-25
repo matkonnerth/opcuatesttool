@@ -25,7 +25,7 @@ bool BrowseRequest::execute(TestClient* client)
    return client->browse(id);
 }
 
-bool GenericRequest::prepare(TestClient* client)
+bool GenericRequest::prepare(TestClient*)
 {
    return true;
 }
