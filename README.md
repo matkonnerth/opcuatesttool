@@ -22,16 +22,29 @@ A task is a single command, e.g. a read request or a wait. Types of tasks:
 * wait: pauses the job execution for N milliseconds
 * generic: describe the service request in json encoding, as described in the opc ua specification specs https://prototyping.opcfoundation.org/Home/Read/
 
-## Useful commands
+## REST interface
 
 ### Triggering a new job
+```bash
 curl -H "Content-Type: application/json" --data @tests/rest/newJob.json http://localhost:9080/jobs
+```
+The test service assigns a unique id to the new job (ids are ordered), this id can be used to address the job in further requests.
 
 ### Get finished jobs
+getting all of them
+```bash
 curl http://localhost:9080/jobs?finished=true
+```
+
+getting jobs starting at a certain id
+```bash
+curl http://localhost:9080/jobs?finished=true&from=1000
+```
 
 ### Get results of job with id 0
+```bash
 curl http://localhost:9080/jobs/0
+```
 
 ## Integration with InfluxDB and Grafana
 

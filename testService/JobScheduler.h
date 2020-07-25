@@ -14,7 +14,7 @@ public:
    JobScheduler(const std::string& workingDir, int maxConcurrentJobs = 4);
    int create(const std::string& jsonString);
    void jobFinished(int pid);
-   void getFinishedJobs(Http::ResponseStream& stream);
+   void getFinishedJobs(Http::ResponseStream& stream, int fromId);
    std::string getFinishedJob(int jobId);
 
 private:

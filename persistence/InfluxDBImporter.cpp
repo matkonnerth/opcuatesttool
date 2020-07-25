@@ -118,10 +118,15 @@ int main(void)
    }
    curl_easy_setopt(curl, CURLOPT_URL, "localhost:9080/jobs?finished=true");
 
+   int fromId = 0;
+
+   std::string uri = "localhost:9080/jobs?finished=true&from=";
+
    /* Perform the request, res will get the return code */
-   while(true)
+   while (true)
    {
-      res = curl_fetch_url(curl, "localhost:9080/jobs?finished=true", &curlFinishedJobs);
+      
+      res = curl_fetch_url(curl, (uri+std::to_string(fromId)).c_str(), &curlFinishedJobs);
       /* Check for errors */
       if (res != CURLE_OK)
       {
@@ -135,16 +140,20 @@ int main(void)
 
          //todo: check if its necessary to insert
          auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=mydb");
+         influxdb->batchOf(100);
 
          for (auto& job : j.items())
          {
             int id = job.value().at("request").at("id").get<int>();
+            if(id>fromId)
+            {
+               fromId=id+1;
+            }
             std::string name = job.value().at("request").at("name").get<std::string>();
             double totalRuntime_ms = job.value().at("result").at("totalRuntime_ms").get<double>();
             int64_t ts_start = job.value().at("result").at("ts_start").get<int64_t>();
             int64_t ts_stop = job.value().at("result").at("ts_stop").get<int64_t>();
 
-            
             try
             {
                // we insert a start and a stop event
@@ -156,9 +165,6 @@ int main(void)
                std::cerr << e.what() << '\n';
                break;
             }
-            
-            
-            // influxdb->write(influxdb::Point{ "mydb" }.addField("cnt", 1).addTag("counter", "cnt"));
          }
       }
       using namespace std::chrono_literals;

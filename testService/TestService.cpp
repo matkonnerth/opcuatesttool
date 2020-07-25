@@ -65,7 +65,22 @@ private:
       {
          response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
          auto stream = response.stream(Http::Code::Ok);
-         scheduler->getFinishedJobs(stream);
+         int id=0;
+         if(query.has("from"))
+         {
+            auto idString = query.get("from").get();
+            std::cout << "from: " << id << "\n";
+            try
+            {
+               id = std::stoi(idString);
+            }
+            catch(const std::exception& e)
+            {
+               std::cerr << e.what() << '\n';
+               id=0;
+            }
+         }
+         scheduler->getFinishedJobs(stream, id);
       }
       else
       {

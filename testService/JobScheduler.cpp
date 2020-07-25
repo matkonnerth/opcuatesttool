@@ -95,17 +95,31 @@ void JobScheduler::jobFinished(int id)
    schedule();
 }
 
-void JobScheduler::getFinishedJobs(Http::ResponseStream& stream)
+void JobScheduler::getFinishedJobs(Http::ResponseStream& stream, int fromId)
 {
    using namespace Pistache;
    stream << "[\n";
    size_t cnt = 0;
    for (auto& p : fs::directory_iterator(db->getJobs_finished_dir()))
    {
+      try
+      {
+         int fileId = std::stoi(p.path().filename());
+         if(fileId<fromId)
+         {
+            continue;
+         }
+      }
+      catch(const std::exception& e)
+      {
+         std::cerr << e.what() << '\n';
+      }
+
       if (cnt > 0)
       {
          stream << ",\n";
       }
+
       std::ifstream resultFile{ p.path() };
       std::string line;
       while (getline(resultFile, line))
