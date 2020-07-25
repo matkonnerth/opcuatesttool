@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <chrono>
 
 namespace tt {
 
@@ -37,6 +38,8 @@ protected:
    const std::string serverUri{};
    double totalRuntime_ms{ 0 };
    double runtimePerIteration_ms{ 0 };
+   std::chrono::system_clock::time_point start{};
+   std::chrono::system_clock::time_point stop{};
 };
 
 class RepetiveJob : public Job

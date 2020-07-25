@@ -5,6 +5,7 @@
 #include "Task.h"
 #include <iostream>
 
+using json = nlohmann::json;
 
 /*
     The testrunner instantiates exactly 1 client and executes exactly 1 job with this client.

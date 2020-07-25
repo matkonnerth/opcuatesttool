@@ -42,6 +42,14 @@ target_link_libraries(TestService PRIVATE CONAN_PKG::pistache pthread)
 target_link_libraries(TestService PRIVATE project_options)
 target_link_libraries(TestService PRIVATE stdc++fs)
 
+add_executable(InfluxDBImporter
+    Persistence/InfluxDBImporter.cpp
+)
+target_link_libraries(InfluxDBImporter PRIVATE CONAN_PKG::libcurl pthread)
+target_link_libraries(InfluxDBImporter PRIVATE open62541 CONAN_PKG::jsonformoderncpp)
+target_link_libraries(InfluxDBImporter PRIVATE project_options)
+target_link_libraries(InfluxDBImporter PRIVATE CONAN_PKG::InfluxDB)
+
 add_executable(testInfluxDb testInflux.cpp)
 target_link_libraries(testInfluxDb PRIVATE CONAN_PKG::InfluxDB)
 target_link_libraries(testInfluxDb PRIVATE project_options)

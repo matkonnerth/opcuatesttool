@@ -3,6 +3,7 @@
 pistache/d5608a1@conan/stable
 jsonformoderncpp/3.7.0
 InfluxDB/0.5.1
+libcurl/7.66.0
 
 [generators]
 cmake

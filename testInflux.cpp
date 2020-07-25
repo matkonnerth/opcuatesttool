@@ -7,7 +7,7 @@
 int main(int argc, char*argv[])
 {
    auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=mydb");
-   influxdb->write(influxdb::Point{ "mydb" }.addField("value", 10).addField("value", 20).addField("value", 100LL).addTag("host", "adampc"));
+   influxdb->write(influxdb::Point{ "mydb" }.addField("pressure", 10).addField("value", 20).addField("value", 100LL).addTag("host", "adampc"));
    influxdb->write(influxdb::Point{ "mydb" }.addField("cnt", 1).addTag("counter", "cnt"));
    auto points = influxdb->query("SELECT * FROM \"mydb\"");
    
