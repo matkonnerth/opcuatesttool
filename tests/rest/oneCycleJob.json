@@ -2,7 +2,6 @@
     "name": "singleRead",
     "serverUri": "opc.tcp://debian:4840",
     "type": "oneCycleJob",
-    "iterations": 100,
     "tasks": [
         {
             "type": "readRequest",

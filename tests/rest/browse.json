@@ -2,7 +2,7 @@
     "name": "browseRequests",
     "serverUri": "opc.tcp://debian:4840",
     "type": "repetiveJob",
-    "iterations": 100,
+    "iterations": 10000,
     "tasks": [
         {
             "type": "browseRequest",

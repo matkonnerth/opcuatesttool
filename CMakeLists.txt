@@ -23,7 +23,7 @@ target_compile_features(project_options INTERFACE cxx_std_17)
 add_subdirectory(open)
 
 add_executable(testRunner
-    driver/TestRunner.cpp
+    testRunner/TestRunner.cpp
     comm/Comm.cpp
     comm/Client.cpp
 	job/Job.cpp
@@ -34,6 +34,7 @@ target_include_directories(testRunner PRIVATE job)
 target_link_libraries(testRunner PRIVATE project_warnings)
 target_link_libraries(testRunner PRIVATE open62541 CONAN_PKG::jsonformoderncpp)
 target_link_libraries(testRunner PRIVATE project_options)
+target_link_libraries(testRunner PRIVATE CONAN_PKG::spdlog)
 
 add_executable(testService 
     testService/TestService.cpp
@@ -42,6 +43,7 @@ add_executable(testService
 target_link_libraries(testService PRIVATE CONAN_PKG::pistache pthread)
 target_link_libraries(testService PRIVATE project_options)
 target_link_libraries(testService PRIVATE stdc++fs)
+target_link_libraries(testService PRIVATE CONAN_PKG::spdlog)
 
 add_executable(influxDBImporter
     persistence/InfluxDBImporter.cpp
@@ -50,7 +52,13 @@ target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::libcurl pthread)
 target_link_libraries(influxDBImporter PRIVATE open62541 CONAN_PKG::jsonformoderncpp)
 target_link_libraries(influxDBImporter PRIVATE project_options)
 target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::InfluxDB)
+target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::spdlog)
 
 add_executable(testInfluxDb testInflux.cpp)
 target_link_libraries(testInfluxDb PRIVATE CONAN_PKG::InfluxDB)
 target_link_libraries(testInfluxDb PRIVATE project_options)
+
+
+add_executable(testVariant testVariant.cpp)
+target_link_libraries(testVariant PRIVATE open62541)
+target_link_libraries(testVariant PRIVATE project_options)

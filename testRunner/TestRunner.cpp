@@ -3,7 +3,8 @@
 #include "Job.h"
 #include "JobFactory.h"
 #include "Task.h"
-#include <iostream>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 using json = nlohmann::json;
 
@@ -14,15 +15,23 @@ using json = nlohmann::json;
     requestJobsDir argv[3]
     requestFilename argv[4]
 */
+
+void setupLogger()
+{
+   auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+   auto logger = std::make_shared<spdlog::logger>("TestRunner", console_sink);
+   logger->set_level(spdlog::level::debug);
+   logger->info("logger init finished");
+   spdlog::register_logger(logger);
+}
+
 int main(int argc , const char** argv)
 {
-    for(int i=0; i<argc; i++)
-    {
-        std::cout << argv[i] << "\n";
-    }
+    setupLogger();
+    auto logger = spdlog::get("TestRunner");
     if(argc!=5)
     {
-       std::cout << "wrong number of arguments, path to job description needed\n";
+       logger->error("wrong number of arguments, exit");
        return 1;
     }
 

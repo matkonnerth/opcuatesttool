@@ -8,7 +8,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 using namespace std;
 using namespace Pistache;
@@ -56,10 +57,13 @@ private:
       int id = scheduler->create(request.body());
       response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
       response.send(Http::Code::Ok, "{\"StatusCode\": \"OK\", \"id\": " + std::to_string(id) + "}");
+      auto logger = spdlog::get("testService");
+      logger->info("newJob, id: {}", id);
    }
 
    void getJobs(const Rest::Request& request, Http::ResponseWriter response)
    {
+      auto logger = spdlog::get("testService");
       auto query = request.query();
       if (query.has("finished"))
       {
@@ -69,7 +73,6 @@ private:
          if(query.has("from"))
          {
             auto idString = query.get("from").get();
-            std::cout << "from: " << id << "\n";
             try
             {
                id = std::stoi(idString);
@@ -80,11 +83,13 @@ private:
                id=0;
             }
          }
+         logger->info("getJobs, from id {}", id);
          scheduler->getFinishedJobs(stream, id);
       }
       else
       {
          response.send(Http::Code::Bad_Request, "wrong query");
+         logger->warn("getJobs, unknown query");
       }
    }
 
@@ -102,50 +107,25 @@ private:
 TestService::TestService(Address addr, const std::string& workingDir)
 : httpEndpoint(std::make_shared<Http::Endpoint>(addr)), scheduler{std::make_unique<JobScheduler>(workingDir)}
 {
-   std::cout << "init http server, host: " << addr.host() << ", port: " << addr.port() << "\n";
+   auto logger = spdlog::get("testService");
+   logger->info("init http server, host: {}, port: {}", addr.host(), addr.port());
 }
 
-void startInfluxDBImporter(const std::string& workingDir)
+void setupLogger(const std::string& workingDir)
 {
-   int pid = fork();
-   if (pid == -1)
-   {
-      // pid == -1 means error occured
-      printf("can't fork InfluxDBImporter, exit\n");
-      exit(EXIT_FAILURE);
-   }
-   else if (pid == 0)
-   {
-      // child process
-      // close file descriptors, let stdin/stdout/stderror open
-      for (int fd = 3; fd < 256; fd++)
-      {
-         close(fd);
-      }
-
-      // the argv list first argument should point to
-      // filename associated with file being executed
-      // the array pointer must be terminated by NULL
-      // pointer
-      char* argv_list[] = { "./influxDBImporter",
-                            const_cast<char*>(workingDir.c_str()),
-                            NULL };
-
-      // the execv() only return if error occured.
-      // The return value is -1
-      std::string importer = workingDir + "/influxDBImporter";
-      execv(importer.c_str(), argv_list);
-      exit(0);
-   }
-   else
-   {
-      // parent
-      printf("InfluxDB importer forked, pid = %u\n", pid);
-   }
+   auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+   auto logger = std::make_shared<spdlog::logger>("testService", console_sink);
+   logger->set_level(spdlog::level::debug);
+   logger->info("logger init finished");
+   spdlog::register_logger(logger);
 }
 
 int main(int argc, char* argv[])
 {
+   std::string binaryPath = argv[0];
+   auto pos = binaryPath.find_last_of('/');
+   binaryPath.erase(pos);
+   setupLogger(binaryPath);
    // handle signals in a dedicated thread
    sigset_t sigset;
    sigemptyset(&sigset);
@@ -158,10 +138,6 @@ int main(int argc, char* argv[])
    {
       port = static_cast<uint16_t>(std::stol(argv[1]));
    }
-
-   std::string binaryPath = argv[0];
-   auto pos = binaryPath.find_last_of('/');
-   binaryPath.erase(pos);
 
    Address addr(Ipv4::any(), port);
    TestService service(addr, binaryPath);
@@ -177,7 +153,6 @@ int main(int argc, char* argv[])
    };
 
    auto ft_signal_handler = std::async(std::launch::async, signalHandler);
-   startInfluxDBImporter(binaryPath);
    service.init(2);
    service.start();
 }

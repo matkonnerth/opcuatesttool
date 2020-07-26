@@ -3,8 +3,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <curl/curl.h>
-#include <iostream>
 #include <nlohmann/json.hpp>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 #include <stdio.h>
 #include <thread>
 
@@ -99,8 +100,20 @@ CURLcode curl_fetch_url(CURL* ch, const char* url, struct curl_fetch_st* fetch)
    return rcode;
 }
 
+void setupLogger()
+{
+   auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+   auto logger = std::make_shared<spdlog::logger>("InfluxDBImporter", console_sink);
+   logger->set_level(spdlog::level::debug);
+   logger->info("logger init finished");
+   spdlog::register_logger(logger);
+}
+
 int main(void)
 {
+   setupLogger();
+   auto logger = spdlog::get("InfluxDBImporter");
+   logger->info("start");
    CURL* curl;
    CURLcode res;
 
@@ -112,7 +125,7 @@ int main(void)
    curl = curl_easy_init();
    if (!curl)
    {
-      std::cout << "curl init failed\n";
+      logger->error("curl init failed, exit");
       curl_global_cleanup();
       return 1;
    }
@@ -130,13 +143,14 @@ int main(void)
       /* Check for errors */
       if (res != CURLE_OK)
       {
-         fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-         //check for memleaks?
+         logger->warn("curl_easy_perform() failed: {}", curl_easy_strerror(res));
+         //TODO: check for memleaks?
       }
       else
       {
-         std::cout << "import in influx start\n";
+         logger->info("import start");
          auto j = json::parse(curlFinishedJobs.payload);
+         free(curlFinishedJobs.payload);
 
          //todo: check if its necessary to insert
          auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=mydb");
@@ -145,10 +159,6 @@ int main(void)
          for (auto& job : j.items())
          {
             int id = job.value().at("request").at("id").get<int>();
-            if(id>fromId)
-            {
-               fromId=id+1;
-            }
             std::string name = job.value().at("request").at("name").get<std::string>();
             double totalRuntime_ms = job.value().at("result").at("totalRuntime_ms").get<double>();
             int64_t ts_start = job.value().at("result").at("ts_start").get<int64_t>();
@@ -159,13 +169,18 @@ int main(void)
                // we insert a start and a stop event
                influxdb->write(influxdb::Point{ "mydb" }.addField("totalRuntime_ms", totalRuntime_ms).addTag("id", std::to_string(id)).setTimestamp(std::chrono::time_point<std::chrono::system_clock>(std::chrono::nanoseconds(ts_stop))));
                influxdb->write(influxdb::Point{ "mydb" }.addField("totalRuntime_ms", totalRuntime_ms).addTag("id", std::to_string(id)).setTimestamp(std::chrono::time_point<std::chrono::system_clock>(std::chrono::nanoseconds(ts_start))));
+               if (id >= fromId)
+               {
+                  fromId = id + 1;
+               }
             }
             catch(const std::exception& e)
             {
-               std::cerr << e.what() << '\n';
+               logger->warn("influxDB write failed: {}", e.what());
                break;
             }
          }
+         logger->info("import end");
       }
       using namespace std::chrono_literals;
       std::this_thread::sleep_for(5s);

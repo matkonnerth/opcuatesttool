@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <spdlog/spdlog.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -18,12 +19,14 @@ JobScheduler::JobScheduler(const std::string& workingDir, int maxConcurrentJobs)
 
 void JobScheduler::schedule()
 {
+   auto logger = spdlog::get("testService");
    if(waitQueue.empty())
    {
       return;
    }
    if(activeJobs.size()>=maxConcurrentJobs)
    {
+      logger->trace("too much active jobs, postpone scheduling, active jobs {}", activeJobs.size());
       return;
    }
    int jobId = waitQueue.front();
@@ -33,7 +36,8 @@ void JobScheduler::schedule()
    if (pid == -1)
    {
       // pid == -1 means error occured
-      printf("can't fork, error occured\n");
+      
+      logger->error("failed to fork TestRunner, exit");
       exit(EXIT_FAILURE);
    }
    else if (pid == 0)
@@ -65,7 +69,7 @@ void JobScheduler::schedule()
    else
    {
       // parent
-      printf("testrunner forked, pid = %u\n", pid);
+      logger->info("testrunner forked, pid {}", pid);
       activeJobs[pid] = jobId;
    }
 }
@@ -81,16 +85,17 @@ int JobScheduler::create(const std::string& jsonString)
 
 void JobScheduler::jobFinished(int id)
 {
+   auto logger = spdlog::get("testService");
    std::lock_guard<std::mutex> guard(_m);
    auto entry = activeJobs.find(id);
    if (entry != activeJobs.end())
    {
-      std::cout << "job (pid: " << id << ", jobId: " << entry->second << ") finished\n";
+      logger->info("job (pid: {}, id: {}) finished", id, entry->second);
       activeJobs.erase(entry);
    }
    else
    {
-      std::cout << "received signal with pid " << id << " but no job active with this id?!\n";
+      logger->warn("received signal with pid {} but no job active with this id?!", id);
    }
    schedule();
 }
