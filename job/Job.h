@@ -1,9 +1,10 @@
 #pragma once
 #include "Task.h"
+#include <chrono>
 #include <memory>
+#include <spdlog/spdlog.h>
 #include <string>
 #include <vector>
-#include <chrono>
 
 namespace tt {
 
@@ -22,8 +23,9 @@ class Job
 public:
    explicit Job(const std::string& name, const std::string& serverUri)
    : name{ name }
-   , serverUri{ serverUri }
-   {}
+   , serverUri{ serverUri }, logger{spdlog::get("TestRunner")}
+   {
+   }
    const std::string& getServerUri() const;
    void addTask(std::unique_ptr<Task> task);
    const std::vector<std::unique_ptr<Task>>& getTasks();
@@ -42,6 +44,7 @@ protected:
    double runtimePerIteration_ms{ 0 };
    std::chrono::system_clock::time_point start{};
    std::chrono::system_clock::time_point stop{};
+   std::shared_ptr<spdlog::logger> logger;
 };
 
 class RepetiveJob : public Job

@@ -57,7 +57,7 @@ sudo docker run -d --name=grafana -p 3000:3000 grafana/grafana
 
 ### some good reads
 https://florimond.dev/blog/articles/2018/08/restful-api-design-13-best-practices-to-make-your-users-happy/
-
+https://code.visualstudio.com/docs/languages/json
 
 
 

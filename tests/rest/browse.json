@@ -5,7 +5,7 @@
     "iterations": 10000,
     "tasks": [
         {
-            "type": "browseRequest",
+            "type": "browse",
             "NodeId": {
                 "ns": "http://opcfoundation.org/UA/",
                 "id": "i=85"

@@ -70,7 +70,7 @@ std::unique_ptr<Task> createAssertValueTask(const std::string& name, const nlohm
 
 const std::unordered_map<std::string, CreateTaskFnc> JobFactory::tasks = {
    { "readValue", createReadValueTask },
-   { "browseRequest", createBrowseRequestTask },
+   { "browse", createBrowseRequestTask },
    { "wait", createWaitTask},
    { "generic", createGenericTask},
    { "assertValue", createAssertValueTask}
@@ -88,11 +88,13 @@ std::unique_ptr<Job> JobFactory::createFromFile(const std::string& path)
 
    std::unique_ptr<Job> job = jobs.at(type)(name, serverUri, j);
 
+   int taskCount=0;
    // add tasks
    for (auto& el : j["tasks"].items())
    {
       auto type = el.value().at("type").get<std::string>();
-      job->addTask(tasks.at(type)("task", el.value()));
+      job->addTask(tasks.at(type)(std::to_string(taskCount)+":"+type, el.value()));
+      taskCount++;
    }
    return job;
 }

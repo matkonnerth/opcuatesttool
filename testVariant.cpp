@@ -4,8 +4,8 @@
 int main()
 {
     UA_Variant var;
-    UA_Int32 info=23;
-    UA_Variant_setScalar(&var, &info, &UA_TYPES[UA_TYPES_INT32]);
+    UA_NodeId id=UA_NODEID_STRING(2, "myString");
+    UA_Variant_setScalar(&var, &id, &UA_TYPES[UA_TYPES_NODEID]);
 
 
     char* jsonVal = (char*)calloc(200, 1);

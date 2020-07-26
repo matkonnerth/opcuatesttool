@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 
 
+
 namespace tt {
 
 void Job::addTask(std::unique_ptr<Task> task)
@@ -47,7 +48,7 @@ void RepetiveJob::execute(TestClient* client)
          if (!t->execute(*this, client))
          {
             status = JobStatus::ABORTED;
-            std::cout << "execute failed, abort job" << std::endl;
+            logger->error("executing task: {} failed, aborting testrun", t->getName());
             return;
          }
          previousTask=t.get();

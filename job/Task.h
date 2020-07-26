@@ -21,6 +21,10 @@ public:
       throw std::runtime_error("Expectation not supported by this task.");
    }
    virtual ~Task() = default;
+   const std::string& getName() const
+   {
+      return name;
+   }
 
 private:
    const std::string name;
