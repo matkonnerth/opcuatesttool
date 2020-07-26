@@ -5,12 +5,13 @@
     "version": "0.2.0",
     "configurations": [
 
+
         {
             "name": "testRunner",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/bin/testRunner",
-            "args": ["${workspaceFolder}/build", "${workspaceFolder}/build", "${workspaceFolder}/tests/rest/", "genericCall.json"],
+            "args": ["${workspaceFolder}/build", "${workspaceFolder}/build/bin", "${workspaceFolder}/tests/rest/", "assertValue.json"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -28,7 +29,7 @@
             "name": "httpDriver",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/bin/TestService",
+            "program": "${workspaceFolder}/build/bin/testService",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -67,6 +68,25 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/bin/InfluxDBImporter",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "testVariantDecoding",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/bin/testVariant",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

@@ -2,17 +2,25 @@
 #include "Client.h"
 #include <chrono>
 #include <thread>
+#include "Job.h"
 
 namespace tt {
 
-bool ReadRequest::prepare(TestClient* client)
+bool ReadValue::prepare(TestClient* client)
 {
    return client->cacheNodeId(id);
 }
 
-bool ReadRequest::execute(TestClient* client)
+bool ReadValue::execute(const Job&, TestClient* client)
 {
-   return client->read(id);
+   auto r = client->read(id);
+   result = std::make_unique<ReadValueResult>(std::move(r));
+   return result->ok;
+}
+
+bool ReadValue::checkExpectation(const Expectation& exp) const
+{
+   return result->check(exp);
 }
 
 bool BrowseRequest::prepare(TestClient* client)
@@ -20,29 +28,26 @@ bool BrowseRequest::prepare(TestClient* client)
    return client->cacheNodeId(id);
 }
 
-bool BrowseRequest::execute(TestClient* client)
+bool BrowseRequest::execute(const Job&, TestClient* client)
 {
    return client->browse(id);
 }
 
-bool GenericRequest::prepare(TestClient*)
-{
-   return true;
-}
-
-bool GenericRequest::execute(TestClient* client)
+bool GenericRequest::execute(const Job&, TestClient* client)
 {
    return client->invokeGenericService(jsonRequest);
 }
 
-bool Wait::prepare(TestClient*)
-{
-   return true;
-}
-
-bool Wait::execute(TestClient*)
+bool Wait::execute(const Job&, TestClient*)
 {
    std::this_thread::sleep_for(std::chrono::milliseconds(delay));
    return true;
 }
+
+bool AssertValue::execute(const Job& j, TestClient*)
+{
+   return j.getPreviousTask().checkExpectation(exp);
+}
+
+
 } // namespace tt

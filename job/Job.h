@@ -30,8 +30,10 @@ public:
    virtual void execute(TestClient* client) = 0;
    virtual ~Job() = default;
    void addResult(const std::string& inputFile, const std::string& outputFile);
+   const Task& getPreviousTask() const;
 
 protected:
+   Task* previousTask{nullptr};
    JobStatus status{ JobStatus::INIT };
    const std::string name;
    std::vector<std::unique_ptr<Task>> tasks{};
@@ -53,6 +55,7 @@ public:
 
 private:
    const size_t iterations{ 0 };
+
 };
 
 class OneCycleJob : public RepetiveJob

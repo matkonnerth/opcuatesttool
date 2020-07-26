@@ -28,7 +28,10 @@ add_executable(testRunner
     comm/Client.cpp
 	job/Job.cpp
     job/Task.cpp
-    job/JobFactory.cpp)
+    job/JobFactory.cpp
+    job/VariantWrapper.cpp
+    job/Expectation.cpp
+    job/Result.cpp)
 target_include_directories(testRunner PRIVATE comm)
 target_include_directories(testRunner PRIVATE job)
 target_link_libraries(testRunner PRIVATE project_warnings)

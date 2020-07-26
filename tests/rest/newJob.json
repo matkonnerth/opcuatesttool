@@ -1,18 +1,20 @@
 {
+    "_comment": "//users can add their own properties",
+    "myClientId": 12344,
     "name": "job1",
     "serverUri": "opc.tcp://localhost:4840",
     "type": "repetiveJob",
     "iterations": 10000,
     "tasks": [
         {
-            "type": "readRequest",
+            "type": "readValue",
             "NodeId": {
                 "ns": "http://opcfoundation.org/UA/",
                 "id": "i=2255"
             }
         },
         {
-            "type": "readRequest",
+            "type": "readValue",
             "NodeId": {
                 "ns": "http://opcfoundation.org/UA/",
                 "id": "i=2255"

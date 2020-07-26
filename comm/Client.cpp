@@ -7,6 +7,7 @@
 #include <open62541/plugin/log_stdout.h>
 
 
+
 namespace tt {
 Client::Client(const std::string& endpointUri)
 {
@@ -25,7 +26,6 @@ Client::~Client()
 
 bool Client::connect()
 {
-   printf("in Client::connect\n\n");
    UA_StatusCode retval = UA_Client_connect(client, uri.c_str());
    if (retval != UA_STATUSCODE_GOOD)
    {
@@ -102,7 +102,9 @@ bool Client::cacheNodeId(const NodeId& id)
    }
    UA_NodeId newId;
    UA_NodeId_init(&newId);
+   
    auto status = UA_NodeId_parse(&newId, UA_STRING_ALLOC(id.identifier.data()));
+   newId.namespaceIndex = static_cast<UA_UInt16>(idx);
    if (status != UA_STATUSCODE_GOOD)
    {
       return false;
@@ -116,24 +118,23 @@ Client::ConnectionState Client::getConnectionState()
    return connState;
 }
 
-bool TestClient::read(const NodeId& id)
+ReadValueResult TestClient::read(const NodeId& id)
 {
+   ReadValueResult result{};
+   result.ok=false;
    auto uaId = nodeIdCache.find(id);
    if (uaId == nodeIdCache.end())
    {
-      return false;
+      return result;
    }
-
-   UA_Variant var;
-   UA_Variant_init(&var);
-   auto status = UA_Client_readValueAttribute(client, uaId->second, &var);
+   auto status = UA_Client_readValueAttribute(client, uaId->second, result.var->getVariant());
    if (status != UA_STATUSCODE_GOOD)
    {
       UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "could not read with NodeId %s", UA_StatusCode_name(status));
-      return false;
+      return result;
    }
-   UA_Variant_clear(&var);
-   return true;
+   result.ok=true;
+   return result;
 }
 
 bool TestClient::browse(const NodeId& id)

@@ -4,7 +4,7 @@
     "type": "oneCycleJob",
     "tasks": [
         {
-            "type": "readRequest",
+            "type": "readValue",
             "NodeId": {
                 "ns": "http://opcfoundation.org/UA/",
                 "id": "i=2255"

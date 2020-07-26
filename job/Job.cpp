@@ -41,14 +41,16 @@ void RepetiveJob::execute(TestClient* client)
    status = JobStatus::RUNNING;
    for (auto i = 0u; i < iterations; i++)
    {
+      previousTask=nullptr;
       for (const auto& t : tasks)
       {
-         if (!t->execute(client))
+         if (!t->execute(*this, client))
          {
             status = JobStatus::ABORTED;
             std::cout << "execute failed, abort job" << std::endl;
             return;
          }
+         previousTask=t.get();
       }
    }
    status = JobStatus::FINISHED;
@@ -58,6 +60,15 @@ void RepetiveJob::execute(TestClient* client)
    duration = steady_stop - steady_start;
    totalRuntime_ms = duration.count();
    runtimePerIteration_ms = totalRuntime_ms / static_cast<double>(iterations);
+}
+
+const Task& Job::getPreviousTask() const
+{
+   if(!previousTask)
+   {
+      throw std::runtime_error("requested previous Task, but there is no previous task");
+   }
+   return *previousTask;
 }
 
 const std::string& Job::getServerUri() const
