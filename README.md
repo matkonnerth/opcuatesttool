@@ -17,10 +17,11 @@ A job represents a single test run and contains 1-n tasks. Types of jobs:
 * oneCycleJob: runs the tasks exactly once
 
 A task is a single command, e.g. a read request or a wait. Types of tasks:
-* readRequest: reads the value attribute of a node
-* browseRequest: browses a node
+* readValue: reads the value attribute of a node
+* browse: browses a node
 * wait: pauses the job execution for N milliseconds
 * generic: describe the service request in json encoding, as described in the opc ua specification specs https://prototyping.opcfoundation.org/Home/Read/
+* assertValue: compares the result value of the previous command (e.g. of readValue request) with an expected value.
 
 ## REST interface
 
