@@ -1,4 +1,5 @@
 #pragma once
+#include "Logger.h"
 #include "NodeId.h"
 #include "Result.h"
 #include <functional>
@@ -40,6 +41,7 @@ protected:
    ConnectionState connState{ ConnectionState::DISCONNECTED };
    std::map<NodeId, UA_NodeId> nodeIdCache{};
    std::vector<std::string> namespaces{};
+   Logger logger{};
 };
 
 class TestClient : public Client
@@ -51,6 +53,7 @@ public:
    ReadValueResult read(const NodeId& id);
    bool browse(const NodeId& id);
    bool invokeGenericService(const std::string& jsonRequest);
+
 private:
    static const std::unordered_map<int, ServiceRequestFnc> requests;
 };

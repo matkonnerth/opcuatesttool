@@ -7,7 +7,6 @@
 #include <open62541/plugin/log_stdout.h>
 
 
-
 namespace tt {
 Client::Client(const std::string& endpointUri)
 {
@@ -16,6 +15,7 @@ Client::Client(const std::string& endpointUri)
    UA_ClientConfig* cc = UA_Client_getConfig(client);
    UA_ClientConfig_setDefault(cc);
    cc->clientContext = this;
+   cc->logger = logger.getUALogger();
 }
 
 Client::~Client()
@@ -102,7 +102,7 @@ bool Client::cacheNodeId(const NodeId& id)
    }
    UA_NodeId newId;
    UA_NodeId_init(&newId);
-   
+
    auto status = UA_NodeId_parse(&newId, UA_STRING_ALLOC(id.identifier.data()));
    newId.namespaceIndex = static_cast<UA_UInt16>(idx);
    if (status != UA_STATUSCODE_GOOD)
@@ -121,7 +121,7 @@ Client::ConnectionState Client::getConnectionState()
 ReadValueResult TestClient::read(const NodeId& id)
 {
    ReadValueResult result{};
-   result.ok=false;
+   result.ok = false;
    auto uaId = nodeIdCache.find(id);
    if (uaId == nodeIdCache.end())
    {
@@ -133,7 +133,7 @@ ReadValueResult TestClient::read(const NodeId& id)
       UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "could not read with NodeId %s", UA_StatusCode_name(status));
       return result;
    }
-   result.ok=true;
+   result.ok = true;
    return result;
 }
 
@@ -164,39 +164,93 @@ bool TestClient::browse(const NodeId& id)
    return status;
 } // namespace tt
 
-static bool readRequest(UA_Client* client, const UA_ExtensionObject& serviceObj)
+static bool checkResultCodes(const UA_StatusCode* statusCodeArray, size_t size)
 {
-   UA_ReadResponse resp = UA_Client_Service_read(client, *static_cast<UA_ReadRequest*>(serviceObj.content.decoded.data));
-   if (resp.results->status != UA_STATUSCODE_GOOD)
+   for (const auto* statusCode = statusCodeArray; statusCode < statusCodeArray + size; statusCode++)
+   {
+      if (*statusCode != UA_STATUSCODE_GOOD)
+      {
+         return false;
+      }
+   }
+   return true;
+}
+
+static bool checkResponseHeader(const UA_ResponseHeader& responseHeader)
+{
+   if (responseHeader.serviceResult != UA_STATUSCODE_GOOD)
    {
       return false;
    }
    return true;
+}
+
+static bool checkResponse(const UA_ReadResponse& response)
+{
+   if(!checkResponseHeader(response.responseHeader))
+   {
+      return false;
+   }
+   for(const auto* dv = response.results; dv < response.results+response.resultsSize; dv++)
+   {
+      if(!(dv->status==UA_STATUSCODE_GOOD))
+      {
+         return false;
+      }
+   }
+   return true;
+}
+
+static bool checkResponse(const UA_WriteResponse& response)
+{
+   if (!checkResponseHeader(response.responseHeader))
+   {
+      return false;
+   }
+   return checkResultCodes(response.results, response.resultsSize);
+}
+
+static bool checkResponse(const UA_CallResponse& response)
+{
+   if (!checkResponseHeader(response.responseHeader))
+   {
+      return false;
+   }
+   for(const auto*result=response.results; result < response.results + response.resultsSize; result++)
+   {
+      if(!(result->statusCode==UA_STATUSCODE_GOOD))
+      {
+         return false;
+      }
+   }
+   return true;
+}
+
+static bool readRequest(UA_Client* client, const UA_ExtensionObject& serviceObj)
+{
+   UA_ReadResponse resp = UA_Client_Service_read(client, *static_cast<UA_ReadRequest*>(serviceObj.content.decoded.data));
+   return checkResponse(resp);
 }
 
 static bool callRequest(UA_Client* client, const UA_ExtensionObject& serviceObj)
 {
    UA_CallResponse resp = UA_Client_Service_call(client, *static_cast<UA_CallRequest*>(serviceObj.content.decoded.data));
-   if (resp.results->statusCode != UA_STATUSCODE_GOOD)
-   {
-      return false;
-   }
-   return true;
+   return checkResponse(resp);
 }
 
 static bool writeRequest(UA_Client* client, const UA_ExtensionObject& serviceObj)
 {
    UA_WriteResponse resp = UA_Client_Service_write(client, *static_cast<UA_WriteRequest*>(serviceObj.content.decoded.data));
-   if (resp.results != UA_STATUSCODE_GOOD)
-   {
-      return false;
-   }
-   return true;
+   return checkResponse(resp);
 }
 
 static bool browseRequest(UA_Client* client, const UA_ExtensionObject& serviceObj)
 {
    UA_BrowseResponse resp = UA_Client_Service_browse(client, *static_cast<UA_BrowseRequest*>(serviceObj.content.decoded.data));
+   if(!checkResponseHeader(resp.responseHeader))
+   {
+      return false;
+   }
    if (resp.results != UA_STATUSCODE_GOOD)
    {
       return false;
