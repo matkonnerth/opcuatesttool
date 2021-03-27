@@ -4,99 +4,104 @@
 #include "Result.h"
 #include <memory>
 #include <string>
+#include <stdexcept>
 
-namespace tt {
-class TestClient;
-class Job;
-class Task
+namespace tt
 {
-public:
-   explicit Task(const std::string& name)
-   : name{ name }
-   {}
-   virtual bool prepare(TestClient*){return true;}
-   virtual bool execute(const Job& job, TestClient* client) = 0;
-   virtual bool checkExpectation(const Expectation&) const
+   class TestClient;
+   class Job;
+   class Task
    {
-      throw std::runtime_error("Expectation not supported by this task.");
-   }
-   virtual ~Task() = default;
-   const std::string& getName() const
+   public:
+      explicit Task(const std::string& name)
+      : name{ name }
+      {}
+      virtual bool prepare(TestClient*)
+      {
+         return true;
+      }
+      virtual bool execute(const Job& job, TestClient* client) = 0;
+      virtual bool checkExpectation(const Expectation&) const
+      {
+         throw std::runtime_error("Expectation not supported by this task.");
+      }
+      virtual ~Task() = default;
+      const std::string& getName() const
+      {
+         return name;
+      }
+
+   private:
+      const std::string name;
+   };
+
+   class ReadValue : public Task
    {
-      return name;
-   }
+   public:
+      ReadValue(const std::string& name, const NodeId& idToRead)
+      : Task{ name }
+      , id{ idToRead }
+      {}
+      bool prepare(TestClient* client) override;
+      bool execute(const Job& job, TestClient* client) override;
+      bool checkExpectation(const Expectation& exp) const override;
 
-private:
-   const std::string name;
-};
+   private:
+      NodeId id;
+      std::unique_ptr<ReadValueResult> result{ nullptr };
+   };
 
-class ReadValue : public Task
-{
-public:
-   ReadValue(const std::string& name, const NodeId& idToRead)
-   : Task{ name }
-   , id{ idToRead }
-   {}
-   bool prepare(TestClient* client) override;
-   bool execute(const Job& job, TestClient* client) override;
-   bool checkExpectation(const Expectation& exp) const override;
+   class BrowseRequest : public Task
+   {
+   public:
+      BrowseRequest(const std::string& name, const NodeId& id)
+      : Task{ name }
+      , id{ id }
+      {}
+      bool prepare(TestClient* client) override;
+      bool execute(const Job& job, TestClient* client) override;
 
-private:
-   NodeId id;
-   std::unique_ptr<ReadValueResult> result{ nullptr };
-};
+   private:
+      NodeId id;
+   };
 
-class BrowseRequest : public Task
-{
-public:
-   BrowseRequest(const std::string& name, const NodeId& id)
-   : Task{ name }
-   , id{ id }
-   {}
-   bool prepare(TestClient* client) override;
-   bool execute(const Job& job, TestClient* client) override;
+   class Wait : public Task
+   {
+   public:
+      Wait(const std::string& name, int milliSeconds)
+      : Task{ name }
+      , delay{ milliSeconds }
+      {}
+      bool execute(const Job& job, TestClient* client) override;
 
-private:
-   NodeId id;
-};
+   private:
+      int delay{ 0 };
+   };
 
-class Wait : public Task
-{
-public:
-   Wait(const std::string& name, int milliSeconds)
-   : Task{ name }
-   , delay{ milliSeconds }
-   {}
-   bool execute(const Job& job, TestClient* client) override;
+   class GenericRequest : public Task
+   {
+   public:
+      GenericRequest(const std::string& name, const std::string& jsonRequest)
+      : Task{ name }
+      , jsonRequest{ jsonRequest }
+      {}
+      bool execute(const Job& job, TestClient* client) override;
 
-private:
-   int delay{ 0 };
-};
+   private:
+      const std::string jsonRequest;
+   };
 
-class GenericRequest : public Task
-{
-public:
-   GenericRequest(const std::string& name, const std::string& jsonRequest)
-   : Task{ name }
-   , jsonRequest{ jsonRequest }
-   {}
-   bool execute(const Job& job, TestClient* client) override;
+   class AssertValue : public Task
+   {
+   public:
+      AssertValue(const std::string& name, const std::string& expectedValue)
+      : Task(name)
+      , exp{ expectedValue }
+      {}
 
-private:
-   const std::string jsonRequest;
-};
+      bool execute(const Job& job, TestClient* client) override;
 
-class AssertValue : public Task
-{
-public:
-   AssertValue(const std::string& name, const std::string& expectedValue)
-   : Task(name)
-   , exp{ expectedValue }
-   {}
-
-   bool execute(const Job& job, TestClient* client) override;
-
-private:
-   const ValueExpectation exp;
-};
+   private:
+      const ValueExpectation exp;
+   };
 } // namespace tt

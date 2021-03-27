@@ -1,8 +1,6 @@
 [requires]
-#gtest/1.8.1@engel/stable
-pistache/d5608a1@conan/stable
-jsonformoderncpp/3.7.0
-InfluxDB/0.5.1
+cpp-httplib/0.8.5
+nlohmann_json/3.9.1
 libcurl/7.66.0
 spdlog/1.7.0
 

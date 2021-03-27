@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <spdlog/spdlog.h>
+#include <sstream>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -100,9 +101,9 @@ void JobScheduler::jobFinished(int id)
    schedule();
 }
 
-void JobScheduler::getFinishedJobs(Http::ResponseStream& stream, int fromId)
+std::string JobScheduler::getFinishedJobs(int fromId, int max)
 {
-   using namespace Pistache;
+   std::stringstream stream;
    stream << "[\n";
    size_t cnt = 0;
    for (auto& p : fs::directory_iterator(db->getJobs_finished_dir()))
@@ -132,9 +133,13 @@ void JobScheduler::getFinishedJobs(Http::ResponseStream& stream, int fromId)
          stream << line.c_str() << '\n';
       }
       cnt++;
+      if(cnt>=max)
+      {
+         break;
+      }
    }
    stream << "]\n";
-   stream.ends();
+   return stream.str();
 }
 
 std::string JobScheduler::getFinishedJob(int jobId)

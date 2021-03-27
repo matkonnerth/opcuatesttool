@@ -35,31 +35,32 @@ add_executable(testRunner
 target_include_directories(testRunner PRIVATE comm)
 target_include_directories(testRunner PRIVATE job)
 target_link_libraries(testRunner PRIVATE project_warnings)
-target_link_libraries(testRunner PRIVATE open62541 CONAN_PKG::jsonformoderncpp)
+target_link_libraries(testRunner PRIVATE open62541 CONAN_PKG::nlohmann_json)
 target_link_libraries(testRunner PRIVATE project_options)
 target_link_libraries(testRunner PRIVATE CONAN_PKG::spdlog)
 
-add_executable(testService 
+add_executable(testService
     testService/TestService.cpp
     testService/JobScheduler.cpp
     testService/DataBase.cpp)
-target_link_libraries(testService PRIVATE CONAN_PKG::pistache pthread)
+target_link_libraries(testService PRIVATE CONAN_PKG::cpp-httplib pthread)
+target_link_libraries(testService PRIVATE CONAN_PKG::nlohmann_json)
 target_link_libraries(testService PRIVATE project_options)
 target_link_libraries(testService PRIVATE stdc++fs)
 target_link_libraries(testService PRIVATE CONAN_PKG::spdlog)
 
-add_executable(influxDBImporter
-    persistence/InfluxDBImporter.cpp
-)
-target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::libcurl pthread)
-target_link_libraries(influxDBImporter PRIVATE open62541 CONAN_PKG::jsonformoderncpp)
-target_link_libraries(influxDBImporter PRIVATE project_options)
-target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::InfluxDB)
-target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::spdlog)
+#add_executable(influxDBImporter
+#    persistence/InfluxDBImporter.cpp
+#)
+#target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::libcurl pthread)
+#target_link_libraries(influxDBImporter PRIVATE open62541 CONAN_PKG::jsonformoderncpp)
+#target_link_libraries(influxDBImporter PRIVATE project_options)
+#target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::InfluxDB)
+#target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::spdlog)
 
-add_executable(testInfluxDb testInflux.cpp)
-target_link_libraries(testInfluxDb PRIVATE CONAN_PKG::InfluxDB)
-target_link_libraries(testInfluxDb PRIVATE project_options)
+#add_executable(testInfluxDb testInflux.cpp)
+#target_link_libraries(testInfluxDb PRIVATE CONAN_PKG::InfluxDB)
+#target_link_libraries(testInfluxDb PRIVATE project_options)
 
 
 add_executable(testVariant testVariant.cpp)

@@ -37,9 +37,9 @@ int main(int argc , const char** argv)
 
     std::string finishedDir = argv[2];
     std::string requestsDir = argv[3];
-    std::string jobName = argv[4];    
+    std::string jobName = argv[4];
 
-    tt::JobFactory f;    
+    tt::JobFactory f;
     auto job = f.createFromFile(requestsDir+"/"+jobName);
 
     tt::Comm comm;

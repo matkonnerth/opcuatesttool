@@ -1,49 +1,28 @@
+#include "../api/Request.h"
+#include "../api/Server.h"
 #include "JobScheduler.h"
 #include <future>
-#include <pistache/description.h>
-#include <pistache/endpoint.h>
-#include <pistache/http.h>
-#include <pistache/router.h>
+#include <iostream>
 #include <signal.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <type_traits>
 #include <unistd.h>
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 
-using namespace std;
-using namespace Pistache;
+namespace opctest::service {
 
-namespace Generic {
-
-void handleReady(const Rest::Request&, Http::ResponseWriter response)
-{
-   response.send(Http::Code::Ok, "1");
-}
-
-} // namespace Generic
+using opctest::api::GetJobsRequest;
+using opctest::api::GetJobRequest;
+using opctest::api::GetJobResponse;
+using opctest::api::NewJobRequest;
+using opctest::api::NewJobResponse;
 
 class TestService
 {
 public:
-   TestService(Address addr, const std::string& workingDir);
-
-   void init(size_t thr = 1)
-   {
-      using namespace Rest;
-      Routes::Post(router, "/jobs", Routes::bind(&TestService::newJob, this));
-      Routes::Get(router, "/jobs", Routes::bind(&TestService::getJobs, this));
-      Routes::Get(router, "/jobs/:jobId", Routes::bind(&TestService::getFinishedJob, this));
-      auto opts = Http::Endpoint::options().threads(static_cast<int>(thr));
-      httpEndpoint->init(opts);
-   }
-
-   void start()
-   {
-
-      httpEndpoint->setHandler(router.handler());
-      httpEndpoint->serve();
-   }
+   TestService(const std::string& workingDir);
 
    void handleSigChld(int sig)
    {
@@ -51,65 +30,48 @@ public:
       scheduler->jobFinished(pid);
    }
 
-private:
-   void newJob(const Rest::Request& request, Http::ResponseWriter response)
+   NewJobResponse newJob(const NewJobRequest& req)
    {
-      int id = scheduler->create(request.body());
-      response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
-      response.send(Http::Code::Ok, "{\"StatusCode\": \"OK\", \"id\": " + std::to_string(id) + "}");
+
+      auto id = scheduler->create(req.jsonRequest);
+      NewJobResponse resp{};
+      resp.ok = true;
+      resp.id = id;
       auto logger = spdlog::get("testService");
       logger->info("newJob, id: {}", id);
+      return resp;
    }
 
-   void getJobs(const Rest::Request& request, Http::ResponseWriter response)
+   GetJobResponse getJobs(const GetJobsRequest& req)
    {
       auto logger = spdlog::get("testService");
-      auto query = request.query();
-      if (query.has("finished"))
-      {
-         response.headers().add<Http::Header::ContentType>(MIME(Application, Json));
-         auto stream = response.stream(Http::Code::Ok);
-         int id=0;
-         if(query.has("from"))
-         {
-            auto idString = query.get("from").get();
-            try
-            {
-               id = std::stoi(idString);
-            }
-            catch(const std::exception& e)
-            {
-               std::cerr << e.what() << '\n';
-               id=0;
-            }
-         }
-         logger->info("getJobs, from id {}", id);
-         scheduler->getFinishedJobs(stream, id);
-      }
-      else
-      {
-         response.send(Http::Code::Bad_Request, "wrong query");
-         logger->warn("getJobs, unknown query");
-      }
+
+      GetJobResponse resp{};
+      resp.ok = true;
+      resp.data = scheduler->getFinishedJobs(req.from, req.max);
+      return resp;
    }
 
-   void getFinishedJob(const Rest::Request& request, Http::ResponseWriter response)
+   GetJobResponse getFinishedJob(const GetJobRequest& req)
    {
-      auto jobId = request.param(":jobId").as<int>();
-      response.send(Http::Code::Ok, scheduler->getFinishedJob(jobId), MIME(Application, Json));
+      GetJobResponse resp{};
+      resp.ok = true;
+      resp.data = scheduler->getFinishedJob(req.id);
+      return resp;
    }
 
-   std::shared_ptr<Http::Endpoint> httpEndpoint;
-   Rest::Router router;
+private:
    std::unique_ptr<JobScheduler> scheduler{ nullptr };
 };
 
-TestService::TestService(Address addr, const std::string& workingDir)
-: httpEndpoint(std::make_shared<Http::Endpoint>(addr)), scheduler{std::make_unique<JobScheduler>(workingDir)}
+TestService::TestService(const std::string& workingDir)
+: scheduler{ std::make_unique<JobScheduler>(workingDir) }
 {
    auto logger = spdlog::get("testService");
-   logger->info("init http server, host: {}, port: {}", addr.host(), addr.port());
+   logger->info("init testService");
 }
+
+} // namespace opctest::service
 
 void setupLogger(const std::string& workingDir)
 {
@@ -118,6 +80,36 @@ void setupLogger(const std::string& workingDir)
    logger->set_level(spdlog::level::debug);
    logger->info("logger init finished");
    spdlog::register_logger(logger);
+}
+
+template <class>
+inline constexpr bool always_false_v = false;
+
+bool apiCallback(opctest::service::TestService& service, const opctest::api::RequestVariant& req, opctest::api::ResponseVariant& resp)
+{
+   std::visit(
+   [&](auto&& arg) {
+      using T = std::decay_t<decltype(arg)>;
+      if constexpr (std::is_same_v<T, opctest::api::GetJobRequest>)
+      {
+         resp = service.getFinishedJob(arg);
+      }
+      else if constexpr (std::is_same_v<T, opctest::api::GetJobsRequest>)
+      {
+         resp = service.getJobs(arg);
+      }
+      else if constexpr (std::is_same_v<T, opctest::api::NewJobRequest>)
+      {
+         resp = service.newJob(arg);
+      }
+      else
+      {
+         static_assert(always_false_v<T>, "non-exhaustive visitor!");
+      }
+   },
+   req);
+
+   return true;
 }
 
 int main(int argc, char* argv[])
@@ -132,15 +124,7 @@ int main(int argc, char* argv[])
    sigaddset(&sigset, SIGCHLD);
    pthread_sigmask(SIG_BLOCK, &sigset, nullptr);
 
-   Port port(9080);
-
-   if (argc >= 2)
-   {
-      port = static_cast<uint16_t>(std::stol(argv[1]));
-   }
-
-   Address addr(Ipv4::any(), port);
-   TestService service(addr, binaryPath);
+   opctest::service::TestService service(binaryPath);
 
    auto signalHandler = [&service, &sigset]() {
       while (true)
@@ -153,6 +137,15 @@ int main(int argc, char* argv[])
    };
 
    auto ft_signal_handler = std::async(std::launch::async, signalHandler);
-   service.init(2);
-   service.start();
+
+   opctest::api::Server server{ "0.0.0.0", 9888 };
+
+
+   auto cb = [&](const opctest::api::RequestVariant& req, opctest::api::ResponseVariant & resp)
+   {
+      return apiCallback(service, req, resp);
+   };
+
+   server.setCallback(cb);
+   server.listen();
 }

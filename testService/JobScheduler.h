@@ -1,12 +1,10 @@
 #pragma once
 #include <mutex>
-#include <pistache/http.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include "DataBase.h"
 #include <queue>
-using namespace Pistache;
 
 class JobScheduler
 {
@@ -14,7 +12,7 @@ public:
    JobScheduler(const std::string& workingDir, int maxConcurrentJobs = 4);
    int create(const std::string& jsonString);
    void jobFinished(int pid);
-   void getFinishedJobs(Http::ResponseStream& stream, int fromId);
+   std::string getFinishedJobs(int fromId, int max);
    std::string getFinishedJob(int jobId);
 
 private:
