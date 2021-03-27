@@ -19,7 +19,7 @@ public:
       other.variant = nullptr;
    }
    ~VariantWrapper();
-   bool isEqual(const std::string& jsonVariant) const;
+   bool isEqual() const;
    UA_Variant* getVariant()
    {
       return variant;

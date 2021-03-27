@@ -1,7 +1,6 @@
 #pragma once
 #include "Logger.h"
 #include "NodeId.h"
-#include "Result.h"
 #include <functional>
 #include <map>
 #include <open62541/client_config.h>
@@ -50,9 +49,9 @@ public:
    using ServiceRequestFnc = bool (*)(UA_Client*, const UA_ExtensionObject& obj);
    TestClient(const std::string& endpointUri)
    : Client(endpointUri){};
-   ReadValueResult read(const NodeId& id);
-   bool browse(const NodeId& id);
-   bool invokeGenericService(const std::string& jsonRequest);
+   //ReadValueResult read(const NodeId& id);
+   //bool browse(const NodeId& id);
+   //bool invokeGenericService(const std::string& jsonRequest);
 
 private:
    static const std::unordered_map<int, ServiceRequestFnc> requests;

@@ -1,18 +1,5 @@
 {
     "name": "singleRead",
     "serverUri": "opc.tcp://debian:4840",
-    "type": "oneCycleJob",
-    "tasks": [
-        {
-            "type": "readValue",
-            "NodeId": {
-                "ns": "http://opcfoundation.org/UA/",
-                "id": "i=2255"
-            }
-        },
-        {
-            "type": "wait",
-            "delay_ms": 200
-        }
-    ]
+    "script": "for (var i = 0; i < 10; ++i) { puts(\"test\"); wait(500);}"
 }

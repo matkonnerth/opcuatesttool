@@ -2,11 +2,8 @@
 #include "Comm.h"
 #include "Job.h"
 #include "JobFactory.h"
-#include "Task.h"
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
-
-using json = nlohmann::json;
 
 /*
     The testrunner instantiates exactly 1 client and executes exactly 1 job with this client.
@@ -42,9 +39,6 @@ int main(int argc , const char** argv)
     tt::JobFactory f;
     auto job = f.createFromFile(requestsDir+"/"+jobName);
 
-    tt::Comm comm;
-    auto client = comm.createTestClient(job->getServerUri());
-    client->connect();
-    job->execute(client.get());
+    job->execute();
     job->addResult(requestsDir + "/" + jobName, finishedDir + "/" + jobName);
 }

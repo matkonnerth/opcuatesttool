@@ -20,24 +20,24 @@ set_project_warnings(project_warnings)
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_17)
 
-add_subdirectory(open)
+#add_subdirectory(open)
 
 add_executable(testRunner
     testRunner/TestRunner.cpp
     comm/Comm.cpp
     comm/Client.cpp
 	job/Job.cpp
-    job/Task.cpp
     job/JobFactory.cpp
-    job/VariantWrapper.cpp
-    job/Expectation.cpp
-    job/Result.cpp)
+    job/Runtime.cpp
+    comm/VariantWrapper.cpp)
 target_include_directories(testRunner PRIVATE comm)
 target_include_directories(testRunner PRIVATE job)
 target_link_libraries(testRunner PRIVATE project_warnings)
-target_link_libraries(testRunner PRIVATE open62541 CONAN_PKG::nlohmann_json)
+target_link_libraries(testRunner PRIVATE CONAN_PKG::open62541)
+target_link_libraries(testRunner PRIVATE CONAN_PKG::nlohmann_json)
 target_link_libraries(testRunner PRIVATE project_options)
 target_link_libraries(testRunner PRIVATE CONAN_PKG::spdlog)
+target_link_libraries(testRunner PRIVATE CONAN_PKG::chaiscript)
 
 add_executable(testService
     testService/TestService.cpp
@@ -66,3 +66,5 @@ target_link_libraries(testService PRIVATE CONAN_PKG::spdlog)
 add_executable(testVariant testVariant.cpp)
 target_link_libraries(testVariant PRIVATE open62541)
 target_link_libraries(testVariant PRIVATE project_options)
+
+add_subdirectory(chai)
