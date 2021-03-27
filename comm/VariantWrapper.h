@@ -1,8 +1,11 @@
 #pragma once
 #include <open62541/types_generated.h>
 #include <string>
+#include <variant>
 
 namespace tt {
+
+
 
 class VariantWrapper
 {

@@ -8,9 +8,13 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <optional>
+#include <variant>
 
 struct UA_Client;
 namespace tt {
+
+using Variant = std::variant<bool, int32_t, uint32_t, float, double, std::string>;
 
 class Client
 {
@@ -33,7 +37,7 @@ public:
    bool cacheNodeId(const NodeId& id);
    ConnectionState getConnectionState();
 
-   bool read(const NodeId& id);
+   std::optional<Variant> read(const NodeId& id);
 
 private:
    UA_Client* client{ nullptr };

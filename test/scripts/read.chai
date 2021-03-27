@@ -1,5 +1,6 @@
 for (var i = 0; i < 10; ++i) 
 { 
-    var status = read(NodeId("http://opcfoundation.org/UA/", "i=2255")); 
+    var val = read(NodeId("http://opcfoundation.org/UA/", "i=2255"));
+    puts(val);
     wait(500);
 }

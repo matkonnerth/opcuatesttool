@@ -118,17 +118,17 @@ Client::ConnectionState Client::getConnectionState()
    return connState;
 }
 
-bool Client::read(const NodeId& id)
+std::optional<Variant> Client::read(const NodeId& id)
 {
    if(!cacheNodeId(id))
    {
       UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "could not resolve NodeId");
-      return false;
+      return std::nullopt;
    }
    auto uaId = nodeIdCache.find(id);
    if (uaId == nodeIdCache.end())
    {
-      return false;
+      return std::nullopt;
    }
    UA_Variant var;
    UA_Variant_init(&var);
@@ -136,10 +136,21 @@ bool Client::read(const NodeId& id)
    if (status != UA_STATUSCODE_GOOD)
    {
       UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "could not read with NodeId %s", UA_StatusCode_name(status));
-      return false;
+      return std::nullopt;
    }
+
+   Variant v;
+   if(UA_NodeId_equal(&var.type->typeId, &UA_TYPES[UA_TYPES_INT32].typeId))
+   {
+      v = *static_cast<int32_t*>(var.data);
+   }
+   else if (UA_NodeId_equal(&var.type->typeId, &UA_TYPES[UA_TYPES_UINT32].typeId))
+   {
+      v = *static_cast<uint32_t*>(var.data);
+   }
+
    UA_Variant_clear(&var);
-   return true;
+   return v;
 }
 
 } // namespace tt
