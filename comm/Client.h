@@ -33,7 +33,9 @@ public:
    bool cacheNodeId(const NodeId& id);
    ConnectionState getConnectionState();
 
-protected:
+   bool read(const NodeId& id);
+
+private:
    UA_Client* client{ nullptr };
    std::string uri{};
    std::vector<ConnectionStateCallback> connectionStateCallbacks{};
@@ -41,20 +43,6 @@ protected:
    std::map<NodeId, UA_NodeId> nodeIdCache{};
    std::vector<std::string> namespaces{};
    Logger logger{};
-};
-
-class TestClient : public Client
-{
-public:
-   using ServiceRequestFnc = bool (*)(UA_Client*, const UA_ExtensionObject& obj);
-   TestClient(const std::string& endpointUri)
-   : Client(endpointUri){};
-   //ReadValueResult read(const NodeId& id);
-   //bool browse(const NodeId& id);
-   //bool invokeGenericService(const std::string& jsonRequest);
-
-private:
-   static const std::unordered_map<int, ServiceRequestFnc> requests;
 };
 
 } // namespace tt

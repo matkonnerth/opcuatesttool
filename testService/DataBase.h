@@ -12,6 +12,7 @@ root
             -> requests
             -> finished
             -> logs
+    -> scripts
 
 */
 
@@ -37,6 +38,11 @@ public:
            }
            jobId=lastId;
        }
+       if(!fs::exists(getScriptsFilePath()))
+       {
+          std::cout << "DB: scripts directory missing, initialize new\n";
+          fs::create_directories(getScriptsFilePath());
+       }
    }
 
    int newJob(const std::string& requestJson);
@@ -50,14 +56,19 @@ public:
        return jobs_finished_dir;
    }
 
-   const std::string getRequestFilePath(int id) const
+   std::string getRequestFilePath(int id) const
    {
        return  jobs_requests_dir + "/" + std::to_string(id);
    }
 
-   const std::string getFinishedFilePath(int id) const
+   std::string getFinishedFilePath(int id) const
    {
       return jobs_finished_dir + "/" + std::to_string(id);
+   }
+
+   std::string getScriptsFilePath() const
+   {
+       return rootDir + "/scripts";
    }
 
 private:

@@ -20,7 +20,7 @@
 
 namespace tt {
 
-std::unique_ptr<Job> JobFactory::createFromFile(const std::string& path)
+std::unique_ptr<Job> JobFactory::createFromFile(const std::string& path, const std::string& scriptDir)
 {
    using nlohmann::json;
    std::ifstream ifs1{ path };
@@ -29,8 +29,10 @@ std::unique_ptr<Job> JobFactory::createFromFile(const std::string& path)
 
    auto name = j.at("name").get<std::string>();
    auto serverUri = j.at("serverUri").get<std::string>();
-   auto script = j.at("script").get<std::string>();
+   auto scriptName = j.at("script").get<std::string>();
 
-   return std::make_unique<Job>(name, serverUri, script);
+   
+
+   return std::make_unique<Job>(name, serverUri, scriptDir + "/" + scriptName);
 }
 } // namespace tt

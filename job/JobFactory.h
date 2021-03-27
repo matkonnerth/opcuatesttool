@@ -7,6 +7,6 @@ namespace tt {
 class JobFactory
 {
 public:
-   std::unique_ptr<Job> createFromFile(const std::string& path);
+   std::unique_ptr<Job> createFromFile(const std::string& path, const std::string& scriptPath);
 };
 } // namespace tt

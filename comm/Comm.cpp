@@ -35,13 +35,6 @@ std::shared_ptr<Client> Comm::createClient(const std::string& endpointUri)
     return c;
 }
 
-std::shared_ptr<TestClient> Comm::createTestClient(const std::string& endpointUri)
-{
-   auto c = std::make_shared<TestClient>(endpointUri);
-   clients.emplace_back(c);
-   return c;
-}
-
 Comm::~Comm()
 {
     for(auto c : clients)

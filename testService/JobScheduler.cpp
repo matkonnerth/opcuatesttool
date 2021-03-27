@@ -59,7 +59,8 @@ void JobScheduler::schedule()
                             const_cast<char*>(db->getJobs_finished_dir().c_str()),
                             const_cast<char*>(db->getJobs_requests_dir().c_str()),
                             const_cast<char*>(std::to_string(jobId).c_str()),
-                            NULL };
+                            const_cast<char*>(db->getScriptsFilePath().c_str()),
+                            nullptr };
 
       // the execv() only return if error occured.
       // The return value is -1

@@ -26,7 +26,7 @@ int main(int argc , const char** argv)
 {
     setupLogger();
     auto logger = spdlog::get("TestRunner");
-    if(argc!=5)
+    if(argc!=6)
     {
        logger->error("wrong number of arguments, exit");
        return 1;
@@ -35,9 +35,10 @@ int main(int argc , const char** argv)
     std::string finishedDir = argv[2];
     std::string requestsDir = argv[3];
     std::string jobName = argv[4];
+    std::string scriptDir = argv[5];
 
     tt::JobFactory f;
-    auto job = f.createFromFile(requestsDir+"/"+jobName);
+    auto job = f.createFromFile(requestsDir+"/"+jobName, scriptDir);
 
     job->execute();
     job->addResult(requestsDir + "/" + jobName, finishedDir + "/" + jobName);

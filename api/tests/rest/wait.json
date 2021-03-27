@@ -1,5 +1,5 @@
 {
     "name": "singleRead",
     "serverUri": "opc.tcp://debian:4840",
-    "script": "for (var i = 0; i < 10; ++i) { puts(\"test\"); wait(500);}"
+    "script": "read.chai"
 }

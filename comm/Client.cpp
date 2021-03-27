@@ -61,7 +61,7 @@ void Client::disconnect()
 void Client::doComm()
 {
    auto status = UA_Client_connect(client, uri.c_str());
-   if (!status == UA_STATUSCODE_GOOD)
+   if (!(status == UA_STATUSCODE_GOOD))
    {
       UA_sleep_ms(100);
       return;
@@ -116,6 +116,30 @@ bool Client::cacheNodeId(const NodeId& id)
 Client::ConnectionState Client::getConnectionState()
 {
    return connState;
+}
+
+bool Client::read(const NodeId& id)
+{
+   if(!cacheNodeId(id))
+   {
+      UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "could not resolve NodeId");
+      return false;
+   }
+   auto uaId = nodeIdCache.find(id);
+   if (uaId == nodeIdCache.end())
+   {
+      return false;
+   }
+   UA_Variant var;
+   UA_Variant_init(&var);
+   auto status = UA_Client_readValueAttribute(client, uaId->second, &var);
+   if (status != UA_STATUSCODE_GOOD)
+   {
+      UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "could not read with NodeId %s", UA_StatusCode_name(status));
+      return false;
+   }
+   UA_Variant_clear(&var);
+   return true;
 }
 
 } // namespace tt

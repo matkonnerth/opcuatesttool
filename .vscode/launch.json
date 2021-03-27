@@ -11,7 +11,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/bin/testRunner",
-            "args": ["${workspaceFolder}/build", "${workspaceFolder}/build/bin", "${workspaceFolder}/tests/rest/", "genericWrite.json"],
+            "args": ["${workspaceFolder}/build", "${workspaceFolder}/build/bin", "${workspaceFolder}/api/tests/rest/", "wait.json"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

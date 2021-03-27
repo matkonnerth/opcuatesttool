@@ -1,6 +1,4 @@
 #include "Runtime.h"
-#include "../comm/Client.h"
-#include "../comm/Comm.h"
 #include <chrono>
 #include <thread>
 
@@ -14,17 +12,20 @@ void wait(int delay)
 
 bool Runtime::load()
 {
-   tt::Comm comm;
-   auto client = comm.createTestClient(m_uri);
+   
+   client = comm.createClient(m_uri);
    if(!client->connect())
    {
        return false;
    }
    chai.add(chaiscript::fun(&wait), "wait");
+   chai.add(chaiscript::user_type<tt::NodeId>(), "NodeId");
+   chai.add(chaiscript::constructor<tt::NodeId(const std::string& uri, const std::string& id)>(), "NodeId");
+   chai.add(chaiscript::fun(&tt::Client::read, client.get()), "read");
    return true;
 }
 
 void Runtime::eval()
 {
-   chai.eval(m_script);
+   chai.eval_file(m_script);
 }
