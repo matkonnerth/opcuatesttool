@@ -5,8 +5,7 @@
 #include <thread>
 #include <iostream>
 
-namespace tt
-{
+namespace opctest::client {
 
 Comm::Comm()
 {   
@@ -43,4 +42,4 @@ Comm::~Comm()
     }    
 }
 
-}
+} // namespace opctest::client

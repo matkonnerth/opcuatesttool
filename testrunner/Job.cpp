@@ -1,37 +1,42 @@
 #include "Job.h"
-#include "Client.h"
+#include "../client/Exception.h"
 #include <chrono>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
 
-
-namespace tt {
+namespace opctest::testrunner {
 
 void Job::execute()
 {
    Runtime rt{serverUri, m_script};
 
-   if(!rt.load())
+   try
    {
-      status = JobStatus::ABORTED;
-      return;
+      rt.load();
+
+      auto steady_start = std::chrono::steady_clock::now();
+      start = std::chrono::system_clock::now();
+      status = JobStatus::RUNNING;
+
+      rt.eval();
+
+
+      auto steady_stop = std::chrono::steady_clock::now();
+      stop = std::chrono::system_clock::now();
+      std::chrono::duration<double, std::milli> duration;
+      duration = steady_stop - steady_start;
+      totalRuntime_ms = duration.count();
+      status= JobStatus::FINISHED;
+   }
+   catch(client::OpcException& e)
+   {
+      logger->error("OpcException during execution of job: {0}", e.what());
+      status=JobStatus::ABORTED;
    }
 
-   auto steady_start = std::chrono::steady_clock::now();
-   start = std::chrono::system_clock::now();
-   status = JobStatus::RUNNING;
    
-   rt.eval();
-
-   status = JobStatus::FINISHED;
-   auto steady_stop = std::chrono::steady_clock::now();
-   stop = std::chrono::system_clock::now();
-   std::chrono::duration<double, std::milli> duration;
-   duration = steady_stop - steady_start;
-   totalRuntime_ms = duration.count();
-   //runtimePerIteration_ms = totalRuntime_ms / static_cast<double>(iterations);
 }
 
 const std::string& Job::getServerUri() const
@@ -51,8 +56,7 @@ void Job::addResult(const std::string& inputFile, const std::string& outputFile)
                        start.time_since_epoch().count(),
                        },
                        { "ts_stop", stop.time_since_epoch().count() },
-                       { "totalRuntime_ms", totalRuntime_ms },
-                       /*{ "runtimePerIteration_ms", runtimePerIteration_ms }*/ };
+                       { "totalRuntime_ms", totalRuntime_ms }};
    if (status != JobStatus::FINISHED)
    {
       result["statusCode"] = "Error";
@@ -70,4 +74,4 @@ void Job::addResult(const std::string& inputFile, const std::string& outputFile)
    out << output;
    out.close();
 }
-} // namespace tt
+} // namespace opctest::testrunner

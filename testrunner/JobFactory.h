@@ -3,10 +3,11 @@
 #include <map>
 #include <memory>
 #include <string>
-namespace tt {
+
+namespace opctest::testrunner {
 class JobFactory
 {
 public:
    std::unique_ptr<Job> createFromFile(const std::string& path, const std::string& scriptPath);
 };
-} // namespace tt
+} // namespace opctest::testrunner

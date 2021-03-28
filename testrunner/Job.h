@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace tt {
+namespace opctest::testrunner {
 
 enum class JobStatus
 {
@@ -45,4 +45,4 @@ protected:
 };
 
 
-} // namespace tt
+} // namespace opctest::testrunner

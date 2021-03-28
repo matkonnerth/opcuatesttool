@@ -3,8 +3,7 @@
 #include <vector>
 #include <memory>
 
-namespace tt
-{
+namespace opctest::client {
 class Client;
 class TestClient;
 class Comm
@@ -20,4 +19,4 @@ public:
 private:
     std::vector<std::shared_ptr<Client>> clients{};
 };
-}
+} // namespace opctest::client

@@ -1,0 +1,21 @@
+class Variable
+{
+  var id
+
+  // constructor
+  def Variable(x)
+  {
+    this.id = x
+  }
+  
+  // method
+  def Value()
+  {
+    return read(this.id)
+  }
+}
+
+for(var i=0; i<10; ++i)
+{
+    Variable(NodeId("http://opcfoundation.org/UA/", "i=22735")).Value()
+}

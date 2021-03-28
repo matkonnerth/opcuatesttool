@@ -1,19 +1,20 @@
 #include "Runtime.h"
 #include <chrono>
 #include <thread>
+#include <iostream>
 
-
-using tt::Runtime;
+using opctest::testrunner::Runtime;
 
 void wait(int delay)
 {
    std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 }
 
+/*
 template <class>
 inline constexpr bool always_false_v = false;
 
-std::string toString(const tt::Variant& var)
+std::string toString(const opctest::client::Variant& var)
 {
    std::visit(
    [&](auto&& arg) {
@@ -50,29 +51,33 @@ std::string toString(const tt::Variant& var)
    var);
 }
 
-tt::Variant get(std::optional<tt::Variant> opt)
-{
-    return *opt;
-}
+*/
 
-bool Runtime::load()
+
+
+void Runtime::load()
 {
    
    client = comm.createClient(m_uri);
-   if(!client->connect())
-   {
-       return false;
-   }
+   client->connect();
    chai.add(chaiscript::fun(&wait), "wait");
-   chai.add(chaiscript::user_type<tt::NodeId>(), "NodeId");
-   chai.add(chaiscript::constructor<tt::NodeId(const std::string& uri, const std::string& id)>(), "NodeId");
-   chai.add(chaiscript::fun(&tt::Client::read, client.get()), "read");
-   chai.add(chaiscript::fun(&toString), "toString");
-   chai.add(chaiscript::fun(&get), "get");
-   return true;
+   chai.add(chaiscript::user_type<opctest::client::NodeId>(), "NodeId");
+   chai.add(chaiscript::constructor<opctest::client::NodeId(const std::string& uri, const std::string& id)>(), "NodeId");
+   chai.add(chaiscript::constructor<opctest::client::NodeId(const opctest::client::NodeId& other)>(), "NodeId");
+   chai.add(chaiscript::fun(&opctest::client::Client::read, client.get()), "read");
+   //chai.add(chaiscript::fun(&toString), "toString");
+   //chai.add(chaiscript::fun(&get), "get");
 }
 
 void Runtime::eval()
 {
-   chai.eval_file(m_script);
+   try
+   {
+      chai.eval_file(m_script);
+   }
+   catch (chaiscript::exception::eval_error& e)
+   {
+      logger->error(e.pretty_print());
+      throw;
+   }
 }

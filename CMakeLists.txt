@@ -23,13 +23,13 @@ target_compile_features(project_options INTERFACE cxx_std_17)
 #add_subdirectory(open)
 
 add_executable(testRunner
-    testRunner/TestRunner.cpp
-    comm/Comm.cpp
-    comm/Client.cpp
-	job/Job.cpp
-    job/JobFactory.cpp
-    job/Runtime.cpp
-    comm/VariantWrapper.cpp)
+    testrunner/TestRunner.cpp
+    client/Comm.cpp
+    client/Client.cpp
+	testrunner/Job.cpp
+    testrunner/JobFactory.cpp
+    testrunner/Runtime.cpp
+    client/VariantWrapper.cpp)
 target_include_directories(testRunner PRIVATE comm)
 target_include_directories(testRunner PRIVATE job)
 target_link_libraries(testRunner PRIVATE project_warnings)
@@ -61,10 +61,3 @@ target_link_libraries(testService PRIVATE CONAN_PKG::spdlog)
 #add_executable(testInfluxDb testInflux.cpp)
 #target_link_libraries(testInfluxDb PRIVATE CONAN_PKG::InfluxDB)
 #target_link_libraries(testInfluxDb PRIVATE project_options)
-
-
-add_executable(testVariant testVariant.cpp)
-target_link_libraries(testVariant PRIVATE open62541)
-target_link_libraries(testVariant PRIVATE project_options)
-
-add_subdirectory(chai)

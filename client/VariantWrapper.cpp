@@ -1,7 +1,7 @@
-#include <VariantWrapper.h>
+#include "VariantWrapper.h"
 #include <open62541/types_generated_handling.h>
 
-namespace tt {
+namespace opctest::client {
 VariantWrapper::VariantWrapper()
 {
    variant = UA_Variant_new();
@@ -17,4 +17,4 @@ bool VariantWrapper::isEqual() const
 {
   return false;
 }
-} // namespace tt
+} // namespace opctest::client

@@ -5,9 +5,10 @@
 #include <open62541/client_highlevel_async.h>
 #include <open62541/client_subscriptions.h>
 #include <open62541/plugin/log_stdout.h>
+#include "Exception.h"
 
 
-namespace tt {
+namespace opctest::client {
 Client::Client(const std::string& endpointUri)
 {
    uri = endpointUri;
@@ -24,13 +25,13 @@ Client::~Client()
    UA_Client_delete(client);
 }
 
-bool Client::connect()
+void Client::connect()
 {
    UA_StatusCode retval = UA_Client_connect(client, uri.c_str());
    if (retval != UA_STATUSCODE_GOOD)
    {
       UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Could not connect client %s with %s", uri.c_str(), UA_StatusCode_name(retval));
-      return false;
+      throw OpcException("could not connect");
    }
 
    UA_NodeId namespaceArrayId = UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER_NAMESPACEARRAY);
@@ -40,7 +41,7 @@ bool Client::connect()
    if (status != UA_STATUSCODE_GOOD)
    {
       UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "could not read namespaceArray with %s", UA_StatusCode_name(retval));
-      return false;
+      throw OpcException("could not read namespace array");
    }
    for (auto i = 0u; i < var.arrayLength; i++)
    {
@@ -50,7 +51,6 @@ bool Client::connect()
    }
    UA_Variant_clear(&var);
    connState = ConnectionState::CONNECTED;
-   return true;
 }
 
 void Client::disconnect()
@@ -83,7 +83,7 @@ void Client::notifyConnectionState(ConnectionState state)
    }
 }
 
-bool Client::cacheNodeId(const NodeId& id)
+void Client::cacheNodeId(const NodeId& id)
 {
    bool found = false;
    size_t idx = 0;
@@ -98,7 +98,7 @@ bool Client::cacheNodeId(const NodeId& id)
    }
    if (!found)
    {
-      return false;
+      throw OpcException("namespaceUri of nodeId not found");
    }
    UA_NodeId newId;
    UA_NodeId_init(&newId);
@@ -107,10 +107,9 @@ bool Client::cacheNodeId(const NodeId& id)
    newId.namespaceIndex = static_cast<UA_UInt16>(idx);
    if (status != UA_STATUSCODE_GOOD)
    {
-      return false;
+      throw OpcException("could not parse nodeId");
    }
    nodeIdCache.emplace(id, newId);
-   return true;
 }
 
 Client::ConnectionState Client::getConnectionState()
@@ -118,17 +117,13 @@ Client::ConnectionState Client::getConnectionState()
    return connState;
 }
 
-std::optional<Variant> Client::read(const NodeId& id)
+Variant Client::read(const NodeId& id)
 {
-   if(!cacheNodeId(id))
-   {
-      UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "could not resolve NodeId");
-      return std::nullopt;
-   }
+   cacheNodeId(id);
    auto uaId = nodeIdCache.find(id);
    if (uaId == nodeIdCache.end())
    {
-      return std::nullopt;
+      throw OpcException("NodeId not found in cache");
    }
    UA_Variant var;
    UA_Variant_init(&var);
@@ -136,7 +131,7 @@ std::optional<Variant> Client::read(const NodeId& id)
    if (status != UA_STATUSCODE_GOOD)
    {
       UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "could not read with NodeId %s", UA_StatusCode_name(status));
-      return std::nullopt;
+      throw OpcException("Error on readValueAttribute");
    }
 
    Variant v;
@@ -153,4 +148,4 @@ std::optional<Variant> Client::read(const NodeId& id)
    return v;
 }
 
-} // namespace tt
+} // namespace opctest::client

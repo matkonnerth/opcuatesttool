@@ -1,8 +1,7 @@
 #pragma once
 #include <string>
 
-namespace tt
-{
+namespace opctest::client {
 struct NodeId
 {
 public:
@@ -21,5 +20,4 @@ public:
       return lhs.identifier < rhs.identifier;
 }
 };
-}
-
+} // namespace opctest::client

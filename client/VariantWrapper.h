@@ -3,8 +3,7 @@
 #include <string>
 #include <variant>
 
-namespace tt {
-
+namespace opctest::client {
 
 
 class VariantWrapper
@@ -31,4 +30,4 @@ public:
 private:
    UA_Variant* variant;
 };
-} // namespace tt
+} // namespace opctest::client

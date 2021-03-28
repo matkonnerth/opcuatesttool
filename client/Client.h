@@ -12,7 +12,7 @@
 #include <variant>
 
 struct UA_Client;
-namespace tt {
+namespace opctest::client {
 
 using Variant = std::variant<bool, int32_t, uint32_t, float, double, std::string>;
 
@@ -29,15 +29,15 @@ public:
    ~Client();
    Client(const Client&) = delete;
    Client& operator=(const Client&) = delete;
-   bool connect();
+   void connect();
    void disconnect();
    void doComm();
    void registerConnectionCallback(ConnectionStateCallback fn);
    void notifyConnectionState(ConnectionState state);
-   bool cacheNodeId(const NodeId& id);
+   void cacheNodeId(const NodeId& id);
    ConnectionState getConnectionState();
 
-   std::optional<Variant> read(const NodeId& id);
+   Variant read(const NodeId& id);
 
 private:
    UA_Client* client{ nullptr };

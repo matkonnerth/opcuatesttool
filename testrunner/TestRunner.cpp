@@ -1,5 +1,3 @@
-#include "Client.h"
-#include "Comm.h"
 #include "Job.h"
 #include "JobFactory.h"
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -37,7 +35,7 @@ int main(int argc , const char** argv)
     std::string jobName = argv[4];
     std::string scriptDir = argv[5];
 
-    tt::JobFactory f;
+    opctest::testrunner::JobFactory f;
     auto job = f.createFromFile(requestsDir+"/"+jobName, scriptDir);
 
     job->execute();
