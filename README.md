@@ -2,26 +2,33 @@ opcuaTestTool
 
 ## Overview
 
-The main goal of this project is to automate OPC UA server performance testing.
+The main goal of this project is to automate OPC UA server performance testing. The intention is not to provide a unit test framework for OPC UA.
 
 ## Architecture
 
-Components in green are covered by this project. A http client can trigger new jobs, retrieve results. After requesting a new job, the TestService forks and executes the TestRunner. The TestRunner is a single threaded application, which parses the job configuration, connects to the OPC UA Server and executes the requests. After finishing the tests, a result file with json content is written.
+Components in green are covered by this project. A http client can trigger new jobs, retrieve results. After requesting a new job, the TestService forks and executes the TestRunner. The TestRunner is a single threaded application, which parses the job configuration, connects to the OPC UA Server and executes the requests. After finishing the tests, a result file with json content is written. 
+
+On startup the testService will fetch the availabe test scripts from a github repo.
 
 ![Alt](drawio/architecture.png)
 
-## Jobs and Tasks
+## Jobs
 
-A job represents a single test run and contains 1-n tasks. Types of jobs:
-* repetiveJob: runs for N iterations
-* oneCycleJob: runs the tasks exactly once
+A job represents a single test run and execute a performance test script. The end user can implement performance test scripts with chaiscript.
 
-A task is a single command, e.g. a read request or a wait. Types of tasks:
-* readValue: reads the value attribute of a node
-* browse: browses a node
+The following opc ua specific types / method calls are exposed to the chai script interpreter:
+
+* read(NodeId id): reads the value attribute of a node
 * wait: pauses the job execution for N milliseconds
-* generic: describe the service request in json encoding, as described in the opc ua specification specs https://prototyping.opcfoundation.org/Home/Read/
-* assertValue: compares the result value of the previous command (e.g. of readValue request) with an expected value.
+
+Todo - NOT IMPLEMENTED:
+* a sane Variant implementation ;) -> is this really needed?
+* browse(NodeId startId) or browseSubtree and pass in callback for certain node type?
+* readAttribute??
+* call(NodeId objectId, NodeId methodId)
+* write(NodeId, Variant value)
+
+Per default all opc ua operations will check the statuscodes and throw an exception on error. The exception will not be catched by default, so the job will be marked as aborted.
 
 ## REST interface
 
@@ -32,14 +39,9 @@ curl -H "Content-Type: application/json" --data @tests/rest/newJob.json http://l
 The test service assigns a unique id to the new job (ids are ordered), this id can be used to address the job in further requests.
 
 ### Get finished jobs
-getting all of them
+getting jobs starting at a certain id, max 100
 ```bash
-curl http://localhost:9080/jobs?finished=true
-```
-
-getting jobs starting at a certain id
-```bash
-curl http://localhost:9080/jobs?finished=true&from=1000
+curl http://localhost:9080/jobs?from=id&max=100
 ```
 
 ### Get results of job with id 0
@@ -54,10 +56,6 @@ sudo docker run -p 8086:8086       -v $PWD:/var/lib/influxdb       influxdb
 
 Start Grafana
 sudo docker run -d --name=grafana -p 3000:3000 grafana/grafana
-
-### some good reads
-https://florimond.dev/blog/articles/2018/08/restful-api-design-13-best-practices-to-make-your-users-happy/
-https://code.visualstudio.com/docs/languages/json
 
 
 
