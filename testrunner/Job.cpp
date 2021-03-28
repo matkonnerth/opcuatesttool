@@ -33,10 +33,8 @@ void Job::execute()
    catch(client::OpcException& e)
    {
       logger->error("OpcException during execution of job: {0}", e.what());
-      status=JobStatus::ABORTED;
+      status = JobStatus::ABORTED;
    }
-
-   
 }
 
 const std::string& Job::getServerUri() const

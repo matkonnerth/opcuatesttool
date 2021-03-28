@@ -12,20 +12,19 @@
 
 namespace fs = std::filesystem;
 
-JobScheduler::JobScheduler(const std::string& workingDir, int maxConcurrentJobs)
+JobScheduler::JobScheduler(const std::string& workingDir)
 : workingDir{ workingDir }
-, maxConcurrentJobs{ maxConcurrentJobs }
 , db{ std::make_unique<DataBase>(workingDir) }
 {}
 
 void JobScheduler::schedule()
 {
-   auto logger = spdlog::get("testService");
-   if(waitQueue.empty())
+   auto logger = spdlog::get("TestService");
+   if (waitQueue.empty())
    {
       return;
    }
-   if(activeJobs.size()>=maxConcurrentJobs)
+   if (activeJobs.size() >= maxConcurrentJobs)
    {
       logger->trace("too much active jobs, postpone scheduling, active jobs {}", activeJobs.size());
       return;
@@ -37,7 +36,7 @@ void JobScheduler::schedule()
    if (pid == -1)
    {
       // pid == -1 means error occured
-      
+
       logger->error("failed to fork TestRunner, exit");
       exit(EXIT_FAILURE);
    }
@@ -54,13 +53,16 @@ void JobScheduler::schedule()
       // filename associated with file being executed
       // the array pointer must be terminated by NULL
       // pointer
-      char* argv_list[] = { "./testRunner",
-                            const_cast<char*>(workingDir.c_str()),
-                            const_cast<char*>(db->getJobs_finished_dir().c_str()),
-                            const_cast<char*>(db->getJobs_requests_dir().c_str()),
-                            const_cast<char*>(std::to_string(jobId).c_str()),
-                            const_cast<char*>(db->getScriptsFilePath().c_str()),
-                            nullptr };
+
+      // the const cass tare ugly but execv isn't modifying
+      std::string jobIdString = std::to_string(jobId);
+      char* const argv_list[] = { "./testRunner",
+                                  const_cast<char*>(workingDir.c_str()),
+                                  const_cast<char*>(db->getJobs_finished_dir().c_str()),
+                                  const_cast<char*>(db->getJobs_requests_dir().c_str()),
+                                  const_cast<char*>(jobIdString.c_str()),
+                                  const_cast<char*>(db->getScriptsFilePath().c_str()),
+                                  nullptr };
 
       // the execv() only return if error occured.
       // The return value is -1
@@ -87,7 +89,7 @@ int JobScheduler::create(const std::string& jsonString)
 
 void JobScheduler::jobFinished(int id)
 {
-   auto logger = spdlog::get("testService");
+   auto logger = spdlog::get("TestService");
    std::lock_guard<std::mutex> guard(_m);
    auto entry = activeJobs.find(id);
    if (entry != activeJobs.end())
@@ -106,18 +108,18 @@ std::string JobScheduler::getFinishedJobs(int fromId, int max)
 {
    std::stringstream stream;
    stream << "[\n";
-   size_t cnt = 0;
+   int cnt = 0;
    for (auto& p : fs::directory_iterator(db->getJobs_finished_dir()))
    {
       try
       {
          int fileId = std::stoi(p.path().filename());
-         if(fileId<fromId)
+         if (fileId < fromId)
          {
             continue;
          }
       }
-      catch(const std::exception& e)
+      catch (const std::exception& e)
       {
          std::cerr << e.what() << '\n';
       }
@@ -134,7 +136,7 @@ std::string JobScheduler::getFinishedJobs(int fromId, int max)
          stream << line.c_str() << '\n';
       }
       cnt++;
-      if(cnt>=max)
+      if (cnt >= max)
       {
          break;
       }
@@ -148,6 +150,8 @@ std::string JobScheduler::getFinishedJob(int jobId)
    std::ifstream job(db->getFinishedFilePath(jobId));
    if (job.fail())
    {
+      auto logger = spdlog::get("TestService");
+      logger->warn("job not found");
       return "job not found";
    }
    std::stringstream buffer;

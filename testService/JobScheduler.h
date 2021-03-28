@@ -9,7 +9,7 @@
 class JobScheduler
 {
 public:
-   JobScheduler(const std::string& workingDir, int maxConcurrentJobs = 4);
+   JobScheduler(const std::string& workingDir);
    int create(const std::string& jsonString);
    void jobFinished(int pid);
    std::string getFinishedJobs(int fromId, int max);
@@ -17,9 +17,9 @@ public:
 
 private:
    void schedule();
-   int maxConcurrentJobs{ 4 };
-   std::mutex _m;
    const std::string workingDir;
+   const size_t maxConcurrentJobs{ 4 };
+   std::mutex _m;   
    std::unordered_map<int, int> activeJobs{};
    std::vector<int> finishedPids{};
    std::unique_ptr<DataBase> db {nullptr};

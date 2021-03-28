@@ -17,7 +17,6 @@ enum class JobStatus
    ABORTED
 };
 
-class TestClient;
 class Job
 {
 public:

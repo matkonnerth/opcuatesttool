@@ -20,8 +20,6 @@ set_project_warnings(project_warnings)
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_17)
 
-#add_subdirectory(open)
-
 add_executable(testRunner
     testrunner/TestRunner.cpp
     client/Comm.cpp
@@ -32,12 +30,12 @@ add_executable(testRunner
     client/VariantWrapper.cpp)
 target_include_directories(testRunner PRIVATE comm)
 target_include_directories(testRunner PRIVATE job)
-target_link_libraries(testRunner PRIVATE project_warnings)
 target_link_libraries(testRunner PRIVATE CONAN_PKG::open62541)
 target_link_libraries(testRunner PRIVATE CONAN_PKG::nlohmann_json)
-target_link_libraries(testRunner PRIVATE project_options)
 target_link_libraries(testRunner PRIVATE CONAN_PKG::spdlog)
 target_link_libraries(testRunner PRIVATE CONAN_PKG::chaiscript)
+target_link_libraries(testRunner PRIVATE project_warnings)
+target_link_libraries(testRunner PRIVATE project_options)
 
 add_executable(testService
     testService/TestService.cpp
@@ -45,9 +43,10 @@ add_executable(testService
     testService/DataBase.cpp)
 target_link_libraries(testService PRIVATE CONAN_PKG::cpp-httplib pthread)
 target_link_libraries(testService PRIVATE CONAN_PKG::nlohmann_json)
-target_link_libraries(testService PRIVATE project_options)
 target_link_libraries(testService PRIVATE stdc++fs)
 target_link_libraries(testService PRIVATE CONAN_PKG::spdlog)
+target_link_libraries(testService PRIVATE project_warnings)
+target_link_libraries(testService PRIVATE project_options)
 
 #add_executable(influxDBImporter
 #    persistence/InfluxDBImporter.cpp

@@ -1,6 +1,7 @@
 #include "../api/Request.h"
 #include "../api/Server.h"
 #include "JobScheduler.h"
+#include <spdlog/sinks/rotating_file_sink.h>
 #include <future>
 #include <iostream>
 #include <signal.h>
@@ -26,6 +27,7 @@ public:
 
    void handleSigChld(int sig)
    {
+      (void)sig;
       pid_t pid = wait(nullptr);
       scheduler->jobFinished(pid);
    }
@@ -37,15 +39,13 @@ public:
       NewJobResponse resp{};
       resp.ok = true;
       resp.id = id;
-      auto logger = spdlog::get("testService");
+      auto logger = spdlog::get("TestService");
       logger->info("newJob, id: {}", id);
       return resp;
    }
 
    GetJobResponse getJobs(const GetJobsRequest& req)
    {
-      auto logger = spdlog::get("testService");
-
       GetJobResponse resp{};
       resp.ok = true;
       resp.data = scheduler->getFinishedJobs(req.from, req.max);
@@ -67,7 +67,7 @@ private:
 TestService::TestService(const std::string& workingDir)
 : scheduler{ std::make_unique<JobScheduler>(workingDir) }
 {
-   auto logger = spdlog::get("testService");
+   auto logger = spdlog::get("TestService");
    logger->info("init testService");
 }
 
@@ -75,11 +75,12 @@ TestService::TestService(const std::string& workingDir)
 
 void setupLogger(const std::string& workingDir)
 {
-   auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-   auto logger = std::make_shared<spdlog::logger>("testService", console_sink);
-   logger->set_level(spdlog::level::debug);
-   logger->info("logger init finished");
-   spdlog::register_logger(logger);
+   std::vector<spdlog::sink_ptr> sinks;
+   sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+   sinks.push_back(std::make_shared<spdlog::sinks::rotating_file_sink_st>(workingDir + "/logs/TestService.log", 1048576 * 5, 10));
+   auto combined_logger = std::make_shared<spdlog::logger>("TestService", begin(sinks), end(sinks));
+   // register it if you need to access it globally
+   spdlog::register_logger(combined_logger);
 }
 
 template <class>
