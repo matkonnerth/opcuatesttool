@@ -48,14 +48,15 @@ target_link_libraries(testService PRIVATE CONAN_PKG::spdlog)
 target_link_libraries(testService PRIVATE project_warnings)
 target_link_libraries(testService PRIVATE project_options)
 
-#add_executable(influxDBImporter
-#    persistence/InfluxDBImporter.cpp
-#)
-#target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::libcurl pthread)
-#target_link_libraries(influxDBImporter PRIVATE open62541 CONAN_PKG::jsonformoderncpp)
-#target_link_libraries(influxDBImporter PRIVATE project_options)
-#target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::InfluxDB)
-#target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::spdlog)
+add_executable(influxDBImporter
+    persistence/InfluxDBImporter.cpp
+)
+target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::libcurl pthread)
+target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::nlohmann_json)
+target_link_libraries(influxDBImporter PRIVATE project_options)
+target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::influxdb-cpp)
+target_link_libraries(influxDBImporter PRIVATE project_warnings)
+target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::spdlog)
 
 #add_executable(testInfluxDb testInflux.cpp)
 #target_link_libraries(testInfluxDb PRIVATE CONAN_PKG::InfluxDB)

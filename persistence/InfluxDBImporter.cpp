@@ -1,8 +1,8 @@
-#include <InfluxDBFactory.h>
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <curl/curl.h>
+#include <influxdb.hpp>
 #include <nlohmann/json.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
@@ -138,13 +138,13 @@ int main(void)
    /* Perform the request, res will get the return code */
    while (true)
    {
-      
-      res = curl_fetch_url(curl, (uri+std::to_string(fromId)).c_str(), &curlFinishedJobs);
+
+      res = curl_fetch_url(curl, (uri + std::to_string(fromId)).c_str(), &curlFinishedJobs);
       /* Check for errors */
       if (res != CURLE_OK)
       {
          logger->warn("curl_easy_perform() failed: {}", curl_easy_strerror(res));
-         //TODO: check for memleaks?
+         // TODO: check for memleaks?
       }
       else
       {
@@ -152,9 +152,9 @@ int main(void)
          auto j = json::parse(curlFinishedJobs.payload);
          free(curlFinishedJobs.payload);
 
-         //todo: check if its necessary to insert
-         auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=mydb");
-         influxdb->batchOf(100);
+         // todo: check if its necessary to insert
+
+         influxdb_cpp::server_info si("127.0.0.1", 8086, "db", "usr", "pwd");
 
          for (auto& job : j.items())
          {
@@ -167,14 +167,13 @@ int main(void)
             try
             {
                // we insert a start and a stop event
-               influxdb->write(influxdb::Point{ "mydb" }.addField("totalRuntime_ms", totalRuntime_ms).addTag("id", std::to_string(id)).setTimestamp(std::chrono::time_point<std::chrono::system_clock>(std::chrono::nanoseconds(ts_stop))));
-               influxdb->write(influxdb::Point{ "mydb" }.addField("totalRuntime_ms", totalRuntime_ms).addTag("id", std::to_string(id)).setTimestamp(std::chrono::time_point<std::chrono::system_clock>(std::chrono::nanoseconds(ts_start))));
+               influxdb_cpp::builder().meas("mydb").field("totalRuntime_ms", totalRuntime_ms).timestamp(ts_stop).meas("mydb").field("totalRuntime_ms", totalRuntime_ms).timestamp(ts_start).post_http(si);
                if (id >= fromId)
                {
                   fromId = id + 1;
                }
             }
-            catch(const std::exception& e)
+            catch (const std::exception& e)
             {
                logger->warn("influxDB write failed: {}", e.what());
                break;
