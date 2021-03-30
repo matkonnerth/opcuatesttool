@@ -1,11 +1,10 @@
 #pragma once
-#include "../client/Client.h"
-#include "../client/Comm.h"
 #include <chaiscript/chaiscript.hpp>
+#include <functional>
+#include <modernOpc/client/Client.h>
 #include <spdlog/spdlog.h>
 
-namespace opctest::testrunner
-{
+namespace opctest::testrunner {
 class Runtime
 {
 public:
@@ -16,12 +15,13 @@ public:
    {}
    void load();
    void eval();
+
 private:
    std::string m_uri;
    std::string m_script;
    std::shared_ptr<spdlog::logger> logger;
    chaiscript::ChaiScript chai;
-   std::shared_ptr<opctest::client::Client> client{};
-   opctest::client::Comm comm{};
+   std::shared_ptr<modernopc::Client> client{};
+   std::function<modernopc::Variant(const modernopc::UnresolvedNodeId&)> m_read;
 };
-}
+} // namespace opctest::testrunner

@@ -15,7 +15,7 @@ class Variable
   }
 }
 
-for(var i=0; i<10; ++i)
+for(var i=0; i<10000; ++i)
 {
-    Variable(NodeId("http://opcfoundation.org/UA/", "i=22735")).Value()
+    Variable(NodeId("http://opcfoundation.org/UA/", "i=2235")).Value()
 }

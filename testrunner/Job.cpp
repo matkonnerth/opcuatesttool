@@ -1,8 +1,8 @@
 #include "Job.h"
-#include "../client/Exception.h"
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <modernOpc/OpcException.h>
 #include <nlohmann/json.hpp>
 
 
@@ -10,7 +10,7 @@ namespace opctest::testrunner {
 
 void Job::execute()
 {
-   Runtime rt{serverUri, m_script};
+   Runtime rt{ serverUri, m_script };
 
    try
    {
@@ -28,9 +28,9 @@ void Job::execute()
       std::chrono::duration<double, std::milli> duration;
       duration = steady_stop - steady_start;
       totalRuntime_ms = duration.count();
-      status= JobStatus::FINISHED;
+      status = JobStatus::FINISHED;
    }
-   catch(client::OpcException& e)
+   catch (modernopc::OpcException& e)
    {
       logger->error("OpcException during execution of job: {0}", e.what());
       status = JobStatus::ABORTED;
@@ -54,7 +54,7 @@ void Job::addResult(const std::string& inputFile, const std::string& outputFile)
                        start.time_since_epoch().count(),
                        },
                        { "ts_stop", stop.time_since_epoch().count() },
-                       { "totalRuntime_ms", totalRuntime_ms }};
+                       { "totalRuntime_ms", totalRuntime_ms } };
    if (status != JobStatus::FINISHED)
    {
       result["statusCode"] = "Error";

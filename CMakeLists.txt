@@ -20,17 +20,16 @@ set_project_warnings(project_warnings)
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_17)
 
+find_package(open62541 REQUIRED)
+find_package(modernOpc REQUIRED)
+
 add_executable(testRunner
     testrunner/TestRunner.cpp
-    client/Comm.cpp
-    client/Client.cpp
 	testrunner/Job.cpp
     testrunner/JobFactory.cpp
-    testrunner/Runtime.cpp
-    client/VariantWrapper.cpp)
-target_include_directories(testRunner PRIVATE comm)
+    testrunner/Runtime.cpp)
 target_include_directories(testRunner PRIVATE job)
-target_link_libraries(testRunner PRIVATE CONAN_PKG::open62541)
+target_link_libraries(testRunner PRIVATE modernOpc)
 target_link_libraries(testRunner PRIVATE CONAN_PKG::nlohmann_json)
 target_link_libraries(testRunner PRIVATE CONAN_PKG::spdlog)
 target_link_libraries(testRunner PRIVATE CONAN_PKG::chaiscript)
