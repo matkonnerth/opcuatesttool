@@ -22,7 +22,6 @@ The following opc ua specific types / method calls are exposed to the chai scrip
 * wait: pauses the job execution for N milliseconds
 
 Todo - NOT IMPLEMENTED:
-* a sane Variant implementation ;) -> is this really needed?
 * browse(NodeId startId) or browseSubtree and pass in callback for certain node type?
 * readAttribute??
 * call(NodeId objectId, NodeId methodId)

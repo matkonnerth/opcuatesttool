@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <modernOpc/UnresolvedNodeId.h>
+#include <modernOpc/Variant.h>
 #include <modernOpc/types/NodeId.h>
 #include <thread>
 
@@ -24,12 +25,23 @@ void Runtime::load()
       return client->read(resolvedId);
    };
 
+   m_write =
+   [&](const modernopc::UnresolvedNodeId& id, const modernopc::Variant& var) {
+      auto resolvedId = client->resolve(id);
+      client->write(resolvedId, var);
+   };
+
 
    chai.add(chaiscript::fun(&wait), "wait");
    chai.add(chaiscript::user_type<modernopc::UnresolvedNodeId>(), "NodeId");
    chai.add(chaiscript::constructor<modernopc::UnresolvedNodeId(const std::string& ns, const std::string identifier)>(), "NodeId");
    chai.add(chaiscript::constructor<modernopc::UnresolvedNodeId(const modernopc::UnresolvedNodeId& other)>(), "NodeId");
+
+   chai.add(chaiscript::user_type<modernopc::Variant>(), "Variant");
+   chai.add(chaiscript::constructor<modernopc::Variant(int32_t val)>(), "Int32");
+   chai.add(chaiscript::constructor<modernopc::Variant(int64_t val)>(), "Int64");
    chai.add(chaiscript::fun(m_read), "read");
+   chai.add(chaiscript::fun(m_write), "write");
 }
 
 void Runtime::eval()

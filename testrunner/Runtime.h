@@ -23,5 +23,6 @@ private:
    chaiscript::ChaiScript chai;
    std::shared_ptr<modernopc::Client> client{};
    std::function<modernopc::Variant(const modernopc::UnresolvedNodeId&)> m_read;
+   std::function<void(const modernopc::UnresolvedNodeId& id, const modernopc::Variant& var)> m_write;
 };
 } // namespace opctest::testrunner
