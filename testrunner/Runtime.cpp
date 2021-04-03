@@ -8,6 +8,7 @@
 #include <modernOpc/types/NodeId.h>
 #include <modernOpc/types/QualifiedName.h>
 #include <thread>
+#include <string>
 
 using chaiscript::constructor;
 using chaiscript::fun;
@@ -64,7 +65,6 @@ void Runtime::load()
 
    using BrowseResultList = std::vector<BrowseResult>;
    chai.add(chaiscript::bootstrap::standard_library::vector_type<BrowseResultList>("BrowseResultList"));
-
    chaiscript::utility::add_class<QualifiedName>(*m,
                                                  "QualifiedName",
                                                  { constructor<QualifiedName(const QualifiedName&)>(), constructor<QualifiedName(QualifiedName &&)>() },
