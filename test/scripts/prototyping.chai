@@ -13,9 +13,35 @@ class Variable
   {
     return read(this.id)
   }
+
+  def setValue(val)
+  {
+      write(this.id, val)
+  }
 }
 
-for(var i=0; i<10000; ++i)
+var val = Variable(UriId("http://opcfoundation.org/UA/", "i=2235")).Value()
+
+def intent(x)
 {
-    Variable(NodeId("http://opcfoundation.org/UA/", "i=2235")).Value()
+  for(auto i=0; i< x; ++i)
+  {
+    puts(" ");
+  }
 }
+
+
+def browseRecursive(id, intention) 
+{
+  auto results = browse(id);
+  intent(intention)
+   for(r : results)
+   {
+      print(r.Name().Name())
+      auto nextIntent = intention+1
+      browseRecursive(r.Id(), nextIntent)
+   }
+}
+
+browseRecursive(NodeId(0,85), 0)
+

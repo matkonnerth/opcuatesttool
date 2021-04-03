@@ -3,6 +3,8 @@
 #include <functional>
 #include <modernOpc/client/Client.h>
 #include <spdlog/spdlog.h>
+#include <vector>
+#include <modernOpc/BrowseResult.h>
 
 namespace opctest::testrunner {
 class Runtime
@@ -24,5 +26,6 @@ private:
    std::shared_ptr<modernopc::Client> client{};
    std::function<modernopc::Variant(const modernopc::UnresolvedNodeId&)> m_read;
    std::function<void(const modernopc::UnresolvedNodeId& id, const modernopc::Variant& var)> m_write;
+   std::function<std::vector<modernopc::BrowseResult>(const modernopc::NodeId& id)> m_browse;
 };
 } // namespace opctest::testrunner
