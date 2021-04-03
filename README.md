@@ -18,14 +18,17 @@ A job represents a single test run and execute a performance test script. The en
 
 The following opc ua specific types / method calls are exposed to the chai script interpreter:
 
-* read(NodeId id): reads the value attribute of a node
+* Variant read(NodeId id): reads the value attribute of a node
+* void write(NodeId, Variant value): writes to the value attribute of a node
+* vector<BrowseResult> browse(NodeId id): browses the hierachical references of the given id
+* vector<Variant> call(NodeId objectId, NodeId methodId, vector<Variant> inputArguments)
 * wait: pauses the job execution for N milliseconds
 
+
 Todo - NOT IMPLEMENTED:
-* browse(NodeId startId) or browseSubtree and pass in callback for certain node type?
 * readAttribute??
-* call(NodeId objectId, NodeId methodId)
-* write(NodeId, Variant value)
+* subscribeToValueChanges
+* subscribeToEvents
 
 Per default all opc ua operations will check the statuscodes and throw an exception on error. The exception will not be catched by default, so the job will be marked as aborted.
 
