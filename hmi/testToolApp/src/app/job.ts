@@ -19,8 +19,8 @@ export interface FinishedJobs {
 }
 
 export interface FinishedJobsResponse {
-    data: FinishedJobs[];
-    ok: boolean;
+    response: FinishedJobs[];
+    statusCode: boolean;
 }
 /*ui internal*/
 

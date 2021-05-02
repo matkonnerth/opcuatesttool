@@ -12,4 +12,5 @@
     <div><span>script: </span>{{selectedJob.request.script}}</div>
     <div><span>Server URI: </span>{{selectedJob.request.serverUri}}</div>
     <div *ngIf="selectedJob.result"><span>Runtime (ms): </span>{{selectedJob.result.totalRuntime_ms}}</div>
+    <button type="button" class="btn btn-default" (click)="newJob(selectedJob)">Run again</button>
 </div>

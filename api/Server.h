@@ -13,8 +13,15 @@ public:
    : ip{ std::move(ip) }
    , port{ port }
    {
+      srv.Options("/(.*)", [&](const httplib::Request& /*req*/, httplib::Response& res) {
+         res.set_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+         res.set_header("Content-Type", "text/html; charset=utf-8");
+         res.set_header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Accept");
+         res.set_header("Access-Control-Allow-Origin", "*");
+         res.set_header("Connection", "close");
+      });
       // getJobs
-      srv.Get("/jobs", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
+      srv.Get("/api/jobs", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
          httpRes.set_header("Access-Control-Allow-Origin", "*");
 
          GetJobsRequest req{};
@@ -34,12 +41,12 @@ public:
          using nlohmann::json;
          json jResp = json::object();
          jResp["ok"] = std::get<GetJobResponse>(varResp).ok;
-         jResp["data"] = json::parse(std::get<GetJobResponse>(varResp).data);
+         jResp["response"] = json::parse(std::get<GetJobResponse>(varResp).data);
          httpRes.set_content(jResp.dump(), "application/json");
       });
 
       // newJob
-      srv.Post("/jobs", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
+      srv.Post("/api/jobs", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
          httpRes.set_header("Access-Control-Allow-Origin", "*");
 
          NewJobRequest req{};
@@ -55,7 +62,7 @@ public:
       });
 
       // get finished job
-      srv.Get(R"(/jobs/(\d+))", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
+      srv.Get(R"(/api/jobs/(\d+))", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
          httpRes.set_header("Access-Control-Allow-Origin", "*");
 
          GetJobRequest req{};
@@ -67,8 +74,8 @@ public:
 
          using nlohmann::json;
          json jResp = json::object();
-         jResp["ok"] = std::get<GetJobResponse>(varResp).ok;
-         jResp["data"] = json::parse(std::get<GetJobResponse>(varResp).data);
+         jResp["statusCode"] = std::get<GetJobResponse>(varResp).ok;
+         jResp["response"] = json::parse(std::get<GetJobResponse>(varResp).data);
          httpRes.set_content(jResp.dump(), "application/json");
       });
    }

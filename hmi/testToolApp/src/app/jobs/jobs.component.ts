@@ -22,7 +22,13 @@ export class JobsComponent implements OnInit {
     this.selectedJob = job;
   }
 
+  newJob(job: Job): void {
+    console.log('newJob');
+    this.jobService.createJob(job.request);
+  }
+
   getJobs(): void {
+    console.log('getJobs');
     this.jobService.getJobs()
       .subscribe(jobs => this.jobs = jobs);
   }

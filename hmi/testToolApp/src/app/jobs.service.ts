@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Job, FinishedJobsResponse, FinishedJobs } from './job';
+import { Job, FinishedJobsResponse, FinishedJobs, Request } from './job';
 import { Observable, of } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +11,11 @@ export class JobsService {
 
   constructor(private http: HttpClient) { }
 
-  private jobsUrl = 'http://localhost:9888/jobs?from=0&max=10';  // URL to web api
+  private jobsUrl = 'http://localhost:9888/api/jobs';  // URL to web api
 
   getJobs(): Observable<Job[]> {
-    const jobs = this.http.get<FinishedJobsResponse>(this.jobsUrl).
-      pipe(map(response => response.data.map(data => {
+    const jobs = this.http.get<FinishedJobsResponse>(this.jobsUrl + '?from=0&max=10').
+      pipe(map(response => response.response.map(data => {
         const job: Job = {
           request: data.request,
           result: data.result
@@ -23,5 +23,31 @@ export class JobsService {
         return job;
       })));
     return jobs;
-}
+  }
+
+  /** POST: run new test job */
+  createJob(job: Request): void {
+    const req = this.http.post(this.jobsUrl, job)
+      .pipe(
+        catchError(this.handleError('createJob', job))
+    );
+    req.subscribe();
+  }
+
+  /**
+   * Handle Http operation that failed.
+   * Let the app continue.
+   * @param operation - name of the operation that failed
+   * @param result - optional value to return as the observable result
+   */
+  private handleError<T>(operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+
+      // TODO: send the error to remote logging infrastructure
+      console.error(operation, error); // log to console instead
+
+      // Let the app keep running by returning an empty result.
+      return of(result as T);
+    };
+  }
 }
