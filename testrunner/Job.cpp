@@ -42,14 +42,15 @@ const std::string& Job::getServerUri() const
    return serverUri;
 }
 
-void Job::addResult(const std::string& inputFile, const std::string& outputFile)
+void Job::addResult(const std::string& inputFile, const std::string& outputFile, int id)
 {
    using nlohmann::json;
    std::ifstream ifs1{ inputFile };
 
    auto j = json::parse(ifs1);
 
-   auto result = json{ {
+   auto result = json{ { "id", id },
+                       {
                        "ts_start",
                        start.time_since_epoch().count(),
                        },

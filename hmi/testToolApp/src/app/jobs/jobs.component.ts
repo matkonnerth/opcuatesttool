@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Job } from '../job';
+import { FinishedJob } from '../job';
 import { JobsService } from '../jobs.service';
 
 @Component({
@@ -9,8 +9,8 @@ import { JobsService } from '../jobs.service';
 })
 export class JobsComponent implements OnInit {
 
-  jobs: Job[] = [];
-  selectedJob?: Job;
+  jobs: FinishedJob[] = [];
+  selectedJob?: FinishedJob;
 
   constructor(private jobService: JobsService) { }
 
@@ -18,17 +18,15 @@ export class JobsComponent implements OnInit {
     this.getJobs();
   }
 
-  onSelect(job: Job): void {
+  onSelect(job: FinishedJob): void {
     this.selectedJob = job;
   }
 
-  newJob(job: Job): void {
-    console.log('newJob');
+  newJob(job: FinishedJob): void {
     this.jobService.createJob(job.request);
   }
 
   getJobs(): void {
-    console.log('getJobs');
     this.jobService.getJobs()
       .subscribe(jobs => this.jobs = jobs);
   }

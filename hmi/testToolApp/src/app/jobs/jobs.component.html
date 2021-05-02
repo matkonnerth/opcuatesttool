@@ -1,16 +1,17 @@
 <h2>Recent </h2>
 <ul class="jobs">
     <li *ngFor="let job of jobs" [class.selected]="job === selectedJob" (click)="onSelect(job)">
-        <span class="badge">{{job.request.id}}</span> 
+        <span class="badge">{{job.result.id}}</span> 
         {{job.request.name}}
         {{job.request.script}}
     </li>
 </ul>
 <div *ngIf="selectedJob">
-    <h2>{{selectedJob.request.id}} Details</h2>
+    <h2>{{selectedJob.result.id}} Details</h2>
     <div><span>name: </span>{{selectedJob.request.name}}</div>
     <div><span>script: </span>{{selectedJob.request.script}}</div>
     <div><span>Server URI: </span>{{selectedJob.request.serverUri}}</div>
+    <div><span>StatusCode: </span>{{selectedJob.result.statusCode}}</div>
     <div *ngIf="selectedJob.result"><span>Runtime (ms): </span>{{selectedJob.result.totalRuntime_ms}}</div>
     <button type="button" class="btn btn-default" (click)="newJob(selectedJob)">Run again</button>
 </div>

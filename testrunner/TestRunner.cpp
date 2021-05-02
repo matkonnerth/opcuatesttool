@@ -39,5 +39,5 @@ int main(int argc , const char** argv)
     auto job = f.createFromFile(requestsDir+"/"+jobName, scriptDir);
 
     job->execute();
-    job->addResult(requestsDir + "/" + jobName, finishedDir + "/" + jobName);
+    job->addResult(requestsDir + "/" + jobName, finishedDir + "/" + jobName, std::stoi(jobName));
 }

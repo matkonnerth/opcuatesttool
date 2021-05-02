@@ -29,7 +29,7 @@ public:
    const std::string& getServerUri() const;
    virtual void execute();
    virtual ~Job() = default;
-   void addResult(const std::string& inputFile, const std::string& outputFile);
+   void addResult(const std::string& inputFile, const std::string& outputFile, int id);
 
 protected:
    JobStatus status{ JobStatus::INIT };

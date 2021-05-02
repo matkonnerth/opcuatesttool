@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Job, FinishedJobsResponse, FinishedJobs, Request } from './job';
+import { FinishedJob, FinishedJobsResponse, Request } from './job';
 import { Observable, of } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
@@ -13,10 +13,10 @@ export class JobsService {
 
   private jobsUrl = 'http://localhost:9888/api/jobs';  // URL to web api
 
-  getJobs(): Observable<Job[]> {
+  getJobs(): Observable<FinishedJob[]> {
     const jobs = this.http.get<FinishedJobsResponse>(this.jobsUrl + '?from=0&max=10').
       pipe(map(response => response.response.map(data => {
-        const job: Job = {
+        const job: FinishedJob = {
           request: data.request,
           result: data.result
         };
