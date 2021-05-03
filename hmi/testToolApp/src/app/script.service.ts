@@ -1,37 +1,30 @@
 import { Injectable } from '@angular/core';
-import { FinishedJob, FinishedJobsResponse, Request } from './job';
 import { Observable, of } from 'rxjs';
 import { HttpClient} from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
+import { GetScriptsResponse, Script } from './script';
 
 @Injectable({
   providedIn: 'root'
 })
-export class JobsService {
+export class ScriptService {
 
   constructor(private http: HttpClient) { }
 
-  private jobsUrl = 'http://localhost:9888/api/jobs';  // URL to web api
+  private serviceUrl = 'http://localhost:9888/api/scripts';
 
-  getJobs(): Observable<FinishedJob[]> {
-    const jobs = this.http.get<FinishedJobsResponse>(this.jobsUrl + '?from=0&max=10').
+  getScripts(): Observable<Script[]> {
+    const jobs = this.http.get<GetScriptsResponse>(this.serviceUrl).
       pipe(map(response => response.response.map(data => {
-        const job: FinishedJob = {
-          request: data.request,
-          result: data.result
-        };
-        return job;
+        return data;
       })));
     return jobs;
   }
 
-  /** POST: run new test job */
-  createJob(job: Request): void {
-    const req = this.http.post(this.jobsUrl, job)
-      .pipe(
-        catchError(this.handleError('createJob', job))
-    );
-    req.subscribe();
+  getScriptContent(script: Script): Observable<string>
+  {
+    const content = this.http.get(this.serviceUrl + '/' + script.name, { responseType: 'text' });
+    return content;
   }
 
   /**

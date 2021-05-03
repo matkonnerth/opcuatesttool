@@ -1,0 +1,9 @@
+<ul class="script">
+    <li *ngFor="let script of scripts" [class.selected]="script === selectedScript" (click)="onSelect(script)">
+        <span class="badge">{{script.name}}</span>
+    </li>
+</ul>
+<div *ngIf="selectedScript">
+    <h2>{{selectedScript.name}} Details</h2>
+    <div *ngIf="content"><span>content: </span>{{content}}}</div>
+</div>

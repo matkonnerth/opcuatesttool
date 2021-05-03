@@ -33,7 +33,7 @@ std::string DataBase::getScripts() const
          stream << ",{\n";
       }
       stream << "\"name\": ";
-      stream << p.path().filename();
+      stream << p.path().stem();
       stream << "}";
    }
    stream << "]\n";
