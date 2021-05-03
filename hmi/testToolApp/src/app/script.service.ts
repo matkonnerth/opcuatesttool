@@ -27,6 +27,12 @@ export class ScriptService {
     return content;
   }
 
+  /** POST: run new test job */
+  updateScript(script: Script, content: string): void {
+    const req = this.http.post(this.serviceUrl + '/' + script.name, content);
+    req.subscribe();
+  }
+
   /**
    * Handle Http operation that failed.
    * Let the app continue.

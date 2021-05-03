@@ -22,6 +22,8 @@ using opctest::api::NewJobResponse;
 using opctest::api::GetScriptsResponse;
 using opctest::api::GetScriptResponse;
 using opctest::api::GetScriptRequest;
+using opctest::api::Response;
+using opctest::api::UpdateScriptRequest;
 
 class TestService
 {
@@ -79,6 +81,14 @@ public:
       return resp;
    }
 
+   Response updateScript(const UpdateScriptRequest& req)
+   {
+      Response resp{};
+      resp.ok = true;
+      scheduler->updateScript(req.name, req.content);
+      return resp;
+   }
+
 private:
    std::unique_ptr<JobScheduler> scheduler{ nullptr };
 };
@@ -129,6 +139,10 @@ bool apiCallback(opctest::service::TestService& service, const opctest::api::Req
       else if constexpr (std::is_same_v<T, opctest::api::GetScriptRequest>)
       {
          resp = service.getScript(arg);
+      }
+      else if constexpr (std::is_same_v<T, opctest::api::UpdateScriptRequest>)
+      {
+         resp = service.updateScript(arg);
       }
       else
       {

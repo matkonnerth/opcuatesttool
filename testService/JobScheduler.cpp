@@ -169,3 +169,8 @@ std::string JobScheduler::getScript(const std::string& name) const
 {
    return db->getScript(name);
 }
+
+void JobScheduler::updateScript(const std::string& name, const std::string& content)
+{
+   db->updateScript(name, content);
+}

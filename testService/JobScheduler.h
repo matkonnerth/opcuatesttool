@@ -16,6 +16,7 @@ public:
    std::string getFinishedJob(int jobId);
    std::string getScripts() const;
    std::string getScript(const std::string& name) const;
+   void updateScript(const std::string&name, const std::string& content);
 
 private:
    void schedule();

@@ -55,3 +55,10 @@ std::string DataBase::getScript(const std::string& name) const
    script.close();
    return buffer.str();
 }
+
+void DataBase::updateScript(const std::string&name, const std::string& content)
+{
+   std::ofstream out(scriptDir + "/" + name + ".chai");
+   out << content;
+   out.close();
+}

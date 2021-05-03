@@ -4,7 +4,14 @@
     </li>
 </ul>
 <div *ngIf="selectedScript">
-    <h2>{{selectedScript.name}} Details</h2>
-    <div *ngIf="content"><span>content: </span>{{content}}}</div>
+    <h2>{{selectedScript.name}}</h2>
+    <div *ngIf="content">
+        
+        <form #f="ngForm" (ngSubmit)="onSubmit(f)" novalidate>
+            <input name="src" [(ngModel)="content">{{content}}</input>
+            <button>Save</button>
+          </form>
+    </div>
     <button type="button" class="btn btn-default" (click)="newJob(selectedScript)">Run</button>
+    <button *ngIf="content" type="button" class="btn btn-default" (click)="updateScript(selectedScript, content)">Save</button>
 </div>

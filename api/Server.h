@@ -71,6 +71,21 @@ public:
          httpRes.set_content(std::get<GetScriptResponse>(varResp).content, "text/plain");
       });
 
+      srv.Post(R"(/api/scripts/(\w+))", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
+         httpRes.set_header("Access-Control-Allow-Origin", "*");
+
+         UpdateScriptRequest req{};
+         req.name = httpReq.matches[1];
+         req.content = httpReq.body;
+         RequestVariant varReq{ req };
+         ResponseVariant varResp{};
+         callback(varReq, varResp);
+         using nlohmann::json;
+         json jResp = json::object();
+         jResp["ok"] = std::get<GetScriptsResponse>(varResp).ok;
+         httpRes.set_content(jResp.dump(), "application/json");
+      });
+
       // newJob
       srv.Post("/api/jobs", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
          httpRes.set_header("Access-Control-Allow-Origin", "*");

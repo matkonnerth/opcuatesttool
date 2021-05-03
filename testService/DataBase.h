@@ -76,6 +76,7 @@ public:
 
    std::string getScripts() const;
    std::string getScript(const std::string&name) const;
+   void updateScript(const std::string&name, const std::string& content);
 
 private:
    const std::string rootDir;

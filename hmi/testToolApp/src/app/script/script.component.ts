@@ -3,6 +3,7 @@ import { JobsService } from '../jobs.service';
 import { Script } from '../script';
 import { ScriptService } from '../script.service';
 import { Request } from '../job';
+import {NgForm} from '@angular/forms';
 
 @Component({
   selector: 'app-script',
@@ -36,8 +37,17 @@ export class ScriptComponent implements OnInit {
     const req: Request = {
       name: 'myJob',
       script: script.name + '.chai',
-      serverUri: 'opc.tcp://localhost:4840'
+      serverUri: 'opc.tcp://10.11.65.192:4840'
     };
     this.jobService.createJob(req);
+  }
+
+  updateScript(script: Script, content: string): void
+  {
+    this.scriptService.updateScript(script, content);
+  }
+
+  onSubmit(f: NgForm) {
+    console.log(f.value);  // { first: '', last: '' }
   }
 }
