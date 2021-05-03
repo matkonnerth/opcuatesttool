@@ -60,3 +60,9 @@ target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::spdlog)
 #add_executable(testInfluxDb testInflux.cpp)
 #target_link_libraries(testInfluxDb PRIVATE CONAN_PKG::InfluxDB)
 #target_link_libraries(testInfluxDb PRIVATE project_options)
+
+add_custom_command(
+        TARGET testService POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_SOURCE_DIR}/test/scripts
+                ${CMAKE_BINARY_DIR}/bin/scripts)

@@ -74,6 +74,9 @@ public:
       return scriptDir;
    }
 
+   std::string getScripts() const;
+   std::string getScript(const std::string&name) const;
+
 private:
    const std::string rootDir;
    const std::string jobs_requests_dir;

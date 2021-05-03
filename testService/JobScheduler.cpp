@@ -159,3 +159,13 @@ std::string JobScheduler::getFinishedJob(int jobId)
    job.close();
    return buffer.str();
 }
+
+std::string JobScheduler::getScripts() const
+{
+   return db->getScripts();
+}
+
+std::string JobScheduler::getScript(const std::string& name) const
+{
+   return db->getScript(name);
+}

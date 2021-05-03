@@ -14,6 +14,8 @@ public:
    void jobFinished(int pid);
    std::string getFinishedJobs(int fromId, int max);
    std::string getFinishedJob(int jobId);
+   std::string getScripts() const;
+   std::string getScript(const std::string& name) const;
 
 private:
    void schedule();

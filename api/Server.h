@@ -45,6 +45,32 @@ public:
          httpRes.set_content(jResp.dump(), "application/json");
       });
 
+      srv.Get("/api/scripts", [&](const httplib::Request& /*httpReq*/, httplib::Response& httpRes) {
+         httpRes.set_header("Access-Control-Allow-Origin", "*");
+
+         GetScriptsRequest req{};
+         RequestVariant varReq{ req };
+         ResponseVariant varResp{};
+         callback(varReq, varResp);
+
+         using nlohmann::json;
+         json jResp = json::object();
+         jResp["ok"] = std::get<GetScriptsResponse>(varResp).ok;
+         jResp["response"] = json::parse(std::get<GetScriptsResponse>(varResp).data);
+         httpRes.set_content(jResp.dump(), "application/json");
+      });
+
+      srv.Get(R"(/api/scripts/(\w+))", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
+         httpRes.set_header("Access-Control-Allow-Origin", "*");
+
+         GetScriptRequest req{};
+         req.name = httpReq.matches[1];
+         RequestVariant varReq{ req };
+         ResponseVariant varResp{};
+         callback(varReq, varResp);
+         httpRes.set_content(std::get<GetScriptResponse>(varResp).content, "text/plain");
+      });
+
       // newJob
       srv.Post("/api/jobs", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
          httpRes.set_header("Access-Control-Allow-Origin", "*");
