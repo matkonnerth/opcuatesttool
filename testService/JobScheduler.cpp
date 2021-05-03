@@ -109,39 +109,76 @@ std::string JobScheduler::getFinishedJobs(int fromId, int max)
    std::stringstream stream;
    stream << "[\n";
    int cnt = 0;
+
+   int highestId = -1;
+   int fromFound = false;
    for (auto& p : fs::directory_iterator(db->getJobs_finished_dir()))
    {
+      //find from
       try
       {
          int fileId = std::stoi(p.path().filename());
-         if (fileId < fromId)
+         if(highestId<fileId)
          {
-            continue;
+            highestId = fileId;
+         }
+         if (fileId == fromId)
+         {
+            fromFound = true;
+            break;
          }
       }
       catch (const std::exception& e)
       {
          std::cerr << e.what() << '\n';
       }
+   }
 
-      if (cnt > 0)
+   if(fromFound)
+   {
+      for(int id = fromId; id < (fromId+max); id++)
       {
-         stream << ",\n";
+         if (cnt > 0)
+         {
+            stream << ",\n";
+         }
+         std::ifstream resultFile{ db->getJobs_finished_dir() + "/" + std::to_string(id)};
+         if(resultFile.fail())
+         {
+            break;
+         }
+         std::string line;
+         while (getline(resultFile, line))
+         {
+            stream << line.c_str() << '\n';
+         }
+         cnt++;
       }
-
-      std::ifstream resultFile{ p.path() };
-      std::string line;
-      while (getline(resultFile, line))
+   }
+   else
+   {
+      //reverse
+      for(int id = highestId; id>=0 && id>=(highestId-max);id--)
       {
-         stream << line.c_str() << '\n';
-      }
-      cnt++;
-      if (cnt >= max)
-      {
-         break;
+         std::ifstream resultFile{ db->getJobs_finished_dir() + "/" + std::to_string(id) };
+         if (resultFile.fail())
+         {
+            break;
+         }
+         if (cnt > 0)
+         {
+            stream << ",\n";
+         }
+         std::string line;
+         while (getline(resultFile, line))
+         {
+            stream << line.c_str() << '\n';
+         }
+         cnt++;
       }
    }
    stream << "]\n";
+   std::cout << "jobs: " << stream.str() << "\n";
    return stream.str();
 }
 

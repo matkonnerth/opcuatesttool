@@ -14,7 +14,7 @@ export class JobsService {
   private jobsUrl = 'http://localhost:9888/api/jobs';  // URL to web api
 
   getJobs(): Observable<FinishedJob[]> {
-    const jobs = this.http.get<FinishedJobsResponse>(this.jobsUrl + '?from=0&max=10').
+    const jobs = this.http.get<FinishedJobsResponse>(this.jobsUrl + '?from=100000&max=10').
       pipe(map(response => response.response.map(data => {
         const job: FinishedJob = {
           request: data.request,
