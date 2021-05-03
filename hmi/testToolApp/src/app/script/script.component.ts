@@ -14,6 +14,7 @@ export class ScriptComponent implements OnInit {
   scripts: Script[] = [];
   selectedScript?: Script;
   content?: string;
+  targetUri : string = 'opc.tcp://10.11.65.192:4840'
 
   constructor(private scriptService: ScriptService, private jobService: JobsService) { }
 
@@ -36,7 +37,7 @@ export class ScriptComponent implements OnInit {
     const req: Request = {
       name: 'myJob',
       script: script.name + '.chai',
-      serverUri: 'opc.tcp://10.11.65.192:4840'
+      serverUri: this.targetUri
     };
     this.jobService.createJob(req);
   }

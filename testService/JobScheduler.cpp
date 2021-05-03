@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <spdlog/spdlog.h>
 #include <sstream>
 #include <sys/types.h>
@@ -178,7 +177,6 @@ std::string JobScheduler::getFinishedJobs(int fromId, int max)
       }
    }
    stream << "]\n";
-   std::cout << "jobs: " << stream.str() << "\n";
    return stream.str();
 }
 

@@ -20,16 +20,16 @@ class Variable
   }
 }
 
-var val = Variable(UriId("http://opcfoundation.org/UA/", "i=2235")).Value()
+//var val = Variable(UriId("http://opcfoundation.org/UA/", "i=2255")).Value()
 
-for(ns : val)
-{
-  print(ns)
-}
+//for(ns : val)
+//{
+//  print(ns)
+//}
 
 def intent(x)
 {
-  for(auto i=0; i< x; ++i)
+  for(auto i=0; i < x; ++i)
   {
     puts(" ");
   }
@@ -47,5 +47,5 @@ def browseRecursive(id, intention)
    }
 }
 
-//browseRecursive(NodeId(0,85), 0)
+browseRecursive(NodeId(0,85), 0)
 

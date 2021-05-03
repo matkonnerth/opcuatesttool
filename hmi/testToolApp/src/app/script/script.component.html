@@ -8,6 +8,8 @@
     <div *ngIf="content">
         <textarea class="form-control" name="message" cols=100 rows=20 [(ngModel)]="content"></textarea>
     </div>
-    <button type="button" class="btn btn-default" (click)="newJob(selectedScript)">Run</button>
-    <button *ngIf="content" type="button" class="btn btn-default" (click)="updateScript(selectedScript, content)">Save</button>
+    
+    <div><button *ngIf="content" type="button" class="btn btn-default" (click)="updateScript(selectedScript, content)">Save</button></div>
+    <input [(ngModel)]="targetUri">
+    <div><button type="button" class="btn btn-default" (click)="newJob(selectedScript)">Run</button></div>
 </div>
