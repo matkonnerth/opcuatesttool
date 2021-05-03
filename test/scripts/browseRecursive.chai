@@ -1,3 +1,11 @@
+def intent(x)
+{
+  for(auto i=0; i < x; ++i)
+  {
+    puts(" ");
+  }
+}
+
 def browseRecursive(id, intention) 
 {
   auto results = browse(id);
