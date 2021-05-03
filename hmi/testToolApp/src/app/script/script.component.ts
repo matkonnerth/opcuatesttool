@@ -3,7 +3,6 @@ import { JobsService } from '../jobs.service';
 import { Script } from '../script';
 import { ScriptService } from '../script.service';
 import { Request } from '../job';
-import {NgForm} from '@angular/forms';
 
 @Component({
   selector: 'app-script',
@@ -45,9 +44,5 @@ export class ScriptComponent implements OnInit {
   updateScript(script: Script, content: string): void
   {
     this.scriptService.updateScript(script, content);
-  }
-
-  onSubmit(f: NgForm) {
-    console.log(f.value);  // { first: '', last: '' }
   }
 }
