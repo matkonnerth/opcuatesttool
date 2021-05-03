@@ -6,4 +6,5 @@
 <div *ngIf="selectedScript">
     <h2>{{selectedScript.name}} Details</h2>
     <div *ngIf="content"><span>content: </span>{{content}}}</div>
+    <button type="button" class="btn btn-default" (click)="newJob(selectedScript)">Run</button>
 </div>

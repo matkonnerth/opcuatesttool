@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { JobsService } from '../jobs.service';
 import { Script } from '../script';
 import { ScriptService } from '../script.service';
+import { Request } from '../job';
 
 @Component({
   selector: 'app-script',
@@ -13,7 +15,7 @@ export class ScriptComponent implements OnInit {
   selectedScript?: Script;
   content?: string;
 
-  constructor(private scriptService: ScriptService) { }
+  constructor(private scriptService: ScriptService, private jobService: JobsService) { }
 
   ngOnInit(): void {
     this.getScripts();
@@ -29,4 +31,13 @@ export class ScriptComponent implements OnInit {
       .subscribe(s => this.scripts = s);
   }
 
+  newJob(script: Script): void {
+
+    const req: Request = {
+      name: 'myJob',
+      script: script.name + '.chai',
+      serverUri: 'opc.tcp://localhost:4840'
+    };
+    this.jobService.createJob(req);
+  }
 }
