@@ -1,9 +1,11 @@
 <h2>Recent </h2>
 <ul class="jobs">
-    <li *ngFor="let job of jobs" [class.selected]="job === selectedJob" (click)="onSelect(job)">
-        <span class="badge">{{job.result.id}}</span> 
+    <li *ngFor="let job of jobs" [class.selected]="job === selectedJob" (click)="onSelect(job)" [ngClass]="{'error': job.result.statusCode=='Error'}">
+        <span class="badge">{{job.result.id}}</span>
         {{job.request.name}}
         {{job.request.script}}
+        <!--{{job.result.statusCode}}-->
+        <!--{{job.result.totalRuntime_ms}}-->
     </li>
 </ul>
 <div *ngIf="selectedJob">
