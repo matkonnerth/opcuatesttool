@@ -7,8 +7,8 @@
 #include <modernOpc/Variant.h>
 #include <modernOpc/types/NodeId.h>
 #include <modernOpc/types/QualifiedName.h>
-#include <thread>
 #include <string>
+#include <thread>
 
 using chaiscript::constructor;
 using chaiscript::fun;
@@ -28,17 +28,17 @@ void Runtime::load()
    client = std::make_unique<modernopc::Client>(m_uri);
    client->connect();
 
-   m_read = [&](const modernopc::UnresolvedNodeId& id) {
-      auto resolvedId = client->resolve(id);
-      return client->read(resolvedId);
+   m_read = [&](const modernopc::NodeId& id) {
+      //auto resolvedId = client->resolve(id);
+      return client->read(id);
    };
 
-   m_write = [&](const modernopc::UnresolvedNodeId& id, const modernopc::Variant& var) {
-      auto resolvedId = client->resolve(id);
-      client->write(resolvedId, var);
+   m_write = [&](const modernopc::NodeId& id, const modernopc::Variant& var) {
+      client->write(id, var);
    };
 
    m_browse = [&](const NodeId& id) { return client->browse(id); };
+   m_IsVariable = [&](const BrowseResult& res) { return (res.Type() == modernopc::NodeType::VARIABLE); };
 
    chaiscript::ModulePtr m = chaiscript::ModulePtr(new chaiscript::Module());
 
@@ -54,14 +54,9 @@ void Runtime::load()
    m->add(chaiscript::fun(m_read), "read");
    m->add(chaiscript::fun(m_write), "write");
    m->add(fun(m_browse), "browse");
+   m->add(fun(m_IsVariable), "isVariable");
 
-   chaiscript::utility::add_class<BrowseResult>(*m,
-                                                "BrowseResult",
-                                                { constructor<BrowseResult(const BrowseResult&)>(), constructor<BrowseResult(BrowseResult &&)>() },
-                                                {
-                                                { fun(&BrowseResult::Id), "Id" },
-                                                { fun(&BrowseResult::Name), "Name" },
-                                                });
+   chaiscript::utility::add_class<BrowseResult>(*m, "BrowseResult", { constructor<BrowseResult(const BrowseResult&)>(), constructor<BrowseResult(BrowseResult &&)>() }, { { fun(&BrowseResult::Id), "Id" }, { fun(&BrowseResult::Name), "Name" } });
 
    using BrowseResultList = std::vector<BrowseResult>;
    chai.add(chaiscript::bootstrap::standard_library::vector_type<BrowseResultList>("BrowseResultList"));

@@ -24,8 +24,9 @@ private:
    std::shared_ptr<spdlog::logger> logger;
    chaiscript::ChaiScript chai;
    std::shared_ptr<modernopc::Client> client{};
-   std::function<modernopc::Variant(const modernopc::UnresolvedNodeId&)> m_read;
-   std::function<void(const modernopc::UnresolvedNodeId& id, const modernopc::Variant& var)> m_write;
+   std::function<modernopc::Variant(const modernopc::NodeId&)> m_read;
+   std::function<void(const modernopc::NodeId& id, const modernopc::Variant& var)> m_write;
    std::function<std::vector<modernopc::BrowseResult>(const modernopc::NodeId& id)> m_browse;
+   std::function<bool(const modernopc::BrowseResult& res)> m_IsVariable;
 };
 } // namespace opctest::testrunner
