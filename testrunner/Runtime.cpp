@@ -42,15 +42,19 @@ void Runtime::load()
 
    chaiscript::ModulePtr m = chaiscript::ModulePtr(new chaiscript::Module());
 
-
+   //namespace basic
    m->add(chaiscript::fun(&wait), "wait");
+
+   //namespace opc
    m->add(chaiscript::user_type<modernopc::UnresolvedNodeId>(), "UriId");
    m->add(chaiscript::constructor<modernopc::UnresolvedNodeId(const std::string& ns, const std::string identifier)>(), "UriId");
    m->add(chaiscript::constructor<modernopc::UnresolvedNodeId(const modernopc::UnresolvedNodeId& other)>(), "UriId");
 
+   //opc variant
    m->add(chaiscript::user_type<modernopc::Variant>(), "Variant");
    m->add(chaiscript::constructor<modernopc::Variant(int32_t val)>(), "Int32");
    m->add(chaiscript::constructor<modernopc::Variant(int64_t val)>(), "Int64");
+   //opc services
    m->add(chaiscript::fun(m_read), "read");
    m->add(chaiscript::fun(m_write), "write");
    m->add(fun(m_browse), "browse");
