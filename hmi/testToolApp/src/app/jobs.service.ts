@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { FinishedJob, FinishedJobsResponse, Request, Result } from './job';
-import { Observable, of } from 'rxjs';
+import { Observable, Observer, of } from 'rxjs';
 import { HttpClient} from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 
@@ -9,7 +9,7 @@ import { catchError, map } from 'rxjs/operators';
 })
 export class JobsService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private _zone: NgZone) { }
 
   private jobsUrl = 'http://localhost:9888/api/jobs';  // URL to web api
 
@@ -38,6 +38,26 @@ export class JobsService {
   {
     const content = this.http.get(this.jobsUrl + '/logs/' + job.id, { responseType: 'text' });
     return content;
+  }
+
+  // getServerSentEvent(): Observable<string> {
+  //   return Observable.create((observer : Observer<string>) => {
+  //     const eventSource = this.getEventSource('http://localhost:9888/event1');
+  //     eventSource.onmessage = event => {
+  //       this._zone.run(() => {
+  //         observer.next(event);
+  //       });
+  //     };
+  //     eventSource.onerror = error => {
+  //       this._zone.run(() => {
+  //         observer.error(error);
+  //       });
+  //     };
+  //   });
+  // }
+
+  private getEventSource(url: string): EventSource {
+    return new EventSource(url);
   }
 
   /**

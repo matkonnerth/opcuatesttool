@@ -5,6 +5,7 @@
 #include <vector>
 #include "DataBase.h"
 #include <queue>
+#include <functional>
 
 class JobScheduler
 {
@@ -18,6 +19,10 @@ public:
    std::string getScript(const std::string& name) const;
    void updateScript(const std::string&name, const std::string& content);
    std::string getJobLog(int jobId);
+   void setJobFinishedCallback(std::function<void(int)> cb)
+   {
+      m_fJobFinished = cb;
+   }
 
 private:
    void schedule();
@@ -29,4 +34,5 @@ private:
    std::unique_ptr<DataBase> db {nullptr};
    std::queue<int> waitQueue
    {};
+   std::function<void(int)> m_fJobFinished{ nullptr };
 };

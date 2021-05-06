@@ -18,11 +18,11 @@ JobScheduler::JobScheduler(const std::string& workingDir)
 
 void JobScheduler::schedule()
 {
-   auto logger = spdlog::get("TestService");
    if (waitQueue.empty())
    {
       return;
    }
+   auto logger = spdlog::get("TestService");
    if (activeJobs.size() >= maxConcurrentJobs)
    {
       logger->trace("too much active jobs, postpone scheduling, active jobs {}", activeJobs.size());
@@ -95,13 +95,18 @@ int JobScheduler::create(const std::string& jsonString)
 
 void JobScheduler::jobFinished(int id)
 {
-   auto logger = spdlog::get("TestService");
+   auto logger = spdlog::get("TestService");   
    std::lock_guard<std::mutex> guard(_m);
    auto entry = activeJobs.find(id);
    if (entry != activeJobs.end())
    {
       logger->info("job (pid: {}, id: {}) finished", id, entry->second);
+      if (m_fJobFinished)
+      {
+         m_fJobFinished(entry->second);
+      }
       activeJobs.erase(entry);
+      
    }
    else
    {

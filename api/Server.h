@@ -3,9 +3,43 @@
 #include <httplib.h>
 #include <iostream>
 #include <unordered_map>
+#include <mutex>
 
 
 namespace opctest::api {
+
+class EventDispatcher
+{
+public:
+   EventDispatcher()
+   {}
+
+   void wait_event(httplib::DataSink* sink)
+   {
+      std::unique_lock<std::mutex> lk(m_);
+      int id = id_;
+      cv_.wait(lk, [&] { return cid_ == id; });
+      if (sink->is_writable())
+      {
+         sink->write(message_.data(), message_.size());
+      }
+   }
+
+   void send_event(const std::string& message)
+   {
+      std::lock_guard<std::mutex> lk(m_);
+      cid_ = id_++;
+      message_ = message;
+      cv_.notify_all();
+   }
+
+private:
+   std::mutex m_;
+   std::condition_variable cv_;
+   std::atomic_int id_ = 0;
+   std::atomic_int cid_ = -1;
+   std::string message_;
+};
 class Server
 {
 public:
@@ -25,7 +59,7 @@ public:
          httpRes.set_header("Access-Control-Allow-Origin", "*");
 
          GetJobsRequest req{};
-         if(httpReq.has_param("from"))
+         if (httpReq.has_param("from"))
          {
             req.from = stoi(httpReq.get_param_value("from"));
          }
@@ -133,6 +167,16 @@ public:
 
          httpRes.set_content(std::get<GetJobLogResponse>(varResp).data, "text/plain");
       });
+
+      srv.Get("/event1", [&](const httplib::Request& /*req*/, httplib::Response& res) {
+         std::cout << "register event" << "\n";
+         res.set_chunked_content_provider("text/event-stream", [&](size_t /*offset*/, httplib::DataSink& sink) {
+            ed.wait_event(&sink);
+            return true;
+         });
+      });
+
+      m_fEventCallback = [&](int id) { ed.send_event(std::to_string(id)); };
    }
 
    void listen()
@@ -145,10 +189,17 @@ public:
       callback = cb;
    }
 
+   auto getEventCallback()
+   {
+      return m_fEventCallback;
+   }
+
 private:
    httplib::Server srv;
    std::string ip{ "0.0.0.0" };
    int port{ 9888 };
    RequestCallback callback{ nullptr };
+   EventDispatcher ed{};
+   std::function<void(int)> m_fEventCallback{ nullptr };
 };
 }; // namespace opctest::api

@@ -1,10 +1,10 @@
 #include "../api/Request.h"
 #include "../api/Server.h"
 #include "JobScheduler.h"
-#include <spdlog/sinks/rotating_file_sink.h>
 #include <future>
 #include <iostream>
 #include <signal.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 #include <sys/types.h>
@@ -14,18 +14,18 @@
 
 namespace opctest::service {
 
-using opctest::api::GetJobsRequest;
-using opctest::api::GetJobRequest;
-using opctest::api::GetJobResponse;
-using opctest::api::NewJobRequest;
-using opctest::api::NewJobResponse;
-using opctest::api::GetScriptsResponse;
-using opctest::api::GetScriptResponse;
-using opctest::api::GetScriptRequest;
-using opctest::api::Response;
-using opctest::api::UpdateScriptRequest;
 using opctest::api::GetJobLogRequest;
 using opctest::api::GetJobLogResponse;
+using opctest::api::GetJobRequest;
+using opctest::api::GetJobResponse;
+using opctest::api::GetJobsRequest;
+using opctest::api::GetScriptRequest;
+using opctest::api::GetScriptResponse;
+using opctest::api::GetScriptsResponse;
+using opctest::api::NewJobRequest;
+using opctest::api::NewJobResponse;
+using opctest::api::Response;
+using opctest::api::UpdateScriptRequest;
 
 class TestService
 {
@@ -99,6 +99,11 @@ public:
       return resp;
    }
 
+   void setJobFinishedCallback(std::function<void(int)> cb)
+   {
+      scheduler->setJobFinishedCallback(cb);
+   }
+
 private:
    std::unique_ptr<JobScheduler> scheduler{ nullptr };
 };
@@ -154,7 +159,7 @@ bool apiCallback(opctest::service::TestService& service, const opctest::api::Req
       {
          resp = service.updateScript(arg);
       }
-      else if constexpr(std::is_same_v<T, opctest::api::GetJobLogRequest>)
+      else if constexpr (std::is_same_v<T, opctest::api::GetJobLogRequest>)
       {
          resp = service.getJobLog(arg);
       }
@@ -197,10 +202,9 @@ int main(int argc, char* argv[])
    opctest::api::Server server{ "0.0.0.0", 9888 };
 
 
-   auto cb = [&](const opctest::api::RequestVariant& req, opctest::api::ResponseVariant & resp)
-   {
-      return apiCallback(service, req, resp);
-   };
+   auto cb = [&](const opctest::api::RequestVariant& req, opctest::api::ResponseVariant& resp) { return apiCallback(service, req, resp); };
+
+   service.setJobFinishedCallback(server.getEventCallback());
 
    server.setCallback(cb);
    server.listen();
