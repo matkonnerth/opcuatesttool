@@ -11,6 +11,7 @@ export class JobsComponent implements OnInit {
 
   jobs: FinishedJob[] = [];
   selectedJob?: FinishedJob;
+  jobLog = '';
 
   constructor(private jobService: JobsService) { }
 
@@ -20,6 +21,7 @@ export class JobsComponent implements OnInit {
 
   onSelect(job: FinishedJob): void {
     this.selectedJob = job;
+    this.jobService.getJobLog(job.result).subscribe(log => this.jobLog = log);
   }
 
   newJob(job: FinishedJob): void {

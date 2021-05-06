@@ -43,17 +43,24 @@ void JobScheduler::schedule()
    {
       // child process
       // close file descriptors, let stdin/stdout/stderror open
-      for (int fd = 3; fd < 256; fd++)
+      for (int fd = 0; fd < 256; fd++)
       {
          close(fd);
       }
+
+      auto file = fopen((workingDir + "/logs/" + std::to_string(jobId) + ".log").c_str(), "w");
+      if (file == NULL)
+         fputs("Could not open file", stderr);
+
+      dup2(fileno(file), STDOUT_FILENO);
+      fclose(file);
 
       // the argv list first argument should point to
       // filename associated with file being executed
       // the array pointer must be terminated by NULL
       // pointer
 
-      // the const cass tare ugly but execv isn't modifying
+      // the const casts tare ugly but execv isn't modifying
       std::string jobIdString = std::to_string(jobId);
       char* const argv_list[] = { "./testRunner",
                                   const_cast<char*>(workingDir.c_str()),
@@ -208,4 +215,19 @@ std::string JobScheduler::getScript(const std::string& name) const
 void JobScheduler::updateScript(const std::string& name, const std::string& content)
 {
    db->updateScript(name, content);
+}
+
+std::string JobScheduler::getJobLog(int jobId)
+{
+   std::ifstream log(db->getJobLogPath(jobId));
+   if (log.fail())
+   {
+      auto logger = spdlog::get("TestService");
+      logger->warn("job log not found");
+      return "job log not found";
+   }
+   std::stringstream buffer;
+   buffer << log.rdbuf();
+   log.close();
+   return buffer.str();
 }

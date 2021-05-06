@@ -19,6 +19,11 @@ struct GetJobRequest : public Request
    int id;
 };
 
+struct GetJobLogRequest : public Request
+{
+   int id;
+};
+
 struct GetJobsRequest : public Request
 {
    int from;
@@ -26,8 +31,7 @@ struct GetJobsRequest : public Request
 };
 
 struct GetScriptsRequest : public Request
-{
-};
+{};
 
 struct GetScriptRequest : public Request
 {
@@ -65,10 +69,15 @@ struct GetScriptResponse : public Response
    std::string content;
 };
 
+struct GetJobLogResponse : public Response
+{
+   std::string data;
+};
+
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(NewJobResponse, ok, id);
 
-using RequestVariant = std::variant<NewJobRequest, GetJobRequest, GetJobsRequest, GetScriptsRequest, GetScriptRequest, UpdateScriptRequest>;
-using ResponseVariant = std::variant<Response, NewJobResponse, GetJobResponse, GetScriptsResponse, GetScriptResponse>;
+using RequestVariant = std::variant<NewJobRequest, GetJobRequest, GetJobsRequest, GetScriptsRequest, GetScriptRequest, UpdateScriptRequest, GetJobLogRequest>;
+using ResponseVariant = std::variant<Response, NewJobResponse, GetJobResponse, GetScriptsResponse, GetScriptResponse, GetJobLogResponse>;
 
 using RequestCallback = std::function<bool(const RequestVariant&, ResponseVariant&)>;
 

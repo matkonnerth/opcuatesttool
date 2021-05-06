@@ -119,6 +119,20 @@ public:
          jResp["response"] = json::parse(std::get<GetJobResponse>(varResp).data);
          httpRes.set_content(jResp.dump(), "application/json");
       });
+
+      // get finished job
+      srv.Get(R"(/api/jobs/logs/(\d+))", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
+         httpRes.set_header("Access-Control-Allow-Origin", "*");
+
+         GetJobLogRequest req{};
+         req.id = stoi(httpReq.matches[1]);
+
+         RequestVariant varReq{ req };
+         ResponseVariant varResp{};
+         callback(varReq, varResp);
+
+         httpRes.set_content(std::get<GetJobLogResponse>(varResp).data, "text/plain");
+      });
    }
 
    void listen()

@@ -15,5 +15,6 @@
     <div><span>Server URI: </span>{{selectedJob.request.serverUri}}</div>
     <div><span>StatusCode: </span>{{selectedJob.result.statusCode}}</div>
     <div *ngIf="selectedJob.result"><span>Runtime (ms): </span>{{selectedJob.result.totalRuntime_ms}}</div>
+    <div><textarea disabled cols=100 rows=20 >{{jobLog}}</textarea></div>
     <button type="button" class="btn btn-default" (click)="newJob(selectedJob)">Run again</button>
 </div>

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FinishedJob, FinishedJobsResponse, Request } from './job';
+import { FinishedJob, FinishedJobsResponse, Request, Result } from './job';
 import { Observable, of } from 'rxjs';
 import { HttpClient} from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
@@ -32,6 +32,12 @@ export class JobsService {
         catchError(this.handleError('createJob', job))
     );
     req.subscribe();
+  }
+
+  getJobLog(job: Result): Observable<string>
+  {
+    const content = this.http.get(this.jobsUrl + '/logs/' + job.id, { responseType: 'text' });
+    return content;
   }
 
   /**

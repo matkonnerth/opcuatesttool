@@ -1,5 +1,6 @@
 #include "Job.h"
 #include "JobFactory.h"
+#include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
@@ -22,13 +23,13 @@ void setupLogger()
 
 int main(int argc , const char** argv)
 {
-    setupLogger();
-    auto logger = spdlog::get("TestRunner");
-    if(argc!=6)
-    {
-       logger->error("wrong number of arguments, exit");
-       return 1;
-    }
+   setupLogger();
+   auto logger = spdlog::get("TestRunner");
+   if (argc != 6)
+   {
+      logger->error("wrong number of arguments, exit");
+      return 1;
+   }
 
     std::string finishedDir = argv[2];
     std::string requestsDir = argv[3];
@@ -38,6 +39,8 @@ int main(int argc , const char** argv)
     opctest::testrunner::JobFactory f;
     auto job = f.createFromFile(requestsDir+"/"+jobName, scriptDir);
 
+    logger->info("before execute");
     job->execute();
     job->addResult(requestsDir + "/" + jobName, finishedDir + "/" + jobName, std::stoi(jobName));
+    logger->info("job finished");
 }

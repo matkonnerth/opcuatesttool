@@ -69,6 +69,11 @@ public:
       return jobs_finished_dir + "/" + std::to_string(id);
    }
 
+   std::string getJobLogPath(int id) const
+   {
+      return rootDir + "/logs/" + std::to_string(id) + ".log";
+   }
+
    const std::string& getScriptsFilePath() const
    {
       return scriptDir;
