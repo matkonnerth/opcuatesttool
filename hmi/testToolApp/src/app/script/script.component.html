@@ -10,6 +10,12 @@
     </div>
     
     <div><button *ngIf="content" type="button" class="btn btn-default" (click)="updateScript(selectedScript, content)">Save</button></div>
-    <input [(ngModel)]="targetUri">
+    
+    
+    <select [ngModel]="target" (ngModelChange)="onChange($event)">
+        <option disabled>Select Target</option>
+        <option>Choose Target</option>
+        <option [ngValue]="target" *ngFor="let target of targets">{{target.name}}</option>
+    </select>
     <div><button type="button" class="btn btn-default" (click)="newJob(selectedScript)">Run</button></div>
 </div>

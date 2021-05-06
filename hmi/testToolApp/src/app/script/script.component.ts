@@ -3,6 +3,7 @@ import { JobsService } from '../jobs.service';
 import { Script } from '../script';
 import { ScriptService } from '../script.service';
 import { Request } from '../job';
+import { targets, Target} from '../target';
 
 @Component({
   selector: 'app-script',
@@ -14,7 +15,9 @@ export class ScriptComponent implements OnInit {
   scripts: Script[] = [];
   selectedScript?: Script;
   content?: string;
-  targetUri = 'opc.tcp://10.11.65.192:4840';
+  target = targets[0];
+
+  targets = targets;
 
   constructor(private scriptService: ScriptService, private jobService: JobsService) { }
 
@@ -37,7 +40,7 @@ export class ScriptComponent implements OnInit {
     const req: Request = {
       name: 'myJob',
       script: script.name + '.chai',
-      serverUri: this.targetUri
+      serverUri: 'opc.tcp://' + this.target.host + ':' + this.target.port
     };
     this.jobService.createJob(req);
   }
@@ -46,4 +49,11 @@ export class ScriptComponent implements OnInit {
   {
     this.scriptService.updateScript(script, content);
   }
+
+  onChange(e: Target): void {
+    console.log(e);
+    this.target = e;
+  }
+
+
 }
