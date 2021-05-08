@@ -11,9 +11,11 @@
 
 namespace fs = std::filesystem;
 
-JobScheduler::JobScheduler(const std::string& workingDir)
+namespace opctest {
+JobScheduler::JobScheduler(const std::string& workingDir, const Config& c)
 : workingDir{ workingDir }
-, db{ std::make_unique<DataBase>(workingDir) }
+, db{ std::make_unique<DataBase>(workingDir, c) }
+, config{ c }
 {}
 
 void JobScheduler::schedule()
@@ -143,3 +145,4 @@ std::string JobScheduler::getJobLog(int jobId)
 {
    return db->getJobLog(jobId);
 }
+} // namespace opctest

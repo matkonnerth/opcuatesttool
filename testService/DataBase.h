@@ -1,4 +1,5 @@
 #pragma once
+#include "Config.h"
 #include <filesystem>
 #include <iostream>
 #include <spdlog/spdlog.h>
@@ -18,14 +19,16 @@ root
 
 */
 
+namespace opctest {
 class DataBase
 {
 public:
-   DataBase(const std::string& root)
+   DataBase(const std::string& root, const Config& c)
    : rootDir{ root }
    , jobs_requests_dir{ rootDir + "/jobs/requests" }
    , jobs_finished_dir{ rootDir + "/jobs/finished" }
    , scriptDir{ rootDir + "/scripts/scripts" }
+   , config{ c }
    {
       if (!fs::exists(rootDir + "/jobs"))
       {
@@ -44,7 +47,7 @@ public:
          jobId = lastId;
       }
       // load scripts from git repo
-      int status = system((rootDir + "/getScripts.sh " + rootDir + "/scripts").c_str());
+      int status = system((rootDir + "/getScripts.sh " + rootDir + "/scripts " + config.gitRepository).c_str());
       if (status != 0)
       {
          auto logger = spdlog::get("TestService");
@@ -96,4 +99,6 @@ private:
    const std::string jobs_finished_dir;
    const std::string scriptDir;
    int jobId{ 0 };
+   const Config& config;
 };
+} // namespace opctest

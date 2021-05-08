@@ -1,0 +1,6 @@
+{
+    "majorVersion": 0,
+    "minorVersion": 0,
+    "gitRepository": "https://github.com/matkonnerth/opcuaTestToolScripts.git",
+    "maxParallelJobs": 4
+}

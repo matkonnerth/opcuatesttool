@@ -3,6 +3,7 @@
 #include <sstream>
 
 
+namespace opctest {
 int DataBase::newJob(const std::string& requestJson)
 {
    std::string request = requestJson;
@@ -170,3 +171,4 @@ std::string DataBase::getJobLog(int jobId)
    log.close();
    return buffer.str();
 }
+} // namespace opctest

@@ -1,5 +1,6 @@
 #include "../api/Request.h"
 #include "../api/Server.h"
+#include "Config.h"
 #include "JobScheduler.h"
 #include <future>
 #include <iostream>
@@ -12,7 +13,7 @@
 #include <type_traits>
 #include <unistd.h>
 
-namespace opctest::service {
+namespace opctest {
 
 using opctest::api::GetJobLogRequest;
 using opctest::api::GetJobLogResponse;
@@ -30,7 +31,15 @@ using opctest::api::UpdateScriptRequest;
 class TestService
 {
 public:
-   TestService(const std::string& workingDir);
+   TestService(const std::string& workingDir)
+   {
+      auto logger = spdlog::get("TestService");
+      logger->info("init testService");
+      logger->info("load configuration");
+      config = std::make_unique<ConfigPersistence>(workingDir + "/config.json");
+      logger->info("script repo: {}", config->getConfig().gitRepository);
+      scheduler = std::make_unique<JobScheduler>(workingDir, config->getConfig());
+   }
 
    void handleSigChld(int sig)
    {
@@ -106,16 +115,9 @@ public:
 
 private:
    std::unique_ptr<JobScheduler> scheduler{ nullptr };
+   std::unique_ptr<ConfigPersistence> config{ nullptr };
 };
-
-TestService::TestService(const std::string& workingDir)
-: scheduler{ std::make_unique<JobScheduler>(workingDir) }
-{
-   auto logger = spdlog::get("TestService");
-   logger->info("init testService");
-}
-
-} // namespace opctest::service
+} // namespace opctest
 
 void setupLogger(const std::string& workingDir)
 {
@@ -130,7 +132,7 @@ void setupLogger(const std::string& workingDir)
 template <class>
 inline constexpr bool always_false_v = false;
 
-bool apiCallback(opctest::service::TestService& service, const opctest::api::RequestVariant& req, opctest::api::ResponseVariant& resp)
+bool apiCallback(opctest::TestService& service, const opctest::api::RequestVariant& req, opctest::api::ResponseVariant& resp)
 {
    std::visit(
    [&](auto&& arg) {
@@ -173,12 +175,12 @@ bool apiCallback(opctest::service::TestService& service, const opctest::api::Req
    return true;
 }
 
-int main(int argc, char* argv[])
+int main(int, char* argv[])
 {
    std::string binaryPath = argv[0];
    auto pos = binaryPath.find_last_of('/');
    binaryPath.erase(pos);
-   setupLogger(binaryPath);   
+   setupLogger(binaryPath);
 
    // handle signals in a dedicated thread
    sigset_t sigset;
@@ -186,9 +188,8 @@ int main(int argc, char* argv[])
    sigaddset(&sigset, SIGCHLD);
    pthread_sigmask(SIG_BLOCK, &sigset, nullptr);
 
-   opctest::service::TestService service(binaryPath);
+   opctest::TestService service(binaryPath);
 
-   
 
    auto signalHandler = [&service, &sigset]() {
       while (true)

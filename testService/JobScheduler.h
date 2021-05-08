@@ -1,23 +1,25 @@
 #pragma once
+#include "Config.h"
+#include "DataBase.h"
+#include <functional>
 #include <mutex>
+#include <queue>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "DataBase.h"
-#include <queue>
-#include <functional>
 
+namespace opctest {
 class JobScheduler
 {
 public:
-   JobScheduler(const std::string& workingDir);
+   JobScheduler(const std::string& workingDir, const Config& config);
    int create(const std::string& jsonString);
    void jobFinished(int pid);
    std::string getFinishedJobs(int fromId, int max);
    std::string getFinishedJob(int jobId);
    std::string getScripts() const;
    std::string getScript(const std::string& name) const;
-   void updateScript(const std::string&name, const std::string& content);
+   void updateScript(const std::string& name, const std::string& content);
    std::string getJobLog(int jobId);
    void setJobFinishedCallback(std::function<void(int)> cb)
    {
@@ -28,11 +30,12 @@ private:
    void schedule();
    const std::string workingDir;
    const size_t maxConcurrentJobs{ 4 };
-   std::mutex _m;   
+   std::mutex _m;
    std::unordered_map<int, int> activeJobs{};
    std::vector<int> finishedPids{};
-   std::unique_ptr<DataBase> db {nullptr};
-   std::queue<int> waitQueue
-   {};
+   std::unique_ptr<DataBase> db{ nullptr };
+   std::queue<int> waitQueue{};
    std::function<void(int)> m_fJobFinished{ nullptr };
+   const Config& config;
 };
+} // namespace opctest

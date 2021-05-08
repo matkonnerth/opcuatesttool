@@ -1,6 +1,6 @@
 #!/bin/bash
 repoDirectory=$1
-repoUrl="https://github.com/matkonnerth/opcuaTestToolScripts.git"
+repoUrl=$2
 
 rm -rf $repoDirectory
 git clone $repoUrl $repoDirectory

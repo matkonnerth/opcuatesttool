@@ -39,7 +39,8 @@ target_link_libraries(testRunner PRIVATE project_options)
 add_executable(testService
     testService/TestService.cpp
     testService/JobScheduler.cpp
-    testService/DataBase.cpp)
+    testService/DataBase.cpp
+    testService/Config.cpp)
 target_link_libraries(testService PRIVATE CONAN_PKG::cpp-httplib pthread)
 target_link_libraries(testService PRIVATE CONAN_PKG::nlohmann_json)
 target_link_libraries(testService PRIVATE stdc++fs)
@@ -65,4 +66,10 @@ add_custom_command(
         TARGET testService POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_SOURCE_DIR}/testService/getScripts.sh
+                ${CMAKE_BINARY_DIR}/bin)
+
+add_custom_command(
+        TARGET testService POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_SOURCE_DIR}/testService/config.json
                 ${CMAKE_BINARY_DIR}/bin)
