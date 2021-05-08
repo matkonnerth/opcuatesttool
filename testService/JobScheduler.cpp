@@ -45,7 +45,7 @@ void JobScheduler::schedule()
    {
       // child process
       // close file descriptors, let stdin/stdout/stderror open
-      for (int fd = 0; fd < 256; fd++)
+      for (int fd = 3; fd < 256; fd++)
       {
          close(fd);
       }
