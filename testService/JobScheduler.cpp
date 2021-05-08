@@ -95,7 +95,7 @@ int JobScheduler::create(const std::string& jsonString)
 
 void JobScheduler::jobFinished(int id)
 {
-   auto logger = spdlog::get("TestService");   
+   auto logger = spdlog::get("TestService");
    std::lock_guard<std::mutex> guard(_m);
    auto entry = activeJobs.find(id);
    if (entry != activeJobs.end())
@@ -106,7 +106,6 @@ void JobScheduler::jobFinished(int id)
          m_fJobFinished(entry->second);
       }
       activeJobs.erase(entry);
-      
    }
    else
    {
@@ -117,94 +116,12 @@ void JobScheduler::jobFinished(int id)
 
 std::string JobScheduler::getFinishedJobs(int fromId, int max)
 {
-   std::stringstream stream;
-   stream << "[\n";
-   int cnt = 0;
-
-   int highestId = -1;
-   int fromFound = false;
-   for (auto& p : fs::directory_iterator(db->getJobs_finished_dir()))
-   {
-      //find from
-      try
-      {
-         int fileId = std::stoi(p.path().filename());
-         if(highestId<fileId)
-         {
-            highestId = fileId;
-         }
-         if (fileId == fromId)
-         {
-            fromFound = true;
-            break;
-         }
-      }
-      catch (const std::exception& e)
-      {
-         std::cerr << e.what() << '\n';
-      }
-   }
-
-   if(fromFound)
-   {
-      for(int id = fromId; id < (fromId+max); id++)
-      {
-         if (cnt > 0)
-         {
-            stream << ",\n";
-         }
-         std::ifstream resultFile{ db->getJobs_finished_dir() + "/" + std::to_string(id)};
-         if(resultFile.fail())
-         {
-            break;
-         }
-         std::string line;
-         while (getline(resultFile, line))
-         {
-            stream << line.c_str() << '\n';
-         }
-         cnt++;
-      }
-   }
-   else
-   {
-      //reverse
-      for(int id = highestId; id>=0 && id>=(highestId-max);id--)
-      {
-         std::ifstream resultFile{ db->getJobs_finished_dir() + "/" + std::to_string(id) };
-         if (resultFile.fail())
-         {
-            break;
-         }
-         if (cnt > 0)
-         {
-            stream << ",\n";
-         }
-         std::string line;
-         while (getline(resultFile, line))
-         {
-            stream << line.c_str() << '\n';
-         }
-         cnt++;
-      }
-   }
-   stream << "]\n";
-   return stream.str();
+   return db->getFinishedJobs(fromId, max);
 }
 
 std::string JobScheduler::getFinishedJob(int jobId)
 {
-   std::ifstream job(db->getFinishedFilePath(jobId));
-   if (job.fail())
-   {
-      auto logger = spdlog::get("TestService");
-      logger->warn("job not found");
-      return "job not found";
-   }
-   std::stringstream buffer;
-   buffer << job.rdbuf();
-   job.close();
-   return buffer.str();
+   return db->getFinishedJob(jobId);
 }
 
 std::string JobScheduler::getScripts() const
@@ -224,15 +141,5 @@ void JobScheduler::updateScript(const std::string& name, const std::string& cont
 
 std::string JobScheduler::getJobLog(int jobId)
 {
-   std::ifstream log(db->getJobLogPath(jobId));
-   if (log.fail())
-   {
-      auto logger = spdlog::get("TestService");
-      logger->warn("job log not found");
-      return "job log not found";
-   }
-   std::stringstream buffer;
-   buffer << log.rdbuf();
-   log.close();
-   return buffer.str();
+   return db->getJobLog(jobId);
 }

@@ -178,7 +178,8 @@ int main(int argc, char* argv[])
    std::string binaryPath = argv[0];
    auto pos = binaryPath.find_last_of('/');
    binaryPath.erase(pos);
-   setupLogger(binaryPath);
+   setupLogger(binaryPath);   
+
    // handle signals in a dedicated thread
    sigset_t sigset;
    sigemptyset(&sigset);
@@ -186,6 +187,8 @@ int main(int argc, char* argv[])
    pthread_sigmask(SIG_BLOCK, &sigset, nullptr);
 
    opctest::service::TestService service(binaryPath);
+
+   
 
    auto signalHandler = [&service, &sigset]() {
       while (true)

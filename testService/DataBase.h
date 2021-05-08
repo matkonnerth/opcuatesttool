@@ -1,6 +1,7 @@
 #pragma once
 #include <filesystem>
 #include <iostream>
+#include <spdlog/spdlog.h>
 #include <string>
 
 namespace fs = std::filesystem;
@@ -12,7 +13,8 @@ root
             -> requests
             -> finished
             -> logs
-    -> scripts
+    -> scripts (this is the script repo)
+         -> scripts (directory with scripts)
 
 */
 
@@ -23,7 +25,7 @@ public:
    : rootDir{ root }
    , jobs_requests_dir{ rootDir + "/jobs/requests" }
    , jobs_finished_dir{ rootDir + "/jobs/finished" }
-   , scriptDir{ rootDir + "/scripts" }
+   , scriptDir{ rootDir + "/scripts/scripts" }
    {
       if (!fs::exists(rootDir + "/jobs"))
       {
@@ -41,10 +43,12 @@ public:
          }
          jobId = lastId;
       }
-      if (!fs::exists(getScriptsFilePath()))
+      // load scripts from git repo
+      int status = system((rootDir + "/getScripts.sh " + rootDir + "/scripts").c_str());
+      if (status != 0)
       {
-         std::cout << "DB: scripts directory missing, initialize new\n";
-         fs::create_directories(getScriptsFilePath());
+         auto logger = spdlog::get("TestService");
+         logger->warn("could initialize script repo");
       }
    }
 
@@ -80,8 +84,11 @@ public:
    }
 
    std::string getScripts() const;
-   std::string getScript(const std::string&name) const;
-   void updateScript(const std::string&name, const std::string& content);
+   std::string getScript(const std::string& name) const;
+   void updateScript(const std::string& name, const std::string& content);
+   std::string getFinishedJobs(int fromId, int max) const;
+   std::string getFinishedJob(int jobId) const;
+   std::string getJobLog(int jobId);
 
 private:
    const std::string rootDir;

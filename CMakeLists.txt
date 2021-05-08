@@ -63,6 +63,6 @@ target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::spdlog)
 
 add_custom_command(
         TARGET testService POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-                ${CMAKE_SOURCE_DIR}/test/scripts
-                ${CMAKE_BINARY_DIR}/bin/scripts)
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_SOURCE_DIR}/testService/getScripts.sh
+                ${CMAKE_BINARY_DIR}/bin)
