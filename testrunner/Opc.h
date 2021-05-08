@@ -13,6 +13,7 @@ private:
    std::function<void(const modernopc::NodeId& id, const modernopc::Variant& var)> m_write;
    std::function<std::vector<modernopc::BrowseResult>(const modernopc::NodeId& id)> m_browse;
    std::function<bool(const modernopc::BrowseResult& res)> m_IsVariable;
+   std::function<int(const std::string& uri)> m_resolveUri;
    std::shared_ptr<modernopc::Client> client{};
 };
 } // namespace opctest::testrunner

@@ -23,19 +23,15 @@ void Opc::registerNamespace(chaiscript::ChaiScript& chai, const std::string& uri
    client->connect();
 
    m_read = [&](const modernopc::NodeId& id) {
-      // auto resolvedId = client->resolve(id);
       return client->read(id);
    };
+
+   m_resolveUri = [&](const std::string& uri) { return client->resolveNamespaceUri(uri); };
 
    m_write = [&](const modernopc::NodeId& id, const modernopc::Variant& var) { client->write(id, var); };
 
    m_browse = [&](const NodeId& id) { return client->browse(id); };
    m_IsVariable = [&](const BrowseResult& res) { return (res.Type() == modernopc::NodeType::VARIABLE); };
-
-   // namespace opc
-   m->add(chaiscript::user_type<modernopc::UnresolvedNodeId>(), "UriId");
-   m->add(chaiscript::constructor<modernopc::UnresolvedNodeId(const std::string& ns, const std::string identifier)>(), "UriId");
-   m->add(chaiscript::constructor<modernopc::UnresolvedNodeId(const modernopc::UnresolvedNodeId& other)>(), "UriId");
 
    // opc variant
    m->add(chaiscript::user_type<modernopc::Variant>(), "Variant");
@@ -46,6 +42,7 @@ void Opc::registerNamespace(chaiscript::ChaiScript& chai, const std::string& uri
    m->add(chaiscript::fun(m_write), "write");
    m->add(fun(m_browse), "browse");
    m->add(fun(m_IsVariable), "isVariable");
+   m->add(fun(m_resolveUri), "resolveUri");
 
    chaiscript::utility::add_class<BrowseResult>(*m, "BrowseResult", { constructor<BrowseResult(const BrowseResult&)>(), constructor<BrowseResult(BrowseResult &&)>() }, { { fun(&BrowseResult::Id), "Id" }, { fun(&BrowseResult::Name), "Name" } });
 
@@ -60,13 +57,6 @@ void Opc::registerNamespace(chaiscript::ChaiScript& chai, const std::string& uri
 
    chaiscript::utility::add_class<NodeId>(
    *m, "NodeId", { constructor<NodeId(uint16_t nsIdx, int id)>(), constructor<NodeId(uint16_t nsIdx, const std::string& id)>(), constructor<NodeId(const NodeId&)>(), constructor<BrowseResult(BrowseResult &&)>() }, {});
-
-   //   chai->register_namespace(
-   //   [](chaiscript::Namespace& opc) {
-   //      math["pi"] = chaiscript::const_var(3.14159);
-   //      math["sin"] = chaiscript::var(chaiscript::fun([](const double x) { return sin(x); }));
-   //   },
-   //   "opc");
 
    chai.add(m);
 }
