@@ -1,10 +1,10 @@
 #pragma once
 #include <chaiscript/chaiscript.hpp>
 #include <functional>
-#include <modernOpc/client/Client.h>
 #include <spdlog/spdlog.h>
 #include <vector>
 #include <modernOpc/BrowseResult.h>
+#include "Opc.h"
 
 namespace opctest::testrunner {
 class Runtime
@@ -23,10 +23,6 @@ private:
    std::string m_script;
    std::shared_ptr<spdlog::logger> logger;
    chaiscript::ChaiScript chai;
-   std::shared_ptr<modernopc::Client> client{};
-   std::function<modernopc::Variant(const modernopc::NodeId&)> m_read;
-   std::function<void(const modernopc::NodeId& id, const modernopc::Variant& var)> m_write;
-   std::function<std::vector<modernopc::BrowseResult>(const modernopc::NodeId& id)> m_browse;
-   std::function<bool(const modernopc::BrowseResult& res)> m_IsVariable;
+   Opc opc{};
 };
 } // namespace opctest::testrunner

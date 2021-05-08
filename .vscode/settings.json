@@ -72,6 +72,8 @@
         "concepts": "cpp",
         "ranges": "cpp",
         "stop_token": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "unordered_set": "cpp",
+        "shared_mutex": "cpp"
     }
 }

@@ -27,7 +27,8 @@ add_executable(testRunner
     testrunner/TestRunner.cpp
 	testrunner/Job.cpp
     testrunner/JobFactory.cpp
-    testrunner/Runtime.cpp)
+    testrunner/Runtime.cpp
+    testrunner/Opc.cpp)
 target_include_directories(testRunner PRIVATE job)
 target_link_libraries(testRunner PRIVATE modernOpc)
 target_link_libraries(testRunner PRIVATE CONAN_PKG::nlohmann_json)
