@@ -203,7 +203,7 @@ int main(int, char* argv[])
 
    auto ft_signal_handler = std::async(std::launch::async, signalHandler);
 
-   opctest::api::Server server{ "0.0.0.0", 9888 };
+   opctest::api::Server server{ "0.0.0.0", 9888, binaryPath +  "/dist/testToolApp"};
 
 
    auto cb = [&](const opctest::api::RequestVariant& req, opctest::api::ResponseVariant& resp) { return apiCallback(service, req, resp); };

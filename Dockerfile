@@ -55,10 +55,13 @@ COPY api ./api
 COPY persistence ./persistence
 
 RUN mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. \
-    && make testService \
-    && make testRunner
+    && make testService -j \
+    && make testRunner -j;
 
 RUN ldconfig
+
+#copy wepapp
+COPY hmi/testToolApp/dist /src/build/bin/dist
 
 CMD ["/src/build/bin/testService"]
 

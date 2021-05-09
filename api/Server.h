@@ -43,7 +43,7 @@ private:
 class Server
 {
 public:
-   Server(std::string ip, int port)
+   Server(std::string ip, int port, const std::string& pathToWebApp)
    : ip{ std::move(ip) }
    , port{ port }
    {
@@ -54,6 +54,12 @@ public:
          res.set_header("Access-Control-Allow-Origin", "*");
          res.set_header("Connection", "close");
       });
+
+      auto ret = srv.set_mount_point("/", pathToWebApp.c_str());
+      if (!ret)
+      {
+         std::cout << "cannot mount webapp " << pathToWebApp << "\n";
+      }
       // getJobs
       srv.Get("/api/jobs", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
          httpRes.set_header("Access-Control-Allow-Origin", "*");
