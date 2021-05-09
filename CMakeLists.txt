@@ -14,7 +14,7 @@ conan_cmake_run(CONANFILE conanfile.txt
 
 # Link this 'library' to use the warnings specified in CompilerWarnings.cmake
 add_library(project_warnings INTERFACE)
-include(cmake/CompilerWarnings.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/CompilerWarnings.cmake)
 set_project_warnings(project_warnings)
 
 add_library(project_options INTERFACE)
@@ -58,10 +58,6 @@ target_link_libraries(influxDBImporter PRIVATE project_options)
 target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::influxdb-cpp)
 target_link_libraries(influxDBImporter PRIVATE project_warnings)
 target_link_libraries(influxDBImporter PRIVATE CONAN_PKG::spdlog)
-
-#add_executable(testInfluxDb testInflux.cpp)
-#target_link_libraries(testInfluxDb PRIVATE CONAN_PKG::InfluxDB)
-#target_link_libraries(testInfluxDb PRIVATE project_options)
 
 add_custom_command(
         TARGET testService POST_BUILD
