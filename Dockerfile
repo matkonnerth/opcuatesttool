@@ -1,24 +1,11 @@
 # build with
 # sudo docker build -t matkonnerth/opcuatesttool .
 # run with
-# sudo docker run --network host --mount source=testTool-vol,destination=/usr/local/bin/jobs matkonnerth/opcuatesttool
+# sudo docker run --network host --mount source=testTool-vol,destination=/opt/testService/bin/jobs matkonnerth/opcuatesttool
 # uses host network and a volume for the jobs
+# uses the image specified in DockerfileBuild
 
-FROM debian:bullseye AS runtime
-RUN set -ex; \
-    apt-get update; \
-    apt-get -y install git;
-
-#dev
-RUN apt-get -y install libxml2-dev; \
-    apt-get -y install build-essential; \
-    apt-get -y install cmake; \
-    apt-get -y install python3; \
-    apt-get -y install python3-pip; \
-    apt-get -y install clang;
-
-#install conan
-RUN pip install conan;
+FROM cpp-build-base:0.1.0 AS build
 
 #open62541
 RUN git clone https://github.com/open62541/open62541.git open62541 \
@@ -41,7 +28,7 @@ RUN git clone https://github.com/matkonnerth/ModernOPC.git modernOpc \
     && make -j \
     && make install;
 
-#should also be build from scratch, use clang
+#use clang
 RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang 100 \
     && update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 100;
 
@@ -58,10 +45,25 @@ RUN mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. \
     && make testService -j \
     && make testRunner -j;
 
+#copy webapp
+#
+
+FROM debian:bullseye
+
+WORKDIR /opt/testService
+
+COPY --from=build /src/build/bin ./bin
+#get shared libs
+COPY --from=build /usr/local/lib/libopen62541.so.1 /usr/local/lib
+COPY --from=build /usr/local/lib/libmodernOpc.so /usr/local/lib
+COPY --from=build /usr/local/lib/libNodesetLoader.so /usr/local/lib
+COPY hmi/testToolApp/dist ./bin/dist
+
 RUN ldconfig
 
-#copy wepapp
-COPY hmi/testToolApp/dist /src/build/bin/dist
+RUN set -ex; \
+    apt-get update; \
+    apt-get -y install git;
 
-CMD ["/src/build/bin/testService"]
+CMD ["/opt/testService/bin/testService"]
 

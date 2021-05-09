@@ -72,8 +72,8 @@ add_custom_command(
                 ${CMAKE_BINARY_DIR}/bin)
 
 #copy webapp
-add_custom_command(
-        TARGET testService POST_BUILD
-        COMMAND ${CMAKE_COMMAND} - E copy_directory
-                ${CMAKE_SOURCE_DIR}/hmi/testToolApp/dist
-                ${CMAKE_BINARY_DIR}/bin)
+#add_custom_command(
+#        TARGET testService POST_BUILD
+#        COMMAND ${CMAKE_COMMAND} -E copy_directory
+#                ${CMAKE_SOURCE_DIR}/hmi/testToolApp/dist/
+#                ${CMAKE_BINARY_DIR}/bin)
