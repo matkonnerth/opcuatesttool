@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'OPC UA Performance Test Tool';
+  title = 'OPC UA Performance Test Tool (v0.1.0)';
 }

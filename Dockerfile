@@ -3,9 +3,22 @@
 # run with
 # sudo docker run --network host --mount source=testTool-vol,destination=/opt/testService/bin/jobs matkonnerth/opcuatesttool
 # uses host network and a volume for the jobs
-# uses the image specified in DockerfileBuild
+#
+# upload
+#  docker push ghcr.io/matkonnerth/opcuatesttool:latest
 
-FROM cpp-build-base:0.1.0 AS build
+FROM debian:bullseye AS cpp-build-base
+RUN apt-get update \
+    && apt-get -y install git \
+    && apt-get -y install libxml2-dev \
+    && apt-get -y install build-essential \
+    && apt-get -y install cmake \
+    && apt-get -y install python3 \
+    && apt-get -y install python3-pip \
+    && apt-get -y install clang \
+    && pip install conan;
+
+FROM cpp-build-base AS build
 
 #open62541
 RUN git clone https://github.com/open62541/open62541.git open62541 \
@@ -45,8 +58,17 @@ RUN mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. \
     && make testService -j \
     && make testRunner -j;
 
-#copy webapp
-#
+#build webapp
+FROM node:10-alpine as build-webapp
+RUN mkdir -p /app
+
+WORKDIR /app
+
+COPY hmi/testToolApp/package.json /app
+
+RUN npm install
+COPY hmi/testToolApp/. /app
+RUN npm run build --prod
 
 FROM debian:bullseye
 
@@ -57,13 +79,13 @@ COPY --from=build /src/build/bin ./bin
 COPY --from=build /usr/local/lib/libopen62541.so.1 /usr/local/lib
 COPY --from=build /usr/local/lib/libmodernOpc.so /usr/local/lib
 COPY --from=build /usr/local/lib/libNodesetLoader.so /usr/local/lib
-COPY hmi/testToolApp/dist ./bin/dist
+COPY --from=build-webapp /app/dist ./bin/dist
 
-RUN ldconfig
+RUN apt-get update \
+    && apt-get -y install git \
+    && apt-get -y install libxml2;
 
-RUN set -ex; \
-    apt-get update; \
-    apt-get -y install git;
+RUN ldconfig;
 
 CMD ["/opt/testService/bin/testService"]
 

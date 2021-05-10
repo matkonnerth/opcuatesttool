@@ -3,15 +3,16 @@ import { Observable, of } from 'rxjs';
 import { HttpClient} from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { GetScriptsResponse, Script } from './script';
+import { PlatformLocation } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ScriptService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private platform: PlatformLocation) { }
 
-  private serviceUrl = 'http://localhost:9888/api/scripts';
+  private serviceUrl = 'http://' + this.platform.hostname + ':9888/api/scripts';  // URL to web api
 
   getScripts(): Observable<Script[]> {
     const jobs = this.http.get<GetScriptsResponse>(this.serviceUrl).
