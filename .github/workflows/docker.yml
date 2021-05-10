@@ -21,7 +21,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: matkonnerth/opcuatesttool:latest
+          tags: ghcr.io/matkonnerth/opcuatesttool:latest
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
