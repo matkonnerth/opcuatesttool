@@ -45,10 +45,11 @@ RUN mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. \
     && make testService -j \
     && make testRunner -j;
 
-#copy webapp
-#
-
 FROM debian:bullseye
+
+RUN set -ex; \
+    apt-get update; \
+    apt-get -y install libxml2;
 
 WORKDIR /opt/testService
 
