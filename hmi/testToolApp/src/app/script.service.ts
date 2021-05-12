@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { HttpClient} from '@angular/common/http';
-import { catchError, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { GetScriptsResponse, Script } from './script';
 
 @Injectable({
@@ -11,7 +11,7 @@ export class ScriptService {
 
   constructor(private http: HttpClient) { }
 
-  private serviceUrl = 'http://localhost:9888/api/scripts';
+  private serviceUrl = '/api/scripts';
 
   getScripts(): Observable<Script[]> {
     const jobs = this.http.get<GetScriptsResponse>(this.serviceUrl).

@@ -1,17 +1,17 @@
 import { Injectable, NgZone } from '@angular/core';
 import { FinishedJob, FinishedJobsResponse, Request, Result } from './job';
-import { Observable, Observer, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { HttpClient} from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
-
 @Injectable({
   providedIn: 'root'
 })
 export class JobsService {
 
-  constructor(private http: HttpClient, private _zone: NgZone) { }
+  constructor(private http: HttpClient) {
+  }
 
-  private jobsUrl = 'http://localhost:9888/api/jobs';  // URL to web api
+  private jobsUrl = '/api/jobs';
 
   getJobs(): Observable<FinishedJob[]> {
     const jobs = this.http.get<FinishedJobsResponse>(this.jobsUrl + '?from=100000&max=10').
