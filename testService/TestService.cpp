@@ -27,6 +27,8 @@ using opctest::api::NewJobRequest;
 using opctest::api::NewJobResponse;
 using opctest::api::Response;
 using opctest::api::UpdateScriptRequest;
+using opctest::api::GetTargetsRequest;
+using opctest::api::GetTargetsResponse;
 
 class TestService
 {
@@ -108,6 +110,14 @@ public:
       return resp;
    }
 
+   GetTargetsResponse getTargets()
+   {
+      GetTargetsResponse resp{};
+      resp.ok = true;
+      resp.data = scheduler->getTargets();
+      return resp;
+   }
+
    void setJobFinishedCallback(std::function<void(int)> cb)
    {
       scheduler->setJobFinishedCallback(cb);
@@ -164,6 +174,10 @@ bool apiCallback(opctest::TestService& service, const opctest::api::RequestVaria
       else if constexpr (std::is_same_v<T, opctest::api::GetJobLogRequest>)
       {
          resp = service.getJobLog(arg);
+      }
+      else if constexpr (std::is_same_v<T, opctest::api::GetTargetsRequest>)
+      {
+         resp = service.getTargets();
       }
       else
       {

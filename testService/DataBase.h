@@ -27,7 +27,8 @@ public:
    : rootDir{ root }
    , jobs_requests_dir{ rootDir + "/jobs/requests" }
    , jobs_finished_dir{ rootDir + "/jobs/finished" }
-   , scriptDir{ rootDir + "/scripts/scripts" }
+   , scriptDir{ rootDir + "/repo/scripts" }
+   , targetDir{ rootDir + "/repo/targets" }
    , config{ c }
    {
       if (!fs::exists(rootDir + "/jobs"))
@@ -47,7 +48,7 @@ public:
          jobId = lastId;
       }
       // load scripts from git repo
-      int status = system((rootDir + "/getScripts.sh " + rootDir + "/scripts " + config.gitRepository).c_str());
+      int status = system((rootDir + "/getScripts.sh " + rootDir + "/repo " + config.gitRepository).c_str());
       if (status != 0)
       {
          auto logger = spdlog::get("TestService");
@@ -92,12 +93,14 @@ public:
    std::string getFinishedJobs(int fromId, int max) const;
    std::string getFinishedJob(int jobId) const;
    std::string getJobLog(int jobId);
+   std::string getTargets() const;
 
 private:
    const std::string rootDir;
    const std::string jobs_requests_dir;
    const std::string jobs_finished_dir;
    const std::string scriptDir;
+   const std::string targetDir;
    int jobId{ 0 };
    const Config& config;
 };

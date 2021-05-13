@@ -182,6 +182,16 @@ public:
          });
       });
 
+      srv.Get("/api/targets", [&](const httplib::Request& /*httpReq*/, httplib::Response& httpRes) {
+         httpRes.set_header("Access-Control-Allow-Origin", "*");
+
+         GetTargetsRequest req{};
+         RequestVariant varReq{ req };
+         ResponseVariant varResp{};
+         callback(varReq, varResp);
+         httpRes.set_content(std::get<GetTargetsResponse>(varResp).data, "application/json");
+      });
+
       m_fEventCallback = [&](int id) { ed.send_event(std::to_string(id)); };
    }
 

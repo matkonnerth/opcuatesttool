@@ -3,7 +3,8 @@ import { JobsService } from '../jobs.service';
 import { Script } from '../script';
 import { ScriptService } from '../script.service';
 import { Request } from '../job';
-import { targets, Target} from '../target';
+import { Target} from '../target';
+import { TargetService } from '../target.service';
 
 @Component({
   selector: 'app-script',
@@ -13,16 +14,16 @@ import { targets, Target} from '../target';
 export class ScriptComponent implements OnInit {
 
   scripts: Script[] = [];
+  targets: Target[] = [];
   selectedScript?: Script;
   content?: string;
-  target = targets[0];
+  target: Target = { name: 'noTarget', host: 'localhost', port: 9888};
 
-  targets = targets;
-
-  constructor(private scriptService: ScriptService, private jobService: JobsService) { }
+  constructor(private scriptService: ScriptService, private jobService: JobsService, private targetService: TargetService) { }
 
   ngOnInit(): void {
     this.getScripts();
+    this.getTargets();
   }
 
   onSelect(script: Script): void {
@@ -33,6 +34,11 @@ export class ScriptComponent implements OnInit {
   getScripts(): void {
     this.scriptService.getScripts()
       .subscribe(s => this.scripts = s);
+  }
+
+  getTargets(): void {
+    this.targetService.getTargets()
+      .subscribe(t => this.targets = t);
   }
 
   newJob(script: Script): void {

@@ -92,6 +92,20 @@ paths:
           description: bad input parameter
         '500':
           description: job not found
+  /api/targets:
+    get:
+      summary: get test targets
+      responses:
+        '200':
+          description: log content
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Target'
+        '400':
+          description: bad input parameter
 components:
   schemas:
     JobRequest:
@@ -137,3 +151,18 @@ components:
           $ref: '#/components/schemas/JobRequest'
         result:
           $ref: '#/components/schemas/JobResult'
+    Target:
+      required:
+        - name
+        - host
+        - port
+      properties:
+        name:
+          type: string
+          example: 'TestTarget1'
+        host:
+          type: string
+          example: 'localhost'
+        port:
+          type: number
+          example: 4840

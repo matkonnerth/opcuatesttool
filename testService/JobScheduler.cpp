@@ -145,4 +145,9 @@ std::string JobScheduler::getJobLog(int jobId)
 {
    return db->getJobLog(jobId);
 }
+
+std::string JobScheduler::getTargets() const
+{
+   return db->getTargets();
+}
 } // namespace opctest

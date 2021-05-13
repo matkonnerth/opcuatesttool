@@ -21,6 +21,7 @@ public:
    std::string getScript(const std::string& name) const;
    void updateScript(const std::string& name, const std::string& content);
    std::string getJobLog(int jobId);
+   std::string getTargets() const;
    void setJobFinishedCallback(std::function<void(int)> cb)
    {
       m_fJobFinished = cb;

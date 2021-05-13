@@ -171,4 +171,19 @@ std::string DataBase::getJobLog(int jobId)
    log.close();
    return buffer.str();
 }
+
+std::string DataBase::getTargets() const
+{
+   std::ifstream targets(targetDir + "/targets.json");
+   if (targets.fail())
+   {
+      auto logger = spdlog::get("TestService");
+      logger->warn("targets file not found");
+      return "job log not found";
+   }
+   std::stringstream buffer;
+   buffer << targets.rdbuf();
+   targets.close();
+   return buffer.str();
+}
 } // namespace opctest
