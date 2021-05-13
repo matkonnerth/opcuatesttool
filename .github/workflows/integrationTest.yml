@@ -11,6 +11,8 @@ jobs:
     services:
           testContainer:
             image: ghcr.io/matkonnerth/opcuatesttool:latest
+            ports:
+              - 9888:9888
     steps:
     - uses: actions/checkout@v2
     - name: run test script
