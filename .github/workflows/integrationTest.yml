@@ -12,6 +12,7 @@ jobs:
           testContainer:
             image: ghcr.io/matkonnerth/opcuatesttool:latest
     steps:
+    - uses: actions/checkout@v2
     - name: run test script
       shell: bash
       run: ./api/tests/rest/BasicTest.sh
