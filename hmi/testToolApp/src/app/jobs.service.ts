@@ -36,7 +36,7 @@ export class JobsService {
 
   getJobLog(job: Result): Observable<string>
   {
-    const content = this.http.get(this.jobsUrl + job.id + '/log', { responseType: 'text' });
+    const content = this.http.get(this.jobsUrl + '/' + job.id + '/log', { responseType: 'text' });
     return content;
   }
 
