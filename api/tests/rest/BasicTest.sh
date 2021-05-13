@@ -21,7 +21,7 @@ request="$BASE_URL$JOBS?from=1000&max=1"
 checkStatusCode $request 200
 
 request="$BASE_URL$SCRIPTS"
-checkStatusCode $request 20
+checkStatusCode $request 200
 
 request="$BASE_URL$TARGETS"
 checkStatusCode $request 200
