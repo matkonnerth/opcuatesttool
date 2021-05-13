@@ -34,22 +34,10 @@ Per default all opc ua operations will check the statuscodes and throw an except
 
 ## REST interface
 
-### Triggering a new job
-```bash
-curl -H "Content-Type: application/json" --data @tests/rest/newJob.json http://localhost:9080/jobs
-```
-The test service assigns a unique id to the new job (ids are ordered), this id can be used to address the job in further requests.
+### API documentation
 
-### Get finished jobs
-getting jobs starting at a certain id, max 100
-```bash
-curl http://localhost:9080/jobs?from=id&max=100
-```
+![Generated API documentation](api/api.md)
 
-### Get results of job with id 0
-```bash
-curl http://localhost:9080/jobs/0
-```
 
 ## Integration with InfluxDB and Grafana
 
