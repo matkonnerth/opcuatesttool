@@ -22,7 +22,9 @@ FROM cpp-build-base AS build
 
 #open62541
 RUN git clone https://github.com/open62541/open62541.git open62541 \
-    && cd open62541 && mkdir build && cd build \
+    && cd open62541 \
+    #&& git checkout tags/v1.2.2 \
+    && mkdir build && cd build \
     && cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DUA_ENABLE_SUBSCRIPTIONS_EVENTS=ON .. \
     && make -j \
     && make install;
@@ -76,7 +78,7 @@ WORKDIR /opt/testService
 
 COPY --from=build /src/build/bin ./bin
 #get shared libs
-COPY --from=build /usr/local/lib/libopen62541.so.1 /usr/local/lib
+COPY --from=build /usr/local/lib/libopen62541.so.0 /usr/local/lib
 COPY --from=build /usr/local/lib/libmodernOpc.so /usr/local/lib
 COPY --from=build /usr/local/lib/libNodesetLoader.so /usr/local/lib
 COPY --from=build-webapp /app/dist ./bin/dist
