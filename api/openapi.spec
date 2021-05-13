@@ -3,8 +3,8 @@ servers:
   - description: OPC UA TestTool API
     url: https://opcuatesttool.com
 info:
-  description: This is a simple API
-  version: "0.1.0"
+  description: api of test tool app
+  version: 1.0.0
   title: OPC UA TestTool API
   contact:
     email: matkonnerth@gmail.com
@@ -50,6 +50,48 @@ paths:
             schema:
               $ref: '#/components/schemas/JobRequest'
         description: Inventory item to add
+  /api/jobs/{id}:
+    get:
+      summary: get finished test job with specified id
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the finished job to get
+      responses:
+        '200':
+          description: Finished Job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinishedJob'
+        '400':
+          description: bad input parameter
+        '500':
+          description: job not found
+  /api/jobs/{id}/log:
+    get:
+      summary: get log of finished job
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the finished job to get
+      responses:
+        '200':
+          description: log content
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: bad input parameter
+        '500':
+          description: job not found
 components:
   schemas:
     JobRequest:

@@ -161,7 +161,7 @@ public:
       });
 
       // get finished job
-      srv.Get(R"(/api/jobs/logs/(\d+))", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
+      srv.Get(R"(/api/jobs/(\d+)/log)", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
          httpRes.set_header("Access-Control-Allow-Origin", "*");
 
          GetJobLogRequest req{};
