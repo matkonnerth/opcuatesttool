@@ -20,11 +20,12 @@ enum class JobStatus
 class Job
 {
 public:
-   explicit Job(const std::string& name, const std::string& serverUri, const std::string& script)
+   explicit Job(const std::string& name, const std::string& serverUri, const std::string& scriptDir, const std::string& script)
    : name{ name }
    , serverUri{ serverUri }
    , logger{ spdlog::get("TestRunner") }
-   , m_script{ script }
+   , m_scriptDir{ scriptDir }
+   , m_script{script}
    {}
    const std::string& getServerUri() const;
    virtual void execute();
@@ -40,6 +41,7 @@ protected:
    std::chrono::system_clock::time_point start{};
    std::chrono::system_clock::time_point stop{};
    std::shared_ptr<spdlog::logger> logger;
+   std::string m_scriptDir;
    std::string m_script;
 };
 

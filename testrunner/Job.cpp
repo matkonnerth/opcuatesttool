@@ -10,7 +10,7 @@ namespace opctest::testrunner {
 
 void Job::execute()
 {
-   Runtime rt{ serverUri, m_script };
+   Runtime rt{ serverUri, m_scriptDir, m_script };
 
    try
    {

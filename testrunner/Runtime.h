@@ -10,8 +10,9 @@ namespace opctest::testrunner {
 class Runtime
 {
 public:
-   Runtime(const std::string& uri, const std::string& script)
+   Runtime(const std::string& uri, const std::string& scriptDir, const std::string& script)
    : m_uri{ uri }
+   , m_scriptDir {scriptDir}
    , m_script{ script }
    , logger{ spdlog::get("TestRunner") }
    {}
@@ -20,6 +21,7 @@ public:
 
 private:
    std::string m_uri;
+   std::string m_scriptDir;
    std::string m_script;
    std::shared_ptr<spdlog::logger> logger;
    chaiscript::ChaiScript chai;

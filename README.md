@@ -14,7 +14,7 @@ On startup the testService will fetch the availabe test scripts from a github re
 
 ## Jobs
 
-A job represents a single test run and execute a performance test script. The end user can implement performance test scripts with chaiscript.
+A job represents a single test run and executes a performance test script. The end user can implement performance test scripts with chaiscript.
 
 The following opc ua specific types / method calls are exposed to the chai script interpreter:
 
@@ -32,6 +32,9 @@ Todo - NOT IMPLEMENTED:
 
 Per default all opc ua operations will check the statuscodes and throw an exception on error. The exception will not be catched by default, so the job will be marked as aborted.
 
+### library
+
+There is a script called libOpc.chai. This script will be loaded before evalulation of the test script. The intention of this script is to refactor out common testing functionality.
 ## REST interface
 
 ### API documentation

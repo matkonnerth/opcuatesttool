@@ -33,6 +33,6 @@ std::unique_ptr<Job> JobFactory::createFromFile(const std::string& path, const s
 
    
 
-   return std::make_unique<Job>(name, serverUri, scriptDir + "/" + scriptName);
+   return std::make_unique<Job>(name, serverUri, scriptDir, scriptName);
 }
 } // namespace opctest::testrunner
