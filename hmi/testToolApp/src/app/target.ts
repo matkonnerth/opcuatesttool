@@ -4,3 +4,4 @@ export interface Target
     host: string;
     port: number;
 }
+
