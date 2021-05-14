@@ -1,4 +1,4 @@
-name: ci
+name: buildImage
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - 'master'
 
 jobs:
-  docker:
+  dockerImageLatest:
     runs-on: ubuntu-latest
     steps:
       -
@@ -31,3 +31,16 @@ jobs:
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+  notify:
+    needs: dockerImageLatest
+    runs-on: ubuntu-latest
+    services:
+          testContainer:
+            image: ghcr.io/matkonnerth/opcuatesttool:latest
+            ports:
+              - 9888:9888
+    steps:
+    - uses: actions/checkout@v2
+    - name: run test script
+      shell: bash
+      run: ./api/tests/rest/BasicTest.sh
