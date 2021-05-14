@@ -3,6 +3,7 @@ import { Observable, of } from 'rxjs';
 import { HttpClient} from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { GetScriptsResponse, Script } from './script';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +12,10 @@ export class ScriptService {
 
   constructor(private http: HttpClient) { }
 
-  private serviceUrl = '/api/scripts';
+  private baseUrl = environment.baseURL + 'api/scripts';
 
   getScripts(): Observable<Script[]> {
-    const jobs = this.http.get<GetScriptsResponse>(this.serviceUrl).
+    const jobs = this.http.get<GetScriptsResponse>(this.baseUrl).
       pipe(map(response => response.response.map(data => {
         return data;
       })));
@@ -23,13 +24,13 @@ export class ScriptService {
 
   getScriptContent(script: Script): Observable<string>
   {
-    const content = this.http.get(this.serviceUrl + '/' + script.name, { responseType: 'text' });
+    const content = this.http.get(this.baseUrl + '/' + script.name, { responseType: 'text' });
     return content;
   }
 
   /** POST: run new test job */
   updateScript(script: Script, content: string): void {
-    const req = this.http.post(this.serviceUrl + '/' + script.name, content);
+    const req = this.http.post(this.baseUrl + '/' + script.name, content);
     req.subscribe();
   }
 

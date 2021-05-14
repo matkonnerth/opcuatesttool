@@ -1,3 +1,4 @@
+<h2>Available test scripts</h2>
 <ul class="script">
     <li *ngFor="let script of scripts" [class.selected]="script === selectedScript" (click)="onSelect(script)">
         <span class="badge">{{script.name}}</span>

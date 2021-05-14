@@ -1,5 +1,5 @@
 [requires]
-cpp-httplib/0.8.5
+cpp-httplib/0.8.8
 nlohmann_json/3.9.1
 libcurl/7.66.0
 spdlog/1.7.0

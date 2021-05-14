@@ -13,10 +13,13 @@ export class JobsComponent implements OnInit {
   selectedJob?: FinishedJob;
   jobLog = '';
 
+  eventLog = 'empty EventLog';
+
   constructor(private jobService: JobsService) { }
 
   ngOnInit(): void {
     this.getJobs();
+    this.jobService.getServerSentEvent().subscribe(data => { this.eventLog = data; this.getJobs(); });
   }
 
   onSelect(job: FinishedJob): void {
@@ -32,6 +35,7 @@ export class JobsComponent implements OnInit {
     this.jobService.getJobs()
       .subscribe(jobs => this.jobs = jobs);
   }
+
 
 }
 

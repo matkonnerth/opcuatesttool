@@ -4,6 +4,8 @@
 #include <iostream>
 #include <unordered_map>
 #include <mutex>
+#include <thread>
+#include <chrono>
 
 
 namespace opctest::api {
@@ -26,18 +28,18 @@ public:
    }
 
    void send_event(const std::string& message)
-   {
+   {  
       std::lock_guard<std::mutex> lk(m_);
+      message_ = "data: " + message + "\n\n";
       cid_ = id_++;
-      message_ = message;
       cv_.notify_all();
    }
 
 private:
    std::mutex m_;
    std::condition_variable cv_;
-   std::atomic_int id_ = 0;
-   std::atomic_int cid_ = -1;
+   std::atomic_int id_{ 0 };
+   std::atomic_int cid_{ -1 };
    std::string message_;
 };
 class Server
@@ -174,8 +176,8 @@ public:
          httpRes.set_content(std::get<GetJobLogResponse>(varResp).data, "text/plain");
       });
 
-      srv.Get("/event1", [&](const httplib::Request& /*req*/, httplib::Response& res) {
-         std::cout << "register event" << "\n";
+      srv.Get("/api/events", [&](const httplib::Request& /*req*/, httplib::Response& res) {
+         res.set_header("Access-Control-Allow-Origin", "*");
          res.set_chunked_content_provider("text/event-stream", [&](size_t /*offset*/, httplib::DataSink& sink) {
             ed.wait_event(&sink);
             return true;
@@ -192,11 +194,23 @@ public:
          httpRes.set_content(std::get<GetTargetsResponse>(varResp).data, "application/json");
       });
 
-      m_fEventCallback = [&](int id) { ed.send_event(std::to_string(id)); };
+      m_fEventCallback = [&](int id) { ed.send_event("{\"id\": " + std::to_string(id) + "}"); };
    }
 
    void listen()
    {
+      // keep alive
+      // std::thread t([&] {
+      //    int id = 0;
+      //    while (true)
+      //    {
+      //       std::this_thread::sleep_for(std::chrono::seconds(1));
+      //       std::stringstream ss;
+      //       ss << ": keepAlive " << id << "\n\n";
+      //       ed.send_event(ss.str());
+      //       id++;
+      //    }
+      // });
       srv.listen(ip.c_str(), port);
    }
 

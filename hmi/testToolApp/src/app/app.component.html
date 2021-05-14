@@ -1,6 +1,5 @@
 <h1>{{title}}</h1>
-<nav>
-    <a routerLink="/jobs">Jobs</a>
-    <a routerLink="/scripts">Scripts</a>
-</nav>
-<router-outlet></router-outlet>
+<div style="display: flex; flex-grow: grow">
+    <app-jobs></app-jobs>
+    <app-script></app-script>
+</div>

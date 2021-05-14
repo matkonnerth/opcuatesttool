@@ -1,20 +1,21 @@
 import { Injectable, NgZone } from '@angular/core';
 import { FinishedJob, FinishedJobsResponse, Request, Result } from './job';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Observer } from 'rxjs';
 import { HttpClient} from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
+import { environment } from '../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
 export class JobsService {
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private _zone: NgZone) {
   }
 
-  private jobsUrl = '/api/jobs';
+  private baseUrl = environment.baseURL + 'api/jobs';
 
   getJobs(): Observable<FinishedJob[]> {
-    const jobs = this.http.get<FinishedJobsResponse>(this.jobsUrl + '?from=100000&max=10').
+    const jobs = this.http.get<FinishedJobsResponse>(this.baseUrl + '?from=100000&max=10').
       pipe(map(response => response.response.map(data => {
         const job: FinishedJob = {
           request: data.request,
@@ -27,7 +28,7 @@ export class JobsService {
 
   /** POST: run new test job */
   createJob(job: Request): void {
-    const req = this.http.post(this.jobsUrl, job)
+    const req = this.http.post(this.baseUrl, job)
       .pipe(
         catchError(this.handleError('createJob', job))
     );
@@ -36,28 +37,29 @@ export class JobsService {
 
   getJobLog(job: Result): Observable<string>
   {
-    const content = this.http.get(this.jobsUrl + '/' + job.id + '/log', { responseType: 'text' });
+    const content = this.http.get(this.baseUrl + '/' + job.id + '/log', { responseType: 'text' });
     return content;
   }
 
-  // getServerSentEvent(): Observable<string> {
-  //   return Observable.create((observer : Observer<string>) => {
-  //     const eventSource = this.getEventSource('http://localhost:9888/event1');
-  //     eventSource.onmessage = event => {
-  //       this._zone.run(() => {
-  //         observer.next(event);
-  //       });
-  //     };
-  //     eventSource.onerror = error => {
-  //       this._zone.run(() => {
-  //         observer.error(error);
-  //       });
-  //     };
-  //   });
-  // }
+  getServerSentEvent(): Observable<string> {
+    return new Observable((observer: Observer<string>) => {
+      const eventSource = this.getEventSource(environment.baseURL + 'api/events');
+      eventSource.onmessage = event => {
+        this._zone.run(() => {
+          observer.next(event.data);
+        });
+      };
+      eventSource.onerror = error => {
+        this._zone.run(() => {
+          observer.error(error);
+        });
+      };
+    });
+  }
 
-  private getEventSource(url: string): EventSource {
-    return new EventSource(url);
+  getEventSource(uri: string): EventSource
+  {
+    return new EventSource(uri);
   }
 
   /**

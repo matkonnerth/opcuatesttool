@@ -1,11 +1,9 @@
-<h2>Recent </h2>
+<h2>Recent test runs</h2>
 <ul class="jobs">
     <li *ngFor="let job of jobs" [class.selected]="job === selectedJob" (click)="onSelect(job)" [ngClass]="{'error': job.result.statusCode=='Error'}">
         <span class="badge">{{job.result.id}}</span>
         {{job.request.name}}
         {{job.request.script}}
-        <!--{{job.result.statusCode}}-->
-        <!--{{job.result.totalRuntime_ms}}-->
     </li>
 </ul>
 <div *ngIf="selectedJob">
@@ -17,4 +15,7 @@
     <div *ngIf="selectedJob.result"><span>Runtime (ms): </span>{{selectedJob.result.totalRuntime_ms}}</div>
     <div><textarea disabled cols=100 rows=20 >{{jobLog}}</textarea></div>
     <button type="button" class="btn btn-default" (click)="newJob(selectedJob)">Run again</button>
+</div>
+<div>
+    <div><span>log:</span>{{eventLog}}</div>
 </div>
