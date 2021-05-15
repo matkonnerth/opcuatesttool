@@ -1,10 +1,12 @@
 #include "Opc.h"
+#include <string>
 
 using chaiscript::constructor;
 using chaiscript::fun;
 using modernopc::BrowseResult;
 using modernopc::NodeId;
 using modernopc::QualifiedName;
+using modernopc::Variant;
 
 namespace opctest::testrunner {
 void wait(int delay)
@@ -22,27 +24,34 @@ void Opc::registerNamespace(chaiscript::ChaiScript& chai, const std::string& uri
    client = std::make_unique<modernopc::Client>(uri);
    client->connect();
 
-   m_read = [&](const modernopc::NodeId& id) {
-      return client->read(id);
-   };
+   m_read = [&](const NodeId& id) { return client->read(id); };
 
    m_resolveUri = [&](const std::string& uri) { return client->resolveNamespaceUri(uri); };
 
-   m_write = [&](const modernopc::NodeId& id, const modernopc::Variant& var) { client->write(id, var); };
+   m_write = [&](const NodeId& id, const Variant& var) { client->write(id, var); };
 
    m_browse = [&](const NodeId& id) { return client->browse(id); };
    m_IsVariable = [&](const BrowseResult& res) { return (res.Type() == modernopc::NodeType::VARIABLE); };
 
+   m_call = [&](const NodeId& objId, const NodeId& methodId, const std::vector<Variant>& inputs) {
+      return client->call(objId, methodId, inputs);
+   };
+
    // opc variant
-   m->add(chaiscript::user_type<modernopc::Variant>(), "Variant");
-   m->add(chaiscript::constructor<modernopc::Variant(int32_t val)>(), "Int32");
-   m->add(chaiscript::constructor<modernopc::Variant(int64_t val)>(), "Int64");
+   m->add(chaiscript::user_type<Variant>(), "Variant");
+   m->add(chaiscript::constructor<Variant(int32_t val)>(), "Variant");
+   m->add(chaiscript::constructor<Variant(int64_t val)>(), "Variant");
+   m->add(chaiscript::constructor<Variant(std::string val)>(), "Variant");
+   m->add(fun(&Variant::operator==), "==");
+   using VariantList = std::vector<Variant>;
+   chai.add(chaiscript::bootstrap::standard_library::vector_type<VariantList>("VariantList"));
    // opc services
    m->add(chaiscript::fun(m_read), "read");
    m->add(chaiscript::fun(m_write), "write");
    m->add(fun(m_browse), "browse");
    m->add(fun(m_IsVariable), "isVariable");
    m->add(fun(m_resolveUri), "resolveUri");
+   m->add(fun(m_call), "call");
 
    chaiscript::utility::add_class<BrowseResult>(*m, "BrowseResult", { constructor<BrowseResult(const BrowseResult&)>(), constructor<BrowseResult(BrowseResult &&)>() }, { { fun(&BrowseResult::Id), "Id" }, { fun(&BrowseResult::Name), "Name" } });
 
