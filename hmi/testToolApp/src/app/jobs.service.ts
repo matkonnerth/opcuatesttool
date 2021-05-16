@@ -15,7 +15,7 @@ export class JobsService {
   private baseUrl = environment.baseURL + 'api/jobs';
 
   getJobs(): Observable<FinishedJob[]> {
-    const jobs = this.http.get<FinishedJobsResponse>(this.baseUrl + '?from=100000&max=10').
+    const jobs = this.http.get<FinishedJobsResponse>(this.baseUrl + '?from=100000&max=5').
       pipe(map(response => response.response.map(data => {
         const job: FinishedJob = {
           request: data.request,
