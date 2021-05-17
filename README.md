@@ -1,5 +1,3 @@
-opcuaTestTool
-
 ## Overview
 
 The main goal of this project is to automate OPC UA server performance testing. The intention is not to provide a unit test framework for OPC UA.
