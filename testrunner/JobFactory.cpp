@@ -8,12 +8,7 @@
 {
     "name": "job1",
     "serverUri": "opc.tcp://localhost:4840",
-    "script":
-         puts(helloWorld("eval chai"));
-         for (var i = 0; i < 100; ++i) {
-            connect();
-            wait(500);
-         }"
+    "script": "read.lua"
 }
 */
 

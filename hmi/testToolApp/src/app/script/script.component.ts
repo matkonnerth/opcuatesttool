@@ -45,7 +45,7 @@ export class ScriptComponent implements OnInit {
 
     const req: Request = {
       name: 'myJob',
-      script: script.name + '.chai',
+      script: script.name,
       serverUri: 'opc.tcp://' + this.target.host + ':' + this.target.port
     };
     this.jobService.createJob(req);

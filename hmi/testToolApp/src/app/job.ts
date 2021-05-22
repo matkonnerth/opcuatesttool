@@ -22,34 +22,3 @@ export interface FinishedJobsResponse {
     response: FinishedJob[];
     statusCode: boolean;
 }
-
-/*
-{
-data: [
-{
-request: {
-id: 11,
-name: "singleRead",
-script: "read.chai",
-serverUri: "opc.tcp://debian:4840"
-},
-result: {
-statusCode: "Ok",
-totalRuntime_ms: 742.851115,
-ts_start: 1617117497919334000,
-ts_stop: 1617117498662184200
-}
-},
-{},
-{},
-{},
-{},
-{},
-{},
-{},
-{},
-{}
-],
-ok: true
-}
-*/

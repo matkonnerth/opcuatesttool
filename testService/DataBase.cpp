@@ -35,7 +35,7 @@ std::string DataBase::getScripts() const
          stream << ",{\n";
       }
       stream << "\"name\": ";
-      stream << p.path().stem();
+      stream << p.path().filename();
       stream << "}";
    }
    stream << "]\n";
@@ -45,7 +45,7 @@ std::string DataBase::getScripts() const
 
 std::string DataBase::getScript(const std::string& name) const
 {
-   std::ifstream script(scriptDir + "/" + name + ".chai");
+   std::ifstream script(scriptDir + "/" + name);
    if (script.fail())
    {
       auto logger = spdlog::get("TestService");
@@ -60,7 +60,7 @@ std::string DataBase::getScript(const std::string& name) const
 
 void DataBase::updateScript(const std::string& name, const std::string& content)
 {
-   std::ofstream out(scriptDir + "/" + name + ".chai");
+   std::ofstream out(scriptDir + "/" + name);
    out << content;
    out.close();
 }

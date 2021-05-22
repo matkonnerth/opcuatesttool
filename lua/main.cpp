@@ -50,25 +50,27 @@ int main(int, char*[])
 
    lua.set_function("VariantVector", &VariantVector);
 
-   lua.script(R"(
+   try
+   {
+      lua.script(R"(
                 connect()
                 --disconnect()
-                id1 = NodeId.new(0, 2255)
+                id1 = NodeId:new(0, 2255)
                 print(id1)
                 val = read(id1)
                 print(val:toString())
                 print(resolveUri("http://opcfoundation.org/UA/"))
                 --
                 inputs = VariantVector()
-                inputs:add(Variant.new("mk"))
-                outputs = call(NodeId.new(0,85), NodeId.new(1,62541), inputs);
+                inputs:add(Variant:new("mk"))
+                outputs = call(NodeId:new(0,85), NodeId:new(1,62541), inputs);
                 print(outputs[1]:toString())
-                if outputs[1]==Variant.new("Hello mk") then
+                if outputs[1]==Variant:new("Hello mk") then
                     print("variant comparision ok")
                 end
 
                 --browse
-                br = browse(NodeId.new(0,85))
+                br = browse(NodeId:new(0,85))
                 for i,v in ipairs(br) do
                     print(v:Name())
                 end
@@ -84,10 +86,37 @@ int main(int, char*[])
                     end
                 end
 
-                browseRecursive(NodeId.new(0, 85))
+                browseRecursive(NodeId:new(0, 85))
 
                 disconnect()
+                ---exception handling
+                function try(f, catch_f)
+                    local status, exception = pcall(f)
+                    if not status then
+                        catch_f(exception)
+                    end
+                end
+                try(function()
+                    -- Try block
+                    --
+                    val = read(NodeId.new(1,1))
+                end, function(e)
+                    -- Except block. E.g.:
+                    -- Use e for conditional catch
+                    -- Re-raise with error(e)
+                    print("error on calling abc")
+                end)
+                print("after try catch")
+                connect()
+                disconnect()
         )");
+   }
+   catch(const std::exception& e)
+   {
+       std::cerr << e.what() << '\n';
+   }
+   
+   
 
 
    return 0;

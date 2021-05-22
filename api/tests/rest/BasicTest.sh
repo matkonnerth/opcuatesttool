@@ -12,7 +12,7 @@ get () {
 
 #newJob
 post() {
-   curl -X POST -H "Content-Type: application/json" -d '{ "name": "basicTest", "serverUri": "opc.tcp://debian:4840", "script": "read.chai"}' write-out '%{http_code}' --silent --output /dev/null $1
+   curl -X POST -H "Content-Type: application/json" -d '{ "name": "basicTest", "serverUri": "opc.tcp://debian:4840", "script": "read.lua"}' write-out '%{http_code}' --silent --output /dev/null $1
 }
 
 checkHttpStatusCode () {
