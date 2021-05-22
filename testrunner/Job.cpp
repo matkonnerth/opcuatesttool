@@ -35,9 +35,10 @@ void Job::execute()
       logger->error("OpcException during execution of job: {0}", e.what());
       status = JobStatus::ABORTED;
    }
-   catch (chaiscript::exception::eval_error& e)
+   catch (std::exception& e)
    {
       logger->error("Script runtime exception: {0}", e.what());
+      status = JobStatus::ABORTED;
    }
 }
 

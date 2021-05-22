@@ -12,9 +12,9 @@ On startup the testService will fetch the availabe test scripts from a github re
 
 ## Jobs
 
-A job represents a single test run and executes a performance test script. The end user can implement performance test scripts with chaiscript.
+A job represents a single test run and executes a performance test script. The end user can implement performance test scripts with lua.
 
-The following opc ua specific types / method calls are exposed to the chai script interpreter:
+The following opc ua specific types / method calls are exposed to the sol2 lua script interpreter:
 
 * Variant read(NodeId id): reads the value attribute of a node
 * void write(NodeId, Variant value): writes to the value attribute of a node

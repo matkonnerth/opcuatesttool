@@ -1,10 +1,9 @@
 #pragma once
-#include <chaiscript/chaiscript.hpp>
 #include <functional>
+#include <sol/sol.hpp>
 #include <spdlog/spdlog.h>
 #include <vector>
-#include <modernOpc/BrowseResult.h>
-#include "Opc.h"
+#include <modernOpc/client/Client.h>
 
 namespace opctest::testrunner {
 class Runtime
@@ -24,7 +23,7 @@ private:
    std::string m_scriptDir;
    std::string m_script;
    std::shared_ptr<spdlog::logger> logger;
-   chaiscript::ChaiScript chai;
-   Opc opc{};
+   sol::state lua;
+   std::shared_ptr<modernopc::Client> client{};
 };
 } // namespace opctest::testrunner

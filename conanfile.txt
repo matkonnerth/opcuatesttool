@@ -3,12 +3,8 @@ cpp-httplib/0.8.8
 nlohmann_json/3.9.1
 libcurl/7.66.0
 spdlog/1.7.0
-chaiscript/6.1.0
-#open62541/1.1.5
 influxdb-cpp/cci.20201227
+sol2/3.2.3
 
 [generators]
 cmake
-
-[options]
-open62541:shared=True

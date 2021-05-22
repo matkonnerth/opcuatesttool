@@ -102,7 +102,7 @@ public:
          httpRes.set_content(jResp.dump(), "application/json");
       });
 
-      srv.Get(R"(/api/scripts/(\w+))", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
+      srv.Get(R"(/api/scripts/(.*))", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
          httpRes.set_header("Access-Control-Allow-Origin", "*");
 
          GetScriptRequest req{};
@@ -113,7 +113,7 @@ public:
          httpRes.set_content(std::get<GetScriptResponse>(varResp).content, "text/plain");
       });
 
-      srv.Post(R"(/api/scripts/(\w+))", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
+      srv.Post(R"(/api/scripts/(.*))", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
          httpRes.set_header("Access-Control-Allow-Origin", "*");
 
          UpdateScriptRequest req{};
