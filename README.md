@@ -30,6 +30,14 @@ Todo - NOT IMPLEMENTED:
 
 Per default all opc ua operations will check the statuscodes and throw an exception on error. The exception will not be catched by default, so the job will be marked as aborted.
 
+## Repository for configuration and test scripts
+
+Test scripts and configuration can be provided via a git repository. The URL of this repository can be specified as command line argument to the testService, e.g.:
+
+testService https://github.com/matkonnerth/opcuaTestToolScripts.git
+
+This arguments can also be passed to the docker run command.
+
 ### library
 
 There is a script called libOpc.chai. This script will be loaded before evalulation of the test script. The intention of this script is to refactor out common testing functionality.

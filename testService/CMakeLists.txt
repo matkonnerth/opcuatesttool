@@ -15,9 +15,3 @@ add_custom_command(
         COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_CURRENT_SOURCE_DIR}/getScripts.sh
                 ${CMAKE_BINARY_DIR}/bin)
-
-add_custom_command(
-        TARGET testService POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_CURRENT_SOURCE_DIR}/config.json
-                ${CMAKE_BINARY_DIR}/bin)

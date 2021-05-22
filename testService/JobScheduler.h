@@ -12,7 +12,7 @@ namespace opctest {
 class JobScheduler
 {
 public:
-   JobScheduler(const std::string& workingDir, const Config& config);
+   JobScheduler(const std::string& workingDir, const std::string& repo);
    int create(const std::string& jsonString);
    void jobFinished(int pid);
    std::string getFinishedJobs(int fromId, int max);
@@ -37,6 +37,5 @@ private:
    std::unique_ptr<DataBase> db{ nullptr };
    std::queue<int> waitQueue{};
    std::function<void(int)> m_fJobFinished{ nullptr };
-   const Config& config;
 };
 } // namespace opctest

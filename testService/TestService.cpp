@@ -33,14 +33,11 @@ using opctest::api::GetTargetsResponse;
 class TestService
 {
 public:
-   TestService(const std::string& workingDir)
+   TestService(const std::string& workingDir, const std::string& repo)
    {
       auto logger = spdlog::get("TestService");
       logger->info("init testService");
-      logger->info("load configuration");
-      config = std::make_unique<ConfigPersistence>(workingDir + "/config.json");
-      logger->info("script repo: {}", config->getConfig().gitRepository);
-      scheduler = std::make_unique<JobScheduler>(workingDir, config->getConfig());
+      scheduler = std::make_unique<JobScheduler>(workingDir, repo);
    }
 
    void handleSigChld(int sig)
@@ -125,7 +122,6 @@ public:
 
 private:
    std::unique_ptr<JobScheduler> scheduler{ nullptr };
-   std::unique_ptr<ConfigPersistence> config{ nullptr };
 };
 } // namespace opctest
 
@@ -189,12 +185,21 @@ bool apiCallback(opctest::TestService& service, const opctest::api::RequestVaria
    return true;
 }
 
-int main(int, char* argv[])
+int main(int argc, char* argv[])
 {
    std::string binaryPath = argv[0];
    auto pos = binaryPath.find_last_of('/');
    binaryPath.erase(pos);
    setupLogger(binaryPath);
+
+   //get script repo url
+   std::string scriptRepoUrl {"https://github.com/matkonnerth/opcuaTestToolScripts.git"};
+   if (argc == 2)
+   {
+      scriptRepoUrl = argv[1];
+   }
+   auto logger = spdlog::get("TestService");
+   logger->info("using git repo url {}", scriptRepoUrl);
 
    // handle signals in a dedicated thread
    sigset_t sigset;
@@ -202,7 +207,7 @@ int main(int, char* argv[])
    sigaddset(&sigset, SIGCHLD);
    pthread_sigmask(SIG_BLOCK, &sigset, nullptr);
 
-   opctest::TestService service(binaryPath);
+   opctest::TestService service(binaryPath, scriptRepoUrl);
 
 
    auto signalHandler = [&service, &sigset]() {

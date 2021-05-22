@@ -2,6 +2,8 @@
 # sudo docker build -t matkonnerth/opcuatesttool .
 # run with
 # sudo docker run --network host --mount source=testTool-vol,destination=/opt/testService/bin/jobs matkonnerth/opcuatesttool
+# path to git repo
+# sudo docker run --network host --mount source=testTool-vol,destination=/opt/testService/bin/jobs matkonnerth/opcuatesttool https://github.com/matkonnerth/opcuaTestToolScripts.git
 # uses host network and a volume for the jobs
 #
 # upload
