@@ -30,6 +30,7 @@ void Runtime::load()
    client->connect();
 
    lua.open_libraries(sol::lib::base);
+   lua.do_file(m_scriptDir + "/libOpc.lua");
 
    lua.set_function("connect", &Client::connect, client.get());
    lua.set_function("disconnect", &Client::disconnect, client.get());
