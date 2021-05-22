@@ -21,6 +21,7 @@ The following opc ua specific types / method calls are exposed to the chai scrip
 * vector<BrowseResult> browse(NodeId id): browses the hierachical references of the given id
 * vector<Variant> call(NodeId objectId, NodeId methodId, vector<Variant> inputArguments)
 * wait: pauses the job execution for N milliseconds
+* connect/disconnect: connects or disconnects from server
 
 
 Todo - NOT IMPLEMENTED:
