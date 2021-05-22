@@ -46,6 +46,7 @@ void Opc::registerNamespace(chaiscript::ChaiScript& chai, const std::string& uri
    m->add(chaiscript::constructor<Variant(int32_t val)>(), "Variant");
    m->add(chaiscript::constructor<Variant(int64_t val)>(), "Variant");
    m->add(chaiscript::constructor<Variant(std::string val)>(), "Variant");
+   m->add(fun(&Variant::toString), "to_string");
    m->add(fun(&Variant::operator==), "==");
    using VariantList = std::vector<Variant>;
    chai.add(chaiscript::bootstrap::standard_library::vector_type<VariantList>("VariantList"));
