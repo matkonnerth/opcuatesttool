@@ -24,6 +24,10 @@ void Opc::registerNamespace(chaiscript::ChaiScript& chai, const std::string& uri
    client = std::make_unique<modernopc::Client>(uri);
    client->connect();
 
+   m_connect = [&](){client->connect();};
+   m_disconnect = [&](){client->disconnect();};
+   
+
    m_read = [&](const NodeId& id) { return client->read(id); };
 
    m_resolveUri = [&](const std::string& uri) { return client->resolveNamespaceUri(uri); };
@@ -52,6 +56,8 @@ void Opc::registerNamespace(chaiscript::ChaiScript& chai, const std::string& uri
    m->add(fun(m_IsVariable), "isVariable");
    m->add(fun(m_resolveUri), "resolveUri");
    m->add(fun(m_call), "call");
+   m->add(fun(m_connect), "connect");
+   m->add(fun(m_disconnect), "disconnect");
 
    chaiscript::utility::add_class<BrowseResult>(*m, "BrowseResult", { constructor<BrowseResult(const BrowseResult&)>(), constructor<BrowseResult(BrowseResult &&)>() }, { { fun(&BrowseResult::Id), "Id" }, { fun(&BrowseResult::Name), "Name" } });
 
