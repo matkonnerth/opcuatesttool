@@ -1,8 +1,0 @@
-add_executable(luaRunner main.cpp)
-find_package(modernOpc REQUIRED)
-find_package(open62541 REQUIRED)
-target_link_libraries(luaRunner PRIVATE project_warnings)
-target_link_libraries(luaRunner PRIVATE project_options)
-target_link_libraries(luaRunner PRIVATE CONAN_PKG::sol2)
-target_link_libraries(luaRunner PRIVATE modernOpc open62541::open62541)
-target_link_libraries(luaRunner PRIVATE CONAN_PKG::spdlog)
