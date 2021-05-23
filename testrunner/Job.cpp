@@ -10,7 +10,7 @@ namespace opctest::testrunner {
 
 void Job::execute()
 {
-   Runtime rt{ serverUri, m_scriptDir, m_script };
+   Runtime rt{ m_serverUri, m_scriptDir, m_script };
 
    try
    {
@@ -18,7 +18,7 @@ void Job::execute()
 
       auto steady_start = std::chrono::steady_clock::now();
       start = std::chrono::system_clock::now();
-      status = JobStatus::RUNNING;
+      m_status = JobStatus::RUNNING;
 
       rt.eval();
 
@@ -28,23 +28,23 @@ void Job::execute()
       std::chrono::duration<double, std::milli> duration;
       duration = steady_stop - steady_start;
       totalRuntime_ms = duration.count();
-      status = JobStatus::FINISHED;
+      m_status = JobStatus::FINISHED;
    }
    catch (modernopc::OpcException& e)
    {
-      logger->error("OpcException during execution of job: {0}", e.what());
-      status = JobStatus::ABORTED;
+      m_logger->error("OpcException during execution of job: {0}", e.what());
+      m_status = JobStatus::ABORTED;
    }
    catch (std::exception& e)
    {
-      logger->error("Script runtime exception: {0}", e.what());
-      status = JobStatus::ABORTED;
+      m_logger->error("Script runtime exception: {0}", e.what());
+      m_status = JobStatus::ABORTED;
    }
 }
 
 const std::string& Job::getServerUri() const
 {
-   return serverUri;
+   return m_serverUri;
 }
 
 void Job::addResult(const std::string& inputFile, const std::string& outputFile, int id)
@@ -61,13 +61,13 @@ void Job::addResult(const std::string& inputFile, const std::string& outputFile,
                        },
                        { "ts_stop", stop.time_since_epoch().count() },
                        { "totalRuntime_ms", totalRuntime_ms } };
-   if (status != JobStatus::FINISHED)
+   if (m_status != JobStatus::FINISHED)
    {
-      result["statusCode"] = "Error";
+      result["m_statusCode"] = "Error";
    }
    else
    {
-      result["statusCode"] = "Ok";
+      result["m_statusCode"] = "Ok";
    }
 
    nlohmann::json output;
