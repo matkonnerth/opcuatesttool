@@ -1,4 +1,7 @@
 /* Application-wide Styles */
+@import '~codemirror/lib/codemirror';
+@import '~codemirror/theme/material';
+
 h1 {
   color: #369;
   font-family: Arial, Helvetica, sans-serif;

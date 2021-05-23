@@ -7,7 +7,12 @@
 <div *ngIf="selectedScript">
     <h2>{{selectedScript.name}}</h2>
     <div *ngIf="content">
-        <textarea class="form-control" name="message" cols=100 rows=20 [(ngModel)]="content"></textarea>
+        <!--<textarea class="form-control" name="message" cols=100 rows=20 [(ngModel)]="content"></textarea>-->
+        <ngx-codemirror [(ngModel)]="content" [options]="{
+            lineNumbers: true,
+            theme: 'material',
+            mode: 'lua'
+          }"></ngx-codemirror>
     </div>
     
     <div><button *ngIf="content" type="button" class="btn btn-default" (click)="updateScript(selectedScript, content)">Save</button></div>
