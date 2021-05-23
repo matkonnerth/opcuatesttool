@@ -63,7 +63,7 @@ RUN mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. \
     && make testRunner -j;
 
 #build webapp
-FROM node:10-alpine as build-webapp
+FROM node:12-alpine as build-webapp
 RUN mkdir -p /app
 
 WORKDIR /app
