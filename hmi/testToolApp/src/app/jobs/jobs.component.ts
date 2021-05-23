@@ -19,7 +19,10 @@ export class JobsComponent implements OnInit {
 
   ngOnInit(): void {
     this.getJobs();
-    this.jobService.getServerSentEvent().subscribe(data => { this.eventLog = data; this.getJobs(); });
+    this.jobService.getServerSentEvent().subscribe(data => {
+      this.eventLog = data;
+      this.getJobs();
+    });
   }
 
   onSelect(job: FinishedJob): void {
@@ -33,10 +36,13 @@ export class JobsComponent implements OnInit {
 
   getJobs(): void {
     this.jobService.getJobs()
-      .subscribe(jobs => this.jobs = jobs);
+      .subscribe(jobs => {
+        this.jobs = jobs;
+        if (this.jobs.length > 0) {
+          this.onSelect(this.jobs[0]);
+        }
+      });
   }
-
-
 }
 
 

@@ -29,7 +29,7 @@ void Runtime::load()
    client = std::make_unique<modernopc::Client>(m_uri);
    client->connect();
 
-   lua.open_libraries(sol::lib::base);
+   lua.open_libraries(sol::lib::base, sol::lib::string);
    lua.do_file(m_scriptDir + "/libOpc.lua");
 
    lua.set_function("connect", &Client::connect, client.get());
