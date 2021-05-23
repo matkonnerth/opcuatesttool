@@ -1,11 +1,11 @@
 #pragma once
 #include "Request.h"
+#include <chrono>
 #include <httplib.h>
 #include <iostream>
-#include <unordered_map>
 #include <mutex>
 #include <thread>
-#include <chrono>
+#include <unordered_map>
 
 
 namespace opctest::api {
@@ -28,7 +28,7 @@ public:
    }
 
    void send_event(const std::string& message)
-   {  
+   {
       std::lock_guard<std::mutex> lk(m_);
       message_ = "data: " + message + "\n\n";
       cid_ = id_++;
@@ -46,8 +46,8 @@ class Server
 {
 public:
    Server(std::string ip, int port, const std::string& pathToWebApp)
-   : ip{ std::move(ip) }
-   , port{ port }
+   : m_ip{ std::move(ip) }
+   , m_port{ port }
    {
       srv.Options("/(.*)", [&](const httplib::Request& /*req*/, httplib::Response& res) {
          res.set_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
@@ -199,19 +199,7 @@ public:
 
    void listen()
    {
-      // keep alive
-      // std::thread t([&] {
-      //    int id = 0;
-      //    while (true)
-      //    {
-      //       std::this_thread::sleep_for(std::chrono::seconds(1));
-      //       std::stringstream ss;
-      //       ss << ": keepAlive " << id << "\n\n";
-      //       ed.send_event(ss.str());
-      //       id++;
-      //    }
-      // });
-      srv.listen(ip.c_str(), port);
+      srv.listen(m_ip.c_str(), m_port);
    }
 
    void setCallback(RequestCallback cb)
@@ -226,10 +214,10 @@ public:
 
 private:
    httplib::Server srv;
-   std::string ip{ "0.0.0.0" };
-   int port{ 9888 };
+   std::string m_ip{ "0.0.0.0" };
+   int m_port{ 9888 };
    RequestCallback callback{ nullptr };
    EventDispatcher ed{};
    std::function<void(int)> m_fEventCallback{ nullptr };
 };
-}; // namespace opctest::api
+} // namespace opctest::api

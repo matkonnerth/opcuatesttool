@@ -7,14 +7,14 @@ namespace opctest {
 int DataBase::newJob(const std::string& requestJson)
 {
    std::string request = requestJson;
-   int newJobId = jobId;
+   int newJobId = m_jobId;
    std::string newRequest = std::to_string(newJobId);
    std::string newRequestPath = getJobs_requests_dir() + "/" + newRequest;
 
    std::ofstream out(newRequestPath);
    out << requestJson;
    out.close();
-   jobId++;
+   m_jobId++;
    return newJobId;
 }
 
@@ -23,7 +23,7 @@ std::string DataBase::getScripts() const
    std::stringstream stream;
    stream << "[\n";
    bool first = true;
-   for (auto& p : fs::directory_iterator(scriptDir))
+   for (auto& p : fs::directory_iterator(m_scriptDir))
    {
       if (first)
       {
@@ -45,7 +45,7 @@ std::string DataBase::getScripts() const
 
 std::string DataBase::getScript(const std::string& name) const
 {
-   std::ifstream script(scriptDir + "/" + name);
+   std::ifstream script(m_scriptDir + "/" + name);
    if (script.fail())
    {
       auto logger = spdlog::get("TestService");
@@ -60,7 +60,7 @@ std::string DataBase::getScript(const std::string& name) const
 
 void DataBase::updateScript(const std::string& name, const std::string& content)
 {
-   std::ofstream out(scriptDir + "/" + name);
+   std::ofstream out(m_scriptDir + "/" + name);
    out << content;
    out.close();
 }
@@ -174,7 +174,7 @@ std::string DataBase::getJobLog(int jobId)
 
 std::string DataBase::getTargets() const
 {
-   std::ifstream targets(targetDir + "/targets.json");
+   std::ifstream targets(m_targetDir + "/targets.json");
    if (targets.fail())
    {
       auto logger = spdlog::get("TestService");

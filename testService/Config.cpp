@@ -4,7 +4,7 @@
 
 namespace opctest {
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Config, majorVersion, minorVersion, gitRepository, maxParallelJobs);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Config, majorVersion, minorVersion, gitRepository, maxParallelJobs)
 
 void ConfigPersistence::loadConfig()
 {

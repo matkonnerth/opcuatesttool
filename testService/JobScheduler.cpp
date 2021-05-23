@@ -13,8 +13,8 @@ namespace fs = std::filesystem;
 
 namespace opctest {
 JobScheduler::JobScheduler(const std::string& workingDir, const std::string& repo)
-: workingDir{ workingDir }
-, db{ std::make_unique<DataBase>(workingDir, repo) }
+: m_workingDir{ workingDir }
+, db{ std::make_unique<DataBase>(m_workingDir, repo) }
 {}
 
 void JobScheduler::schedule()
@@ -49,7 +49,7 @@ void JobScheduler::schedule()
          close(fd);
       }
 
-      auto file = fopen((workingDir + "/logs/" + std::to_string(jobId) + ".log").c_str(), "w");
+      auto file = fopen((m_workingDir + "/logs/" + std::to_string(jobId) + ".log").c_str(), "w");
       if (file == NULL)
          fputs("Could not open file", stderr);
 
@@ -64,7 +64,7 @@ void JobScheduler::schedule()
       // the const casts tare ugly but execv isn't modifying
       std::string jobIdString = std::to_string(jobId);
       char* const argv_list[] = { "./testRunner",
-                                  const_cast<char*>(workingDir.c_str()),
+                                  const_cast<char*>(m_workingDir.c_str()),
                                   const_cast<char*>(db->getJobs_finished_dir().c_str()),
                                   const_cast<char*>(db->getJobs_requests_dir().c_str()),
                                   const_cast<char*>(jobIdString.c_str()),
@@ -73,7 +73,7 @@ void JobScheduler::schedule()
 
       // the execv() only return if error occured.
       // The return value is -1
-      std::string testRunner = workingDir + "/testRunner";
+      std::string testRunner = m_workingDir + "/testRunner";
       execv(testRunner.c_str(), argv_list);
       exit(0);
    }

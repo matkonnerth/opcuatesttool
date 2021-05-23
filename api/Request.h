@@ -80,7 +80,7 @@ struct GetTargetsResponse : public Response
    std::string data;
 };
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(NewJobResponse, ok, id);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(NewJobResponse, ok, id)
 
 using RequestVariant = std::variant<NewJobRequest, GetJobRequest, GetJobsRequest, GetScriptsRequest, GetScriptRequest, UpdateScriptRequest, GetJobLogRequest, GetTargetsRequest>;
 using ResponseVariant = std::variant<Response, NewJobResponse, GetJobResponse, GetScriptsResponse, GetScriptResponse, GetJobLogResponse, GetTargetsResponse>;

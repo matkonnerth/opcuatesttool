@@ -29,7 +29,7 @@ public:
 
 private:
    void schedule();
-   const std::string workingDir;
+   const std::string m_workingDir;
    const size_t maxConcurrentJobs{ 4 };
    std::mutex _m;
    std::unordered_map<int, int> activeJobs{};
