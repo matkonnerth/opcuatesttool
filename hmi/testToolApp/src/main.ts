@@ -4,6 +4,8 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 
+import 'codemirror/mode/lua/lua';
+
 if (environment.production) {
   enableProdMode();
 }

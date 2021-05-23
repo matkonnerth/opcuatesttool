@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule }   from '@angular/forms';
@@ -19,7 +20,8 @@ import { ScriptComponent } from './script/script.component';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    CodemirrorModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -4,5 +4,5 @@ export const environment = {
   development: false,
   environmentName: 'PROD',
   ResultsPerPage:[5,10,25,50,75,100],
-  baseURL: '/'
+  baseURL: "/"
 };
