@@ -72,7 +72,7 @@ COPY hmi/testToolApp/package.json /app
 
 RUN npm install
 COPY hmi/testToolApp/. /app
-RUN npm run build --prod
+RUN npm run build
 
 FROM debian:bullseye
 
