@@ -3,7 +3,7 @@ import { FinishedJob, FinishedJobsResponse, Request, Result } from './job';
 import { Observable, of, Observer } from 'rxjs';
 import { HttpClient} from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
-import { environment } from '../environments/environment';
+import { environment } from '../environments/environment.prod';
 @Injectable({
   providedIn: 'root'
 })

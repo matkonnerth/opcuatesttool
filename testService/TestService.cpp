@@ -175,6 +175,11 @@ bool apiCallback(opctest::TestService& service, const opctest::api::RequestVaria
       {
          resp = service.getTargets();
       }
+      else if constexpr (std::is_same_v<T, opctest::api::NewLineReplRequest>)
+      {
+         //not implemented
+         resp = opctest::api::Response{false};
+      }
       else
       {
          static_assert(always_false_v<T>, "non-exhaustive visitor!");

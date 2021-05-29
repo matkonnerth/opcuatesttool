@@ -194,7 +194,22 @@ public:
          httpRes.set_content(std::get<GetTargetsResponse>(varResp).data, "application/json");
       });
 
-      m_fEventCallback = [&](const std::string& name, const std::string& data) { ed.send_event("{\"event\": " + name + ", \"data\": " + data + "}"); };
+      //repl - new line
+      srv.Post(R"(/api/repl)", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
+         httpRes.set_header("Access-Control-Allow-Origin", "*");
+
+         NewLineReplRequest req{};
+         req.content = httpReq.body;
+         RequestVariant varReq{ req };
+         ResponseVariant varResp{};
+         callback(varReq, varResp);
+         using nlohmann::json;
+         json jResp = json::object();
+         jResp["ok"] = std::get<Response>(varResp).ok;
+         httpRes.set_content(jResp.dump(), "application/json");
+      });
+
+      m_fEventCallback = [&](const std::string& name, const std::string& data) { ed.send_event("{\"event\": \"" + name + "\", \"data\": \"" + data + "\"}"); };
    }
 
    void listen()

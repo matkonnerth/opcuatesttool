@@ -35,7 +35,7 @@ bool apiCallback(const opctest::api::RequestVariant& req, opctest::api::Response
    std::visit(
    [&](auto&& arg) {
       using T = std::decay_t<decltype(arg)>;
-      if constexpr (std::is_same_v<T, opctest::api::UpdateScriptRequest>)
+      if constexpr (std::is_same_v<T, opctest::api::NewLineReplRequest>)
       {
          using namespace std::chrono_literals;
          std::string message = arg.content + "\n";
@@ -45,13 +45,15 @@ bool apiCallback(const opctest::api::RequestVariant& req, opctest::api::Response
             if (ioctl(STDIN_FILENO, TIOCSTI, it))
             {
                perror("ioctl");
-               // return false;
+               resp = opctest::api::Response{ false };
             }
          }
+         resp = opctest::api::Response{true};
       }
       else
       {
          // static_assert(always_false_v<T>, "non-exhaustive visitor!");
+         resp = opctest::api::Response{ false };
       }
    },
    req);
@@ -59,10 +61,14 @@ bool apiCallback(const opctest::api::RequestVariant& req, opctest::api::Response
    return true;
 }
 
-int main()
+int main(int argc, char*argv[])
 {
    setupLogger();
    auto logger = spdlog::get("ReplService");
+
+   std::string binaryPath = argv[0];
+   auto pos = binaryPath.find_last_of('/');
+   binaryPath.erase(pos);
 
    int pipefd[2];
    if (pipe(pipefd) == -1)
@@ -119,7 +125,7 @@ int main()
 
       close(pipefd[1]); /* Close unused write end */
    }
-   opctest::api::Server server{ "0.0.0.0", 9888, "" };
+   opctest::api::Server server{ "0.0.0.0", 9888, binaryPath + "/dist/testToolApp" };
 
 
    auto cb = [](const opctest::api::RequestVariant& req, opctest::api::ResponseVariant& resp) { return apiCallback(req, resp); };
