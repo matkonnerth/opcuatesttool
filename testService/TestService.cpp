@@ -115,7 +115,7 @@ public:
       return resp;
    }
 
-   void setJobFinishedCallback(std::function<void(int)> cb)
+   void setJobFinishedCallback(std::function<void(const std::string& event, const std::string& data)> cb)
    {
       scheduler->setJobFinishedCallback(cb);
    }

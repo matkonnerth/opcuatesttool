@@ -194,7 +194,7 @@ public:
          httpRes.set_content(std::get<GetTargetsResponse>(varResp).data, "application/json");
       });
 
-      m_fEventCallback = [&](int id) { ed.send_event("{\"id\": " + std::to_string(id) + "}"); };
+      m_fEventCallback = [&](const std::string& name, const std::string& data) { ed.send_event("{\"event\": " + name + ", \"data\": " + data + "}"); };
    }
 
    void listen()
@@ -215,9 +215,9 @@ public:
 private:
    httplib::Server srv;
    std::string m_ip{ "0.0.0.0" };
-   int m_port{ 9888 };
+   int m_port{ 9889 };
    RequestCallback callback{ nullptr };
    EventDispatcher ed{};
-   std::function<void(int)> m_fEventCallback{ nullptr };
+   std::function<void(const std::string eventName, const std::string data)> m_fEventCallback{ nullptr };
 };
 } // namespace opctest::api

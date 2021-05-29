@@ -104,7 +104,7 @@ void JobScheduler::jobFinished(int id)
       logger->info("job (pid: {}, id: {}) finished", id, entry->second);
       if (m_fJobFinished)
       {
-         m_fJobFinished(entry->second);
+         m_fJobFinished("JobFinishedEvent", std::to_string(entry->second));
       }
       activeJobs.erase(entry);
    }
