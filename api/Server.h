@@ -209,7 +209,17 @@ public:
          httpRes.set_content(jResp.dump(), "application/json");
       });
 
-      m_fEventCallback = [&](const std::string& name, const std::string& data) { ed.send_event("{\"event\": \"" + name + "\", \"data\": \"" + data + "\"}"); };
+      m_fEventCallback = [&](const std::string& name, const std::string& data) {
+         std::string data1 = data;
+         while (data1.find("\n") != std::string::npos)
+         {
+            data1.erase(data1.find("\n"), 1);
+         }
+         std::string message = "{\"event\": \"" + name + "\", \"data\": \"" + data1 + "\"}";
+         std::cout << "data1 " << data1 << "\n";
+         std::cout << "message " << message << "\n";
+         ed.send_event(message);
+      };
    }
 
    void listen()

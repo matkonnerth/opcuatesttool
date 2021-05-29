@@ -32,7 +32,7 @@
             "program": "${workspaceFolder}/build/bin/testService",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/build",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",

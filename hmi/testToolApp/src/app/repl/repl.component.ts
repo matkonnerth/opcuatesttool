@@ -27,7 +27,7 @@ export class ReplComponent implements OnInit, AfterViewInit {
       const printable = !ev.altKey && !ev.ctrlKey && !ev.metaKey;
 
       if (ev.keyCode === 13) {
-        this.child.write('\r\n$ ');
+        this.child.write('\r\n');
         const line = this.child.underlying.buffer.active.getLine(this.child.underlying.buffer.active.cursorY);
         if (line)
         {

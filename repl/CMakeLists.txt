@@ -8,7 +8,6 @@ target_link_libraries(repl PRIVATE project_options)
 target_link_libraries(repl PRIVATE CONAN_PKG::sol2)
 #target_link_libraries(luaRunner PRIVATE modernOpc open62541::open62541)
 target_link_libraries(repl PRIVATE CONAN_PKG::spdlog)
-#target_include_directories(repl PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/lua-5.4.3/src)
 target_link_libraries(repl PRIVATE CONAN_PKG::lua)
 
 
