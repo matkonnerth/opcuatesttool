@@ -99,7 +99,7 @@ int main(int argc, char*argv[])
       write(pipefd[1], m.c_str(), m.size());
 
       // close file descriptors, let stdin/stdout/stderror and pipe open
-      for (int fd = 5; fd < 256; fd++)
+      for (int fd = 6; fd < 256; fd++)
       {
          close(fd);
       }
@@ -144,8 +144,8 @@ int main(int argc, char*argv[])
          {
             std::cout << "print" << "\n";
             write(STDOUT_FILENO, &buf, bytes);
-            auto f = server.getEventCallback();
-            f("ReplResponseEvent", std::string{buf, bytes});
+            //auto f = server.getEventCallback();
+            //f("ReplResponseEvent", std::string{buf, bytes});
          }
       }
    } };

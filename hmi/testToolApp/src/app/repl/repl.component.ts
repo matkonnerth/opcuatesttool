@@ -34,10 +34,6 @@ export class ReplComponent implements OnInit, AfterViewInit {
           console.log('current line: ' + line.translateToString(false, 2))
           this.replService.newLine(line.translateToString(false, 2))
         }
-      } else if (ev.keyCode === 8) {
-        if (this.child.underlying.buffer.active.cursorX > 2) {
-          this.child.write('\b \b');
-        }
       } else if (printable) {
         this.child.write(e.key);
       }
@@ -48,7 +44,7 @@ export class ReplComponent implements OnInit, AfterViewInit {
       const ev: Event = JSON.parse(data);
       if (ev.event === 'ReplResponseEvent')
       {
-        this.child.write(ev.data);
+        this.child.write(ev.data.replace("\n", "\r\n"));
       }
     });
   }

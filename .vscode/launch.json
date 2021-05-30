@@ -105,7 +105,7 @@
             "name": "replService",
             "type": "cppdbg",
             "request": "launch",
-            "program": "bin/replService",
+            "program": "${workspaceFolder}/build/bin/replService",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build",
