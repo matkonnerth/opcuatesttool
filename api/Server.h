@@ -6,6 +6,7 @@
 #include <mutex>
 #include <thread>
 #include <unordered_map>
+#include <regex>
 
 
 namespace opctest::api {
@@ -194,7 +195,27 @@ public:
          httpRes.set_content(std::get<GetTargetsResponse>(varResp).data, "application/json");
       });
 
-      m_fEventCallback = [&](int id) { ed.send_event("{\"id\": " + std::to_string(id) + "}"); };
+      //repl - new line
+      srv.Post(R"(/api/repl)", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
+         httpRes.set_header("Access-Control-Allow-Origin", "*");
+
+         NewLineReplRequest req{};
+         req.content = httpReq.body;
+         RequestVariant varReq{ req };
+         ResponseVariant varResp{};
+         callback(varReq, varResp);
+         using nlohmann::json;
+         json jResp = json::object();
+         jResp["ok"] = std::get<Response>(varResp).ok;
+         httpRes.set_content(jResp.dump(), "application/json");
+      });
+
+      m_fEventCallback = [&](const std::string& name, const std::string& data1) {
+         std::regex newlines_re("\n+");
+         auto result = std::regex_replace(data1, newlines_re, "\\n");
+         std::string message = "{\"event\": \"" + name + "\", \"data\": \"" + result + "\"}";
+         ed.send_event(message);
+      };
    }
 
    void listen()
@@ -215,9 +236,9 @@ public:
 private:
    httplib::Server srv;
    std::string m_ip{ "0.0.0.0" };
-   int m_port{ 9888 };
+   int m_port{ 9889 };
    RequestCallback callback{ nullptr };
    EventDispatcher ed{};
-   std::function<void(int)> m_fEventCallback{ nullptr };
+   std::function<void(const std::string eventName, const std::string data)> m_fEventCallback{ nullptr };
 };
 } // namespace opctest::api

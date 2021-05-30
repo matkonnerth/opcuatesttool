@@ -63,11 +63,11 @@ void Job::addResult(const std::string& inputFile, const std::string& outputFile,
                        { "totalRuntime_ms", totalRuntime_ms } };
    if (m_status != JobStatus::FINISHED)
    {
-      result["m_statusCode"] = "Error";
+      result["statusCode"] = "Error";
    }
    else
    {
-      result["m_statusCode"] = "Ok";
+      result["statusCode"] = "Ok";
    }
 
    nlohmann::json output;

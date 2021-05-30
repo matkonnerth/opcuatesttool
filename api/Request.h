@@ -43,11 +43,17 @@ struct UpdateScriptRequest : public Request
    std::string name;
    std::string content;
 };
+
 struct GetTargetsRequest : public Request
 {};
 struct Response
 {
    bool ok;
+};
+
+struct NewLineReplRequest : public Request
+{
+   std::string content;
 };
 
 struct NewJobResponse : public Response
@@ -82,7 +88,7 @@ struct GetTargetsResponse : public Response
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(NewJobResponse, ok, id)
 
-using RequestVariant = std::variant<NewJobRequest, GetJobRequest, GetJobsRequest, GetScriptsRequest, GetScriptRequest, UpdateScriptRequest, GetJobLogRequest, GetTargetsRequest>;
+using RequestVariant = std::variant<NewJobRequest, GetJobRequest, GetJobsRequest, GetScriptsRequest, GetScriptRequest, UpdateScriptRequest, GetJobLogRequest, GetTargetsRequest, NewLineReplRequest>;
 using ResponseVariant = std::variant<Response, NewJobResponse, GetJobResponse, GetScriptsResponse, GetScriptResponse, GetJobLogResponse, GetTargetsResponse>;
 
 using RequestCallback = std::function<bool(const RequestVariant&, ResponseVariant&)>;

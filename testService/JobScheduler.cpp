@@ -44,7 +44,7 @@ void JobScheduler::schedule()
    {
       // child process
       // close file descriptors, let stdin/stdout/stderror open
-      for (int fd = 3; fd < 256; fd++)
+      for (int fd = 5; fd < 256; fd++)
       {
          close(fd);
       }
@@ -104,7 +104,7 @@ void JobScheduler::jobFinished(int id)
       logger->info("job (pid: {}, id: {}) finished", id, entry->second);
       if (m_fJobFinished)
       {
-         m_fJobFinished(entry->second);
+         m_fJobFinished("JobFinishedEvent", std::to_string(entry->second));
       }
       activeJobs.erase(entry);
    }

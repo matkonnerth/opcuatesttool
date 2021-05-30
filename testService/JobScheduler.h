@@ -22,7 +22,7 @@ public:
    void updateScript(const std::string& name, const std::string& content);
    std::string getJobLog(int jobId);
    std::string getTargets() const;
-   void setJobFinishedCallback(std::function<void(int)> cb)
+   void setJobFinishedCallback(std::function<void(const std::string& event, const std::string& data)> cb)
    {
       m_fJobFinished = cb;
    }
@@ -36,6 +36,6 @@ private:
    std::vector<int> finishedPids{};
    std::unique_ptr<DataBase> db{ nullptr };
    std::queue<int> waitQueue{};
-   std::function<void(int)> m_fJobFinished{ nullptr };
+   std::function<void(const std::string& event, const std::string& data)> m_fJobFinished{ nullptr };
 };
 } // namespace opctest

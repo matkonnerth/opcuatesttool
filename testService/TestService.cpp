@@ -12,6 +12,7 @@
 #include <sys/wait.h>
 #include <type_traits>
 #include <unistd.h>
+#include "Repl.h"
 
 namespace opctest {
 
@@ -29,15 +30,18 @@ using opctest::api::Response;
 using opctest::api::UpdateScriptRequest;
 using opctest::api::GetTargetsRequest;
 using opctest::api::GetTargetsResponse;
+using opctest::api::NewLineReplRequest;
 
 class TestService
 {
 public:
-   TestService(const std::string& workingDir, const std::string& repo)
+   TestService(const std::string& workingDir, const std::string& repo, std::function<void(const std::string& event, const std::string& data)> eventCallback)
+   : m_repl{ workingDir, eventCallback }
    {
       auto logger = spdlog::get("TestService");
       logger->info("init testService");
       scheduler = std::make_unique<JobScheduler>(workingDir, repo);
+      scheduler->setJobFinishedCallback(eventCallback);
    }
 
    void handleSigChld(int sig)
@@ -115,13 +119,21 @@ public:
       return resp;
    }
 
-   void setJobFinishedCallback(std::function<void(int)> cb)
+   Response newLineRepl(const NewLineReplRequest& req)
    {
-      scheduler->setJobFinishedCallback(cb);
+      Response resp {true};
+      m_repl.newLine(req.content);
+      return resp;
    }
+
+   // void setJobFinishedCallback(std::function<void(const std::string& event, const std::string& data)> cb)
+   // {
+   //    scheduler->setJobFinishedCallback(cb);
+   // }
 
 private:
    std::unique_ptr<JobScheduler> scheduler{ nullptr };
+   Repl m_repl;
 };
 } // namespace opctest
 
@@ -175,6 +187,10 @@ bool apiCallback(opctest::TestService& service, const opctest::api::RequestVaria
       {
          resp = service.getTargets();
       }
+      else if constexpr (std::is_same_v<T, opctest::api::NewLineReplRequest>)
+      {
+         resp = service.newLineRepl(arg);
+      }
       else
       {
          static_assert(always_false_v<T>, "non-exhaustive visitor!");
@@ -207,7 +223,9 @@ int main(int argc, char* argv[])
    sigaddset(&sigset, SIGCHLD);
    pthread_sigmask(SIG_BLOCK, &sigset, nullptr);
 
-   opctest::TestService service(binaryPath, scriptRepoUrl);
+   opctest::api::Server server{ "0.0.0.0", 9888, binaryPath + "/dist/testToolApp" };
+
+   opctest::TestService service(binaryPath, scriptRepoUrl, server.getEventCallback());
 
 
    auto signalHandler = [&service, &sigset]() {
@@ -222,12 +240,7 @@ int main(int argc, char* argv[])
 
    auto ft_signal_handler = std::async(std::launch::async, signalHandler);
 
-   opctest::api::Server server{ "0.0.0.0", 9888, binaryPath +  "/dist/testToolApp"};
-
-
    auto cb = [&](const opctest::api::RequestVariant& req, opctest::api::ResponseVariant& resp) { return apiCallback(service, req, resp); };
-
-   service.setJobFinishedCallback(server.getEventCallback());
 
    server.setCallback(cb);
    server.listen();
