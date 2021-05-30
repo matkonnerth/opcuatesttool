@@ -57,10 +57,12 @@ COPY testService ./testService
 COPY testrunner ./testrunner
 COPY api ./api
 COPY persistence ./persistence
+COPY repl ./repl
 
 RUN mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. \
     && make testService -j \
-    && make testRunner -j;
+    && make testRunner -j \
+    && make repl -j;
 
 #build webapp
 FROM node:12-alpine as build-webapp
