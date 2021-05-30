@@ -95,6 +95,7 @@ public:
             }
          }
       }};
+   }
                
    void newLine(const std::string& line)
    {
