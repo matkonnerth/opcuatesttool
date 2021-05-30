@@ -17,7 +17,9 @@ namespace opctest {
 class Repl
 {
 public:
-   Repl(const std::string& workingDir, std::function<void(const std::string&, const std::string&)> callback): m_workingDir{workingDir}, m_replFinishedCallback{callback}
+   Repl(const std::string& workingDir, std::function<void(const std::string&, const std::string&)> callback)
+   : m_workingDir{ workingDir }
+   , m_replFinishedCallback{ callback }
    {
       auto logger = spdlog::get("TestService");
       if (pipe(pipefd) == -1)
@@ -76,11 +78,11 @@ public:
          close(pipefd[1]); /* Close unused write end */
       }
 
-      pipeListener = std::thread{[&] {
+      pipeListener = std::thread{ [&] {
          char buf[1024];
          while (true)
          {
-            int bytes = read(pipefd[0], &buf, 1024);
+            auto bytes = read(pipefd[0], &buf, 1024);
             if (bytes == 0)
             {
                std::cout << "child closed pipe\n";
@@ -88,19 +90,17 @@ public:
             }
             else
             {
-               write(STDOUT_FILENO, &buf, bytes);
-               m_replFinishedCallback("ReplResponseEvent", std::string{ buf, bytes });
+               write(STDOUT_FILENO, &buf, static_cast<size_t>(bytes));
+               m_replFinishedCallback("ReplResponseEvent", std::string{ buf, static_cast<size_t>(bytes) });
             }
          }
       }};
-   }
-
+               
    void newLine(const std::string& line)
    {
       std::string message = line + "\n";
       for (auto it = message.cbegin(); it != message.cend(); ++it)
       {
-         if (ioctl(STDIN_FILENO, TIOCSTI, it))
          {
             perror("ioctl");
          }
@@ -108,9 +108,9 @@ public:
    }
 
 private:
-    const std::string m_workingDir;
-    int pipefd[2];
-    std::function<void(const std::string&, const std::string&)> m_replFinishedCallback;
-    std::thread pipeListener;
+   const std::string m_workingDir;
+   int pipefd[2];
+   std::function<void(const std::string&, const std::string&)> m_replFinishedCallback;
+   std::thread pipeListener;
 };
-}; // namespace opctest
+} // namespace opctest
