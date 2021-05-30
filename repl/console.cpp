@@ -10,7 +10,7 @@
 #define lua_c
 
 //#include "lprefix.h"
-#include <sol/sol.hpp>
+
 
 
 #include <signal.h>
@@ -20,6 +20,7 @@
 
 #include "lua.hpp"
 #include <unistd.h>
+#include "OpcUaExtension.h"
 
 //#include "lauxlib.h"
 //#include "lualib.h"
@@ -603,12 +604,12 @@ static int handle_luainit(lua_State* L)
 }
 
 
-int use_sol2(lua_State* L)
-{
-   sol::state_view lua(L);
-   lua.script("print('bark bark bark!')");
-   return 0;
-}
+// int use_sol2(lua_State* L)
+// {
+//    sol::state_view lua(L);
+//    lua.script("print('bark bark bark!')");
+//    return 0;
+// }
 
 /*
 ** Main body of stand-alone interpreter (to be called in protected mode).
@@ -637,6 +638,7 @@ static int pmain(lua_State* L)
    }
    luaL_openlibs(L); /* open standard libraries */
 
+   /*
    lua_pushcclosure(L, &use_sol2, 0);
    lua_setglobal(L, "use_sol2");
 
@@ -645,6 +647,7 @@ static int pmain(lua_State* L)
       lua_error(L);
       return -1;
    }
+   */
    
    createargtable(L, argv, argc, script); /* create table 'arg' */
    if (!(args & has_E))
@@ -701,6 +704,11 @@ int main(int argc, char** argv)
       l_message(argv[0], "cannot create state: not enough memory");
       return EXIT_FAILURE;
    }
+
+   OpcUaExtension ext{};
+   sol::state_view sol{L};
+   ext.add(sol);
+
    lua_pushcfunction(L, &pmain); /* to call 'pmain' in protected mode */
    lua_pushinteger(L, argc); /* 1st argument */
    lua_pushlightuserdata(L, argv); /* 2nd argument */
