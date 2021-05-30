@@ -67,7 +67,10 @@ public:
          // the execv() only return if error occured.
          // The return value is -1
          std::string exePath = m_workingDir + "/repl";
-         execv(exePath.c_str(), argv_list);
+         if(execv(exePath.c_str(), argv_list)!=0)
+         {
+            perror("execv return with errorcode");
+         }
          exit(0);
       }
       else
@@ -102,6 +105,7 @@ public:
       std::string message = line + "\n";
       for (auto it = message.cbegin(); it != message.cend(); ++it)
       {
+         if (ioctl(STDIN_FILENO, TIOCSTI, it))
          {
             perror("ioctl");
          }
