@@ -19,6 +19,7 @@
 #include <string.h>
 
 #include "lua.hpp"
+#include <unistd.h>
 
 //#include "lauxlib.h"
 //#include "lualib.h"
@@ -660,13 +661,19 @@ static int pmain(lua_State* L)
       doREPL(L); /* do read-eval-print loop */
    else if (script == argc && !(args & (has_e | has_v)))
    { /* no arguments? */
+      printf("before stding is tty\n");
       if (lua_stdin_is_tty())
       { /* running in interactive mode? */
+         printf("stdin is tty\n");
          print_version();
          doREPL(L); /* do read-eval-print loop */
       }
       else
+      {
+         printf("do file\n");
          dofile(L, NULL); /* executes stdin as a file */
+      }
+         
    }
    lua_pushboolean(L, 1); /* signal no errors */
    return 1;
@@ -675,7 +682,19 @@ static int pmain(lua_State* L)
 
 int main(int argc, char** argv)
 {
-   int status, result;
+   int res = isatty(STDIN_FILENO);
+   if(res!=1)
+   {
+      printf("stdin doesn't refer to a tty\n");
+      perror("not a tty");
+   }
+   else
+   {
+      printf("stdin refers to a tty\n");
+   }
+
+   int status,
+   result;
    lua_State* L = luaL_newstate(); /* create state */
    if (L == NULL)
    {

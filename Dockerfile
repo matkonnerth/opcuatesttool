@@ -3,8 +3,8 @@
 # run with
 # sudo docker run --network host --mount source=testTool-vol,destination=/opt/testService/bin/jobs matkonnerth/opcuatesttool
 # path to git repo
-# sudo docker run --network host --mount source=testTool-vol,destination=/opt/testService/bin/jobs matkonnerth/opcuatesttool https://github.com/matkonnerth/opcuaTestToolScripts.git
-# uses host network and a volume for the jobs
+# sudo docker run --network host --tty matkonnerth/opcuatesttool https://github.com/matkonnerth/opcuaTestToolScripts.git
+# uses host network and provides a tty for the lua repl
 #
 # upload
 #  docker push ghcr.io/matkonnerth/opcuatesttool:latest
@@ -93,5 +93,5 @@ RUN apt-get update \
 
 RUN ldconfig;
 
-CMD ["/opt/testService/bin/testService"]
+ENTRYPOINT ["/opt/testService/bin/testService"]
 
