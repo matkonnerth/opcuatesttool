@@ -210,12 +210,10 @@ public:
          httpRes.set_content(jResp.dump(), "application/json");
       });
 
-      m_fEventCallback = [&](const std::string& name, const std::string& data) {
-         std::string data1 = data;
+      m_fEventCallback = [&](const std::string& name, const std::string& data1) {
          std::regex newlines_re("\n+");
          auto result = std::regex_replace(data1, newlines_re, "\\n");
          std::string message = "{\"event\": \"" + name + "\", \"data\": \"" + result + "\"}";
-         std::cout << "message " << message << "\n";
          ed.send_event(message);
       };
    }

@@ -88,8 +88,6 @@ public:
             }
             else
             {
-               std::cout << "print"
-                         << "\n";
                write(STDOUT_FILENO, &buf, bytes);
                m_replFinishedCallback("ReplResponseEvent", std::string{ buf, bytes });
             }
