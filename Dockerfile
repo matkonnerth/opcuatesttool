@@ -82,7 +82,7 @@ WORKDIR /opt/testService
 
 COPY --from=build /src/build/bin ./bin
 #get shared libs
-COPY --from=build /usr/local/lib/libopen62541.so.0 /usr/local/lib
+COPY --from=build /usr/local/lib/libopen62541.* /usr/local/lib
 COPY --from=build /usr/local/lib/libmodernOpc.so /usr/local/lib
 COPY --from=build /usr/local/lib/libNodesetLoader.so /usr/local/lib
 COPY --from=build-webapp /app/dist ./bin/dist
