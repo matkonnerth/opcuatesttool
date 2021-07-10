@@ -2,7 +2,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
-#include <modernOpc/OpcException.h>
+#include <modernopc/OpcException.h>
 #include <nlohmann/json.hpp>
 
 

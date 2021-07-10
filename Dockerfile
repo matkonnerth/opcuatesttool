@@ -38,9 +38,9 @@ RUN git clone https://github.com/matkonnerth/nodesetLoader.git nodesetLoader \
     && make -j \
     && make install;
 
-#modernOpc
-RUN git clone https://github.com/matkonnerth/ModernOPC.git modernOpc \
-    && cd modernOpc && mkdir build && cd build \
+#modernopc
+RUN git clone https://github.com/matkonnerth/ModernOPC.git modernopc \
+    && cd modernopc && mkdir build && cd build \
     && cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_CONAN=ON -DBUILD_SHARED_LIBS=ON .. \
     && make -j \
     && make install;
@@ -83,7 +83,7 @@ WORKDIR /opt/testService
 COPY --from=build /src/build/bin ./bin
 #get shared libs
 COPY --from=build /usr/local/lib/libopen62541.* /usr/local/lib/
-COPY --from=build /usr/local/lib/libmodernOpc.so /usr/local/lib
+COPY --from=build /usr/local/lib/libmodernopc.so /usr/local/lib
 COPY --from=build /usr/local/lib/libNodesetLoader.so /usr/local/lib
 COPY --from=build-webapp /app/dist ./bin/dist
 

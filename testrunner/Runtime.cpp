@@ -2,9 +2,9 @@
 #include <chrono>
 #include <iostream>
 #include <memory>
-#include <modernOpc/types/NodeId.h>
-#include <modernOpc/Variant.h>
-#include <modernOpc/BrowseResult.h>
+#include <modernopc/types/NodeId.h>
+#include <modernopc/Variant.h>
+#include <modernopc/BrowseResult.h>
 #include <string>
 #include <thread>
 

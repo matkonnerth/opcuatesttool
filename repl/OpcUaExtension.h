@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include <modernOpc/client/Client.h>
+#include <modernopc/client/Client.h>
 #include <sol/sol.hpp>
 
 class OpcUaExtension

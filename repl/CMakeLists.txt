@@ -1,7 +1,7 @@
 
 find_package(Lua REQUIRED)
 add_executable(repl console.cpp OpcUaExtension.cpp)
-find_package(modernOpc REQUIRED)
+find_package(modernopc REQUIRED)
 find_package(open62541 REQUIRED)
 target_link_libraries(repl PRIVATE project_warnings)
 target_link_libraries(repl PRIVATE project_options)

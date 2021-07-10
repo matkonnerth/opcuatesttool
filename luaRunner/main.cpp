@@ -1,6 +1,6 @@
 #define SOL_ALL_SAFETIES_ON 1
-#include <modernOpc/client/Client.h>
-#include <modernOpc/types/NodeId.h>
+#include <modernopc/client/Client.h>
+#include <modernopc/types/NodeId.h>
 #include <sol/sol.hpp>
 
 using modernopc::BrowseResult;

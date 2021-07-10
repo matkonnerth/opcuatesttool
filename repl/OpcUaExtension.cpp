@@ -1,7 +1,7 @@
 #include "OpcUaExtension.h"
-#include <modernOpc/BrowseResult.h>
-#include <modernOpc/Variant.h>
-#include <modernOpc/types/NodeId.h>
+#include <modernopc/BrowseResult.h>
+#include <modernopc/Variant.h>
+#include <modernopc/types/NodeId.h>
 #include <string>
 
 using modernopc::BrowseResult;

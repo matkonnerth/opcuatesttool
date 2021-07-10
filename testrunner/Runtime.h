@@ -3,7 +3,7 @@
 #include <sol/sol.hpp>
 #include <spdlog/spdlog.h>
 #include <vector>
-#include <modernOpc/client/Client.h>
+#include <modernopc/client/Client.h>
 
 namespace opctest::testrunner {
 class Runtime
