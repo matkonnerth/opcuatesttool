@@ -27,6 +27,8 @@ public:
       m_fJobFinished = cb;
    }
 
+   void cloneScriptRepo();
+
 private:
    void schedule();
    const std::string m_workingDir;

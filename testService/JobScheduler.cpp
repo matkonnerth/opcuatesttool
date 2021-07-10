@@ -149,4 +149,10 @@ std::string JobScheduler::getTargets() const
 {
    return db->getTargets();
 }
+
+void JobScheduler::cloneScriptRepo()
+{
+   db->cloneScriptRepo();
+}
+
 } // namespace opctest

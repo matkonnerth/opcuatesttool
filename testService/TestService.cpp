@@ -31,6 +31,8 @@ using opctest::api::UpdateScriptRequest;
 using opctest::api::GetTargetsRequest;
 using opctest::api::GetTargetsResponse;
 using opctest::api::NewLineReplRequest;
+using opctest::api::CloneScriptRepoRequest;
+using opctest::api::CloneScriptRepoResponse;
 
 class TestService
 {
@@ -126,6 +128,13 @@ public:
       return resp;
    }
 
+   CloneScriptRepoResponse cloneScriptRepo()
+   {
+      CloneScriptRepoResponse resp{true};
+      scheduler->cloneScriptRepo();
+      return resp;
+   }
+
    // void setJobFinishedCallback(std::function<void(const std::string& event, const std::string& data)> cb)
    // {
    //    scheduler->setJobFinishedCallback(cb);
@@ -190,6 +199,10 @@ bool apiCallback(opctest::TestService& service, const opctest::api::RequestVaria
       else if constexpr (std::is_same_v<T, opctest::api::NewLineReplRequest>)
       {
          resp = service.newLineRepl(arg);
+      }
+      else if constexpr (std::is_same_v<T, opctest::api::CloneScriptRepoRequest>)
+      {
+         resp = service.cloneScriptRepo();
       }
       else
       {
