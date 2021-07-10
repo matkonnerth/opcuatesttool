@@ -1,5 +1,5 @@
 find_package(open62541 REQUIRED)
-find_package(modernOpc REQUIRED)
+find_package(modernopc REQUIRED)
 
 add_executable(testRunner
     TestRunner.cpp
@@ -7,7 +7,7 @@ add_executable(testRunner
     JobFactory.cpp
     Runtime.cpp)
 
-target_link_libraries(testRunner PRIVATE modernOpc)
+target_link_libraries(testRunner PRIVATE modernopc)
 target_link_libraries(testRunner PRIVATE CONAN_PKG::nlohmann_json)
 target_link_libraries(testRunner PRIVATE CONAN_PKG::spdlog)
 target_link_libraries(testRunner PRIVATE CONAN_PKG::sol2)
