@@ -57,6 +57,8 @@ void Runtime::load()
    lua.set_function("browse", &Client::browse, client.get());
 
    lua.set_function("VariantVector", &VariantVector);
+
+   lua.set_function("wait", &wait);
 }
 
 void Runtime::eval()
