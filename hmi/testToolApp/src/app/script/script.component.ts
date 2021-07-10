@@ -61,5 +61,10 @@ export class ScriptComponent implements OnInit {
     this.target = e;
   }
 
+  cloneRepo(): void
+  {
+    this.scriptService.cloneRepo();
+  }
+
 
 }

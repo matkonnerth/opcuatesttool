@@ -47,13 +47,7 @@ public:
          }
          m_jobId = lastId;
       }
-      // load scripts from git repo
-      int status = system((m_rootDir + "/getScripts.sh " + m_rootDir + "/repo " + m_repoUrl).c_str());
-      if (status != 0)
-      {
-         auto logger = spdlog::get("TestService");
-         logger->warn("could initialize script repo");
-      }
+      cloneScriptRepo();
    }
 
    int newJob(const std::string& requestJson);
@@ -94,6 +88,17 @@ public:
    std::string getFinishedJob(int jobId) const;
    std::string getJobLog(int jobId);
    std::string getTargets() const;
+
+   void cloneScriptRepo()
+   {
+      // load scripts from git repo
+      int status = system((m_rootDir + "/getScripts.sh " + m_rootDir + "/repo " + m_repoUrl).c_str());
+      if (status != 0)
+      {
+         auto logger = spdlog::get("TestService");
+         logger->warn("could initialize script repo");
+      }
+   }
 
 private:
    const std::string m_rootDir;

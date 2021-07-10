@@ -34,6 +34,12 @@ export class ScriptService {
     req.subscribe();
   }
 
+  cloneRepo(): void
+  {
+    const req = this.http.put(environment.baseURL + 'api/repo/clone', '');
+    req.subscribe();
+  }
+
   /**
    * Handle Http operation that failed.
    * Let the app continue.
