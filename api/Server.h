@@ -51,7 +51,7 @@ public:
    , m_port{ port }
    {
       srv.Options("/(.*)", [&](const httplib::Request& /*req*/, httplib::Response& res) {
-         res.set_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+         res.set_header("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS");
          res.set_header("Content-Type", "text/html; charset=utf-8");
          res.set_header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Accept");
          res.set_header("Access-Control-Allow-Origin", "*");
@@ -102,6 +102,21 @@ public:
          jResp["response"] = json::parse(std::get<GetScriptsResponse>(varResp).data);
          httpRes.set_content(jResp.dump(), "application/json");
       });
+
+      srv.Put("/api/repo/clone", [&](const httplib::Request& /*httpReq*/, httplib::Response& httpRes) {
+         httpRes.set_header("Access-Control-Allow-Origin", "*");
+
+         CloneScriptRepoRequest req{};
+         RequestVariant varReq{ req };
+         ResponseVariant varResp{};
+         callback(varReq, varResp);
+
+         using nlohmann::json;
+         json jResp = json::object();
+         jResp["ok"] = std::get<CloneScriptRepoResponse>(varResp).ok;
+         httpRes.set_content(jResp.dump(), "application/json");
+      });
+
 
       srv.Get(R"(/api/scripts/(.*))", [&](const httplib::Request& httpReq, httplib::Response& httpRes) {
          httpRes.set_header("Access-Control-Allow-Origin", "*");
