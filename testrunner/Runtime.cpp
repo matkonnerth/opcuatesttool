@@ -59,6 +59,9 @@ void Runtime::load()
    lua.set_function("VariantVector", &VariantVector);
 
    lua.set_function("wait", &wait);
+
+   lua.set_function("loadNodeset", [&](const std::string& nodeset) { return client->loadNodeset(m_scriptDir + "/" + nodeset); });
+   lua.set_function("VariantFromJson", [&](const std::string& json, const NodeId& id) { return client->createVariantFromJson(json, id);});
 }
 
 void Runtime::eval()
