@@ -43,7 +43,7 @@ RUN git clone https://github.com/matkonnerth/ModernOPC.git modernopc \
     && cd modernopc \
     && git checkout variantJson \
     && mkdir build && cd build \
-    && cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_CONAN=ON -DBUILD_SHARED_LIBS=ON -DECODE_JSON=ON .. \
+    && cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_CONAN=ON -DBUILD_SHARED_LIBS=ON -DDECODE_JSON=ON .. \
     && make -j \
     && make install;
 
