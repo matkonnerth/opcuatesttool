@@ -22,7 +22,8 @@ The following opc ua specific types / method calls are exposed to the sol2 lua s
 * vector<Variant> call(NodeId objectId, NodeId methodId, vector<Variant> inputArguments)
 * wait: pauses the job execution for N milliseconds
 * connect/disconnect: connects or disconnects from server
-
+* EXPERIMENTAL loadNodeset: imports a nodeset (from scripts folder) and loads the datatypes
+* EXPERIMENTAL VariantFromJson: creates a Variant from json string, needs the datatype loaded from nodeset
 
 Todo - NOT IMPLEMENTED:
 * readAttribute??
