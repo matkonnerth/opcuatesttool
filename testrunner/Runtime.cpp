@@ -60,7 +60,7 @@ void Runtime::load()
 
    lua.set_function("wait", &wait);
 
-   lua.set_function("loadNodeset", [&](const std::string& nodeset) { return client->loadNodeset(m_scriptDir + "/" + nodeset); });
+   lua.set_function("loadNodeset", [&](const std::string& nodeset, int namespaceIndex) { return client->loadNodeset(m_scriptDir + "/" + nodeset, namespaceIndex); });
    lua.set_function("VariantFromJson", [&](const std::string& json, const NodeId& id) { return client->createVariantFromJson(json, id);});
 }
 
