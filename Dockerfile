@@ -34,7 +34,6 @@ RUN git clone https://github.com/matkonnerth/open62541.git open62541 \
 #nodesetLoader
 RUN git clone https://github.com/matkonnerth/nodesetLoader.git nodesetLoader \
     && cd nodesetLoader \
-    && git checkout fixAbstractDataTypeMember \
     && mkdir build && cd build \
     && cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_CONAN=OFF -DBUILD_SHARED_LIBS=ON -DENABLE_BACKEND_OPEN62541=ON .. \
     && make -j \
