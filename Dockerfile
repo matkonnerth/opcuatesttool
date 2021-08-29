@@ -23,9 +23,8 @@ RUN apt-get update \
 FROM cpp-build-base AS build
 
 #open62541
-RUN git clone https://github.com/matkonnerth/open62541.git open62541 \
+RUN git clone https://github.com/open62541/open62541.git open62541 \
     && cd open62541 \
-    && git checkout testTool \
     && mkdir build && cd build \
     && cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON -DUA_ENABLE_SUBSCRIPTIONS_EVENTS=ON -DUA_ENABLE_JSON_ENCODING=ON .. \
     && make -j \
@@ -42,7 +41,6 @@ RUN git clone https://github.com/matkonnerth/nodesetLoader.git nodesetLoader \
 #modernopc
 RUN git clone https://github.com/matkonnerth/ModernOPC.git modernopc \
     && cd modernopc \
-    && git checkout variantJson \
     && mkdir build && cd build \
     && cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_CONAN=ON -DBUILD_SHARED_LIBS=ON -DDECODE_JSON=ON .. \
     && make -j \
